@@ -1,0 +1,40 @@
+/// City of tomorrow!
+city: City
+
+/// The animal
+animal: Animal
+
+/// Some dictionary or array type.
+dictOrArray: DictOrArray
+
+/// Bugs are cool.
+bug: BugBug
+
+horseOrBug: HorseOrBug
+
+/// City is one of these four fantastic cities
+typealias City = "San Francisco" | "London" | "Zurich" | "Cupertino"
+
+class Horse {
+  neigh: Boolean
+}
+
+class Zebra {
+  stripes: String
+}
+
+class Monkey {
+  tail: String
+}
+
+/// Animal is either a horse, monkey, or zebra
+typealias Animal = Horse|Zebra|Monkey
+
+/// Either a dictionary or an array.
+typealias DictOrArray = Mapping<String, String>|Listing<String>
+
+typealias BugBug = "bug bug" | "bugBug"
+
+typealias HorseOrBug = Horse | "bug bug" | "bugBug"
+
+typealias MaybeHorseOrDefinitelyZebra = Horse? | Zebra

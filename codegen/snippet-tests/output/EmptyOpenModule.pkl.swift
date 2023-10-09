@@ -1,0 +1,17 @@
+// Code generated from Pkl module `EmptyOpenModule`. DO NOT EDIT.
+import PklSwift
+
+public enum EmptyOpenModule {}
+
+public protocol EmptyOpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+}
+
+extension EmptyOpenModule {
+    public typealias Module = EmptyOpenModule_Module
+
+    public struct ModuleImpl: Module {
+        public static var registeredIdentifier: String = "EmptyOpenModule"
+
+        public init() {}
+    }
+}

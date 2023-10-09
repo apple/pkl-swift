@@ -1,0 +1,30 @@
+
+res1: List<Int> = List(1, 2, 3)
+
+res2: Listing<Int> = new { 2; 3; 4; }
+
+res3: List<List<Int>> = List(List(1), List(2), List(3))
+
+res4: Listing<Listing<Int>> = new { new { 1 }; new { 2 }; new { 3 } }
+
+res5: Mapping<Int, Boolean> = new { [1] = true; [2] = false }
+
+res6: Mapping<Int, Mapping<Int, Boolean>> = new {
+  [1] {
+    [1] = true
+  }
+  [2] {
+    [2] = true
+  }
+  [3] {
+    [3] = true
+  }
+}
+
+res7: Map<Int, Boolean> = Map(1, true, 2, false)
+
+res8: Map<Int, Map<Int, Boolean>> = Map(1, Map(1, true), 2, Map(2, false))
+
+res9: Set<String> = Set("one", "two", "three")
+
+res10: Set<Int8> = Set(1, 2, 3)

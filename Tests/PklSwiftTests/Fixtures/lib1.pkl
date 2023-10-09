@@ -1,0 +1,5 @@
+module pkl.swift.lib1
+
+abstract class Being {
+  exists: Boolean = true
+}

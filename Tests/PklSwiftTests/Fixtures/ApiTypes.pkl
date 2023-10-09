@@ -1,0 +1,3 @@
+res1: Pair<Int, String> = Pair(42, "Hello")
+res2: Duration = 10.h
+res3: DataSize = 1.2345.gib

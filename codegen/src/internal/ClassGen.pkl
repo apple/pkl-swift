@@ -1,0 +1,373 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+@Unlisted
+module temp.pkl.swift.internal.ClassGen
+
+extends "Gen.pkl"
+
+import "pkl:reflect"
+import "SwiftMapping.pkl"
+import "utils.pkl"
+import "Type.pkl"
+import "typegen.pkl"
+
+clazz: reflect.Class = mapping.source as reflect.Class
+
+classInfo: SwiftMapping.Class = mapping as SwiftMapping.Class
+
+structs: Mapping<String, String>
+
+topLevelContents = protocol
+
+contents = new Listing {
+  when (classInfo.protocol != null) {
+    "public typealias \(classInfo.protocol.name) = \(classInfo.protocol.fullName)"
+  }
+  when (!isAbstract) {
+    when (classInfo.protocol != null) {
+      ""
+    }
+    struct
+  }
+}.join("\n")
+
+local isAbstract: Boolean = clazz.modifiers.contains("abstract")
+
+local superClass: SwiftMapping.Class? = mappings.findOrNull((c) -> c is SwiftMapping.Class && c.clazz == clazz.superclass) as SwiftMapping.Class?
+
+local properties: Map<String, Property> = getProperties(clazz, mappings)
+
+local imports: List<String> =
+  properties.values
+    .flatMap((f) -> f.type.imports)
+    .filter((i) -> i != classInfo.swiftModuleName).distinct
+  + (if (superClass != null && superClass.swiftModuleName != classInfo.swiftModuleName) List(superClass.swiftModuleName) else List())
+  + (if (isModule && !isAbstract) List("PklSwift") else List())
+
+local isModule: Boolean = clazz.enclosingDeclaration.moduleClass == clazz
+
+local function getAllProperties(clazz: reflect.Class?): List<reflect.Property> =
+  if (clazz == null) List()
+  else if (doesNotInherit(clazz)) clazz.properties.values
+  else clazz.properties.values + getAllProperties(clazz.superclass!!)
+
+local function isSameType(typeA: reflect.Type, typeB: reflect.Type) =
+  if (typeA is reflect.DeclaredType && typeB is reflect.DeclaredType)
+    typeA.referent.reflectee == typeB.referent.reflectee
+  else if (typeA is reflect.NullableType && typeB is reflect.NullableType)
+    isSameType(typeA.member, typeB.member)
+  else if (typeA is reflect.NothingType && typeB is reflect.NothingType)
+    true
+  else if (typeA is reflect.UnknownType && typeB is reflect.UnknownType)
+    true
+  else if (typeA is reflect.StringLiteralType && typeB is reflect.StringLiteralType)
+    typeA.value == typeB.value
+  // union types turn into Swift `AnyHashable?`, so we can say that this is always fine.
+  else if (typeA is reflect.UnionType && typeB is reflect.UnionType)
+    true
+  // remaining types: `FunctionType`, `TypeParameter`, `ModuleType`.
+  // we can actually check if `ModuleType` refers to the same type by checking if the enclosing declaration is the same,
+  // but we will pretend it is always false for now.
+  else false
+
+// visible for testing
+function getProperties(
+  clazz: reflect.Class,
+  mappings: List<SwiftMapping>
+): Map<String, Property> =
+  let (isSuperOpenOrAbstract: Boolean =
+    clazz.superclass.modifiers.contains("open") || clazz.superclass.modifiers.contains("abstract"))
+  // add the properties of the superclass as fields unless it is an open class (because its struct gets embedded),
+  // or the class does not inherit.
+  let (superFields: Map<String, Property> =
+    if (doesNotInherit(clazz)) Map()
+    else getProperties(clazz.superclass!!, mappings)
+  )
+  let (superProperties = getAllProperties(clazz.superclass))
+    clazz.properties
+      .filter((propName, prop: reflect.Property) ->
+        let (superProp = superProperties.findOrNull((it) -> it.name == prop.name))
+          // don't render hidden members
+          if (prop.modifiers.contains("hidden")) false
+          // Okay if there is no property override, or if the super property has the same type.
+          else if (superProp == null || isSameType(superProp.type, prop.type)) true
+          // Okay if the property is overridden but does not define a type, but don't render as its own field.
+          // E.g. `class Foo extends Bar { bar = "mybar" }`
+          else if (prop.type is reflect.UnknownType) !isSuperOpenOrAbstract
+          // Otherwise, the property's type has been overridden and this is possible to
+          // represent in Swift, but makes it harder to generate common getters for enums.
+          else throw("""
+              Illegal: Class `\(clazz.reflectee)` overrides property `\(propName)`. This is not supported when generating Swift.
+
+              \(prop.location.displayUri)
+              """)
+      )
+      .mapValues((_, prop: reflect.Property) ->
+        new Property {
+          isInherited = false
+          type = typegen.generateType(prop.type, clazz, mappings)
+          docComment = prop.docComment
+          name = utils.toSwiftName(prop)
+          property = prop
+        }
+      ) + superFields.mapValues((_, field) -> (field) { isInherited = true })
+
+local function doesNotInherit(clazz: reflect.Class?) =
+  clazz.superclass == null
+  || clazz.superclass.reflectee == Typed
+
+local structSuperclasses: String =
+  if (classInfo.protocol != null)
+    classInfo.protocol.name
+  else if (superClass != null)
+    if (classInfo.namespaceName == superClass.namespaceName)
+      superClass.name
+    else
+      "\(superClass.namespaceName).\(superClass.name)"
+  else
+    "PklRegisteredType, Decodable, Hashable"
+
+local struct: String = new Listing {
+  when (clazz.docComment != null) {
+    utils.renderDocComment(clazz.docComment!!, "")
+    "\n"
+  }
+  "public struct \(classInfo.struct.name): "
+  structSuperclasses
+  " {\n"
+  "\(module.indent)public static var registeredIdentifier: String = \(utils.toSwiftString(classInfo.source.reflectee.toString()))\n\n"
+  when (!properties.isEmpty) {
+    for (pklPropertyName, field in properties) {
+      when (pklPropertyName != properties.keys.first) {
+        "\n"
+      }
+      renderProperty(field)
+    }
+    "\n"
+  }
+  synthesisedInit
+  when (properties.values.any((p) -> p.isPolymorphic)) {
+    // need to implement ==, hash and both inits
+    "\n\n"
+    synthesisedEqualsEquals
+    "\n\n"
+    synthesisedHash
+    "\n\n"
+    synthesisedInitDecoder
+  } else {
+    when (properties.values.any((p) -> p.isAny)) {
+      // need to implement both inits
+      "\n\n"
+      synthesisedInitDecoder
+    }
+  }
+  when (codingKeys != null) {
+    "\n\n"
+    codingKeys
+  }
+  "\n}"
+}.join("")
+
+local synthesisedEqualsEquals =
+  new Listing {
+    "\(module.indent)public static func ==(lhs: \(classInfo.struct.name), rhs: \(classInfo.struct.name)) -> Bool {\n"
+    for (prop, field in properties) {
+      when (prop != properties.keys.first) {
+        "\n\(module.indent.repeat(2))&& "
+      } else {
+        module.indent.repeat(2)
+      }
+      when (field.isPolymorphic) {
+        if (field.type is Type.Array)
+          "arrayEquals(arr1: lhs.\(prop), arr2: rhs.\(prop))"
+        else if (field.type is Type.Dictionary)
+          "mapEquals(map1: lhs.\(prop), map2: rhs.\(prop))"
+        else if (field.type is Type.Nullable)
+          "((lhs.\(prop) == nil && rhs.\(prop) == nil) || lhs.\(prop)?.isDynamicallyEqual(to: rhs.\(prop)) ?? false)"
+        else
+          "lhs.\(prop).isDynamicallyEqual(to: rhs.\(prop))"
+      } else {
+        "lhs.\(prop) == rhs.\(prop)"
+      }
+    }
+    "\n"
+    "\(module.indent)}"
+  }.join("")
+
+local synthesisedHash =
+  new Listing {
+    "\(module.indent)public func hash(into hasher: inout Hasher) {\n"
+    properties.keys.map((pklPropertyName) ->
+      let (field = properties[pklPropertyName])
+      if (field.isPolymorphic)
+        if (field.type is Type.Array)
+          """
+          \(module.indent.repeat(2))for x in self.\(field.name) {
+          \(module.indent.repeat(3))hasher.combine(x)
+          \(module.indent.repeat(2))}
+          """
+        else if (field.type is Type.Dictionary)
+          """
+          \(module.indent.repeat(2))for (k, v) in self.\(field.name) {
+          \(module.indent.repeat(3))hasher.combine(k)
+          \(module.indent.repeat(3))hasher.combine(v)
+          \(module.indent.repeat(2))}
+          """
+        else if (field.type is Type.Nullable)
+          """
+          \(module.indent.repeat(2))if let \(field.name) {
+          \(module.indent.repeat(3))hasher.combine(\(field.name))
+          \(module.indent.repeat(2))}
+          """
+        else
+          "\(module.indent.repeat(2))hasher.combine(\(field.name))"
+      else
+        "\(module.indent.repeat(2))hasher.combine(\(field.name))"
+    ).join("\n")
+    "\n"
+    "\(module.indent)}"
+  }.join("")
+
+local synthesisedInit =
+  if (properties.isEmpty) "\(module.indent)public init() {}"
+  else
+    let (renderedProperties = properties.keys.map((name) -> renderPropertyBase(properties[name])))
+    let (renderedPropertiesLength = renderedProperties.toList().map((it) -> it.length + 2).fold(0, (a, b) -> a + b))
+      new Listing {
+        "\(module.indent)public init("
+        when (renderedPropertiesLength > 80) {
+          "\n"
+          for (renderedProp in renderedProperties) {
+            module.indent.repeat(2)
+            renderedProp
+            when (renderedProp != renderedProperties.last) {
+              ",\n"
+            } else {
+              "\n"
+            }
+          }
+          "\(module.indent)) {\n"
+        } else {
+          renderedProperties.join(", ")
+          ") {\n"
+        }
+        properties.values.map((prop) ->
+          "\(module.indent.repeat(2))self.\(prop.name) = \(prop.name)"
+        ).join("\n")
+        "\n"
+        "\(module.indent)}"
+      }.join("")
+
+local synthesisedInitDecoder =
+  new Listing {
+    "\(module.indent)public init(from decoder: Decoder) throws {\n"
+    "\(module.indent.repeat(2))let dec = try decoder.container(keyedBy: PklCodingKey.self)\n"
+    for (pklPropertyName, field in properties) {
+      "\(module.indent.repeat(2))let \(field.name) = try dec.decode("
+      when (field.isPolymorphic || field.isAny) {
+        field.type.renderGeneric(classInfo.namespaceName)
+      } else {
+        field.type.render(classInfo.namespaceName)
+      }
+      ".self, forKey: PklCodingKey(string: \"\(pklPropertyName)\"))"
+      when (field.isPolymorphic || field.isAny) {
+        if (field.type is Type.Array)
+          "\n\(module.indent.repeat(4)).map { $0.value as! \((field.type as Type.Array).elem.render(classInfo.namespaceName)) }"
+        else if (field.type is Type.Dictionary)
+          "\n\(module.indent.repeat(4)).mapValues { $0.value as! \((field.type as Type.Dictionary).elem.render(classInfo.namespaceName)) }"
+        else if (field.type == typegen.anyType)
+          ".value"
+        else
+          "\n\(module.indent.repeat(4)).value as! \(field.type.render(classInfo.namespaceName))"
+      }
+      "\n"
+    }
+    "\(module.indent.repeat(2))self = \(classInfo.struct.name)("
+    properties.values.map((prop) ->
+      "\(prop.name): \(prop.name)"
+    ).join(", ")
+    ")\n\(module.indent)}"
+  }.join("")
+
+local function renderPropertyBase(property: Property): String =
+  let (type = property.type.render(classInfo.namespaceName))
+    "\(property.name): \(type)"
+
+local function renderProperty(property: Property) = new Listing {
+  when (property.docComment != null) {
+    utils.renderDocComment(property.docComment!!, module.indent)
+    "\n"
+  }
+  "\(module.indent)public var "
+  renderPropertyBase(property)
+  "\n"
+}.join("")
+
+local codingKeys: String? =
+  if (properties.every((pklName, prop) -> pklName == prop.name)) null
+  else
+    new Listing {
+      "\(module.indent)enum CodingKeys: String, CodingKey {"
+      for (pklName, prop in properties) {
+        "\(module.indent.repeat(2))case \(prop.name) = \(utils.toSwiftString(pklName))"
+      }
+      "\(module.indent)}"
+    }.join("\n")
+
+local protocol: String? =
+  if (classInfo.protocol != null)
+    // Only generate interface methods for properties that don't exist on the superclass.
+    // Properties on the superclass are handled via interface embedding.
+    let (methodsToGenerate = properties.filter((_, field) -> !field.isInherited))
+      new Listing {
+        "public protocol \(classInfo.protocol.fullName): "
+        when (superClass != null) {
+          "\(superClass.protocol.fullName) {\n"
+        } else {
+          "PklRegisteredType, DynamicallyEquatable, Hashable {\n"
+        }
+        for (key, field in methodsToGenerate) {
+          when (key != methodsToGenerate.keys.first) {
+            "\n"
+          }
+          "\(module.indent)var \(field.name): \(field.type.render(classInfo.swiftModuleName)) { get }\n"
+        }
+        "}\n"
+      }.join("")
+  else null
+
+local class Property {
+  /// Is this property inherited from a parent?
+  isInherited: Boolean
+
+  /// The name of the property
+  name: String
+
+  /// The Swift type associated with this field
+  type: Type
+
+  /// The doc comments on the field
+  docComment: String?
+
+  /// The Pkl property behind the field
+  property: reflect.Property
+
+  /// True if the field is not a concrete type
+  isPolymorphic: Boolean = type.isPolymorphic
+
+  /// True if this field represents the Pkl type Any
+  isAny: Boolean = type.isAny
+}

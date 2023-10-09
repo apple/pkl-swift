@@ -1,0 +1,112 @@
+include::ROOT:partial$component-attributes.adoc[]
+:uri-jpkl: https://pkl-lang.org/main/current/pkl-cli/index.html#java-executable
+:uri-pkl-gen-swift-macos: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-macos.bin
+:uri-pkl-gen-swift-linux-aarch64: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-linux-aarch64.bin
+:uri-pkl-gen-swift-linux-amd64: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-linux-amd64.bin
+
+= Quickstart
+
+These steps will get you up and going with using Pkl and Swift.
+
+== 1. Install dependencies
+
+Add the pkl-swift library as a dependency to your project's `Package.swift`:
+
+.Package.swift
+[source,swift]
+[subs="+attributes"]
+----
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/apple/pkl-swift", from: "{pkl-swift-version}")
+    ],
+    targets: [
+        .executableTarget(
+            name: "my-application",
+            dependencies: [.product(name: "PklSwift", package: "pkl-swift")]
+        ),
+    ]
+)
+----
+
+Also, ensure that Pkl is xref:main:pkl-cli:index.adoc#installation[installed on your machine].
+
+== 2. Define a Pkl schema
+
+Create a new Pkl file in the directory of your choice, to describe the schema of your configuration.
+In this example, the file is placed into `pkl/AppConfig.pkl`.
+
+.pkl/AppConfig.pkl
+[source,pkl]
+----
+module AppConfig
+
+/// The hostname of this application.
+host: String
+
+/// The port to listen on.
+port: UInt16
+----
+
+[#codegen]
+== 3. Generate Swift source code
+
+With a schema defined, generate Swift source code for it.
+
+Code generation is done via the `pkl-gen-swift` CLI. To install, download it from Artifactory.
+
+On macOS:
+
+[source,bash]
+[subs="+attributes"]
+----
+curl {uri-pkl-gen-swift-macos} -o pkl-gen-swift
+
+chmod +x pkl-gen-swift
+----
+
+The binary is published for macOS, and for Linux for aarch64 and amd64 architectures.
+
+* macOS Universal Binary: {uri-pkl-gen-swift-macos}
+* linux/aarch64: {uri-pkl-gen-swift-linux-aarch64}
+* linux/amd64: {uri-pkl-gen-swift-linux-amd64}
+
+In our example, Swift sources can be generated using the following command:
+
+[source,bash]
+----
+pkl-gen-swift pkl/AppConfig.pkl -o Sources/MyApplication/Generated/
+----
+
+This will create a file called `AppConfig.pkl.swift` inside the `Sources/MyApplication/Generated` directory.
+
+For more details on how to control code generation, consult `pkl-gen-swift --help`.
+
+== 4. Evaluate Pkl configuration data in Swift
+
+With the above scaffolding set up, evaluate Pkl configuration data in Swift.
+
+First, define some configuration that uses the Pkl schema.
+
+In our example, we create a file at path `pkl/local/appConfig.pkl`. We imagine that we are defining configuration for a server running in a local environment, and would likewise place other environments in sibling directorys; e.g. `pkl/int/appConfig.pkl` and `pkl/prod/appConfig.pkl`.
+
+.pkl/local/appConfig.pkl
+[source,pkl]
+----
+amends "../AppConfig.pkl"
+
+host = "localhost"
+
+port = 5939
+----
+
+Once defined, evaluate the Pkl module into Swift data.
+
+.Sources/MyApplication/Main.swift
+[source,swift]
+----
+func main() async throws {
+	let config = try await AppConfig.loadFromPath("pkl/local/appConfig.pkl")
+	print("I'm running on host \(config.host)\n")
+}
+----

@@ -1,0 +1,158 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+/// Representation of a type in Swift.
+@Unlisted
+abstract module temp.pkl.swift.internal.Type
+
+import "Type.pkl"
+
+/// The imports required by this type.
+imports: List<String>
+
+/// True if this type is polymorphic (a protocol, not a struct)
+isPolymorphic: Boolean = false
+
+/// True if this type represents a Pkl Any
+isAny: Boolean = false
+
+/// Renders this type into source code.
+///
+/// [swiftModuleName] is the full path of the package that this type appears in.
+abstract function render(swiftModuleName: String?): String
+
+/// Renders this type into source code.
+/// Polymorphic types will render as PklAny.
+///
+/// [swiftModuleName] is the full path of the package that this type appears in.
+abstract function renderGeneric(swiftModuleName: String?): String
+
+class Dictionary extends Type {
+  key: Type
+
+  elem: Type
+
+  imports = key.imports + elem.imports
+
+  isPolymorphic = key.isPolymorphic || elem.isPolymorphic
+
+  isAny = key.isAny || elem.isAny
+
+  function render(withinNamespace: String?) =
+    let (renderedKey = if (key.isPolymorphic) throw("""
+        Illegal: Polymorphic key `\(key.render(withinNamespace))` is not supported when generating Swift.
+        """) else key.render(withinNamespace))
+    "[\(renderedKey): \(elem.render(withinNamespace))]"
+
+  function renderGeneric(withinNamespace: String?) =
+    "[\(key.renderGeneric(withinNamespace)): \(elem.renderGeneric(withinNamespace))]"
+}
+
+class Array extends Type {
+  elem: Type
+
+  imports = elem.imports
+
+  isPolymorphic = elem.isPolymorphic
+
+  isAny = elem.isAny
+
+  function render(withinNamespace: String?) = "[\(elem.render(withinNamespace))]"
+
+  function renderGeneric(withinNamespace: String?) = "[\(elem.renderGeneric(withinNamespace))]"
+}
+
+class Nullable extends Type {
+  elem: Type
+
+  isPolymorphic = elem.isPolymorphic
+
+  isAny = elem.isAny
+
+  function render(withinNamespace: String?) =
+    if (elem.isPolymorphic)
+      "(\(elem.render(withinNamespace)))?"
+    else
+      "\(elem.render(withinNamespace))?"
+
+  function renderGeneric(withinNamespace: String?) =
+    let (rendered = elem.renderGeneric(withinNamespace))
+    if (rendered == "PklSwift.PklAny")
+      rendered
+    else
+      "\(rendered)?"
+}
+
+class Tuple extends Type {
+  members: Listing<Type>
+
+  isPolymorphic = members.toList().any((t) -> t.isPolymorphic)
+
+  isAny = members.toList().any((t) -> t.isAny)
+
+  function render(withinNamespace: String?) =
+    "(" + members.toList().map((it) -> it.render(withinNamespace)).join(", ") + ")"
+
+  function renderGeneric(withinNamespace: String?) =
+    "(" + members.toList().map((it) -> it.renderGeneric(withinNamespace)).join(", ") + ")"
+}
+
+class Declared extends Type {
+  /// The name of the namespace that contains this type.
+  ///
+  /// Namespaces are empty enums and an extension.
+  namespaceName: String?
+
+  /// The name of the Swift module that contains this type.
+  swiftModuleName: String?
+
+  /// The name of the type
+  typeName: String
+
+  /// The type arguments, if any.
+  typeArguments: List<Type>?
+
+  isAny = typeName == "AnyHashable"
+    && swiftModuleName == null
+    && namespaceName == null
+
+  function renderBase(withinNamespace: String?) =
+    // Always qualify imported type names so we avoid conflicts.
+    let (prefix = if (this.isPolymorphic) "any " else "")
+    prefix + if (namespaceName != null && withinNamespace != this.namespaceName)
+        "\(namespaceName).\(typeName)"
+    else typeName
+
+  function renderTypeArguments(withinNamespace: String?) =
+    if (typeArguments == null) ""
+    else "<" + typeArguments.map((t) -> t.render(withinNamespace)).join(", ") + ">"
+
+  function render(withinNamespace: String?) =
+    renderBase(withinNamespace) + renderTypeArguments(withinNamespace)
+
+  function renderBaseGeneric(withinNamespace: String?) =
+    // Always qualify imported type names so we avoid conflicts.
+    let (name = if (this.isPolymorphic || typeName == "AnyHashable") "PklSwift.PklAny" else typeName)
+    if (!this.isPolymorphic && namespaceName != null && withinNamespace != this.namespaceName)
+      "\(namespaceName).\(name)"
+    else name
+
+  function renderTypeArgumentsGeneric(withinNamespace: String?) =
+    if (typeArguments == null) ""
+    else "<" + typeArguments.map((t) -> t.renderGeneric(withinNamespace)).join(", ") + ">"
+
+  function renderGeneric(withinNamespace: String?) =
+    renderBaseGeneric(withinNamespace) + renderTypeArgumentsGeneric(withinNamespace)
+}

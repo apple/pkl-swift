@@ -1,0 +1,30 @@
+
+class Bird {
+  species: String
+}
+
+bird: Any = new Bird {
+  species = "Owl"
+}
+
+primitive: Any = "foo"
+
+primitive2: Any = 12
+
+array: Any = new Listing {
+  1
+  2
+}
+
+set: Any = Set(5, 6)
+
+mapping: Any = new Mapping {
+  ["1"] = 12
+  [12] = "1"
+}
+
+nullable: Any = null
+
+duration: Any = 5.min
+
+dataSize: Any = 10.mb

@@ -1,0 +1,3 @@
+amends "codegen/src/GeneratorSettings.pkl"
+
+generateScript = "codegen/src/Generator.pkl"

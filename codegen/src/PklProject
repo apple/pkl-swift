@@ -1,0 +1,25 @@
+amends "pkl:Project"
+
+package {
+  name = "pkl.swift"
+  baseUri = "package://pkg.pkl-lang.org/pkl-swift/\(name)"
+  packageZipUrl = "https://github.com/apple/pkl-swift/releases/\(name)@\(version).zip"
+  version = read("../../VERSION.txt").text
+  authors {
+    "The Pkl Authors <pkl-oss@group.apple.com>"
+  }
+  sourceCodeUrlScheme = "https://github.com/apple/pkl-swift/blob/\(version)/codegen/src%{path}#L%{line}-L%{endLine}"
+  sourceCode = "https://github.com/apple/pkl-swift"
+  description = "Pkl bindings for the Swift programming language"
+  license = "Apache-2.0"
+  exclude {
+    "tests"
+    "tests/**"
+  }
+}
+
+tests {
+  for (key, _ in import*("tests/*.pkl")) {
+    key
+  }
+}

@@ -1,0 +1,22 @@
+// Code generated from Pkl module `MyModule`. DO NOT EDIT.
+import PklSwift
+
+public enum MyModule {}
+
+public protocol MyModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+    var foo: String { get }
+}
+
+extension MyModule {
+    public typealias Module = MyModule_Module
+
+    public struct ModuleImpl: Module {
+        public static var registeredIdentifier: String = "MyModule"
+
+        public var foo: String
+
+        public init(foo: String) {
+            self.foo = foo
+        }
+    }
+}

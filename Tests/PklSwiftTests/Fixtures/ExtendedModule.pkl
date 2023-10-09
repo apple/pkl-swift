@@ -1,0 +1,5 @@
+extends "OpenModule.pkl"
+
+foo = "foo"
+
+bar = 10

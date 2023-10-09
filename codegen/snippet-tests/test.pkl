@@ -1,0 +1,14 @@
+amends "pkl:test"
+
+import "pkl:reflect"
+import "../src/Generator.pkl"
+
+facts {
+  for (_, mod in import*("input/*.pkl")) {
+    [reflect.Module(mod).name] {
+      for (name, output in new Generator { moduleToGenerate = mod }.output.files!!) {
+         read?("output/\(name)")?.text == output.text
+      }
+    }
+  }
+}

@@ -1,0 +1,149 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+@Unlisted
+module temp.pkl.swift.internal.EnumGen
+
+extends "Gen.pkl"
+
+import "pkl:reflect"
+import "SwiftMapping.pkl"
+import "utils.pkl"
+import "typegen.pkl"
+import "Type.pkl"
+
+alias: reflect.TypeAlias = mapping.source as reflect.TypeAlias
+
+enumMapping: SwiftMapping.Enum = mapping as SwiftMapping.Enum
+
+local unionType: reflect.UnionType = alias.referent as reflect.UnionType
+
+local unionMembers = unionType.members.filter((it) -> !(it is reflect.NothingType))
+
+local isStringLiteralUnion =
+  let (stringLiterals = unionMembers.filterIsInstance(reflect.StringLiteralType))
+    unionMembers.length == stringLiterals.length
+
+local enumBaseMembers: List<EnumMember> = unionMembers
+  .map((it) ->
+    new EnumMember {
+      pklType = it
+      renderedType = type.render(module.namespaceName)
+      type = typegen.generateType(it, module.mapping.source, module.mappings)
+    }
+  )
+
+local enumStringLiteralMembers = enumBaseMembers.map((it) -> (it) {
+  name = utils.normalizeEnumName((it.pklType as reflect.StringLiteralType).value)
+})
+
+local enumNormalMembers = enumBaseMembers.map((it) -> (it) {
+  name =
+    let (baseName = utils.normalizeEnumName(renderedType.replaceFirst(Regex("^any "), "")))
+      if (type is Type.Dictionary) "dictionary" + baseName.capitalize()
+      else if (type is Type.Array) "array" + baseName.capitalize()
+      else baseName
+})
+
+contents =
+  if (isStringLiteralUnion) stringLiteralEnumContents
+  else enumContents
+
+local stringLiteralEnumContents =
+  new Listing {
+    when (alias.docComment != null) {
+      utils.renderDocComment(alias.docComment!!, "")
+    }
+    "public enum \(module.mapping.name): String, CaseIterable, Decodable, Hashable {"
+    for (member in enumStringLiteralMembers) {
+      "\(module.indent)case \(member.name) = \(utils.toSwiftString((member.pklType as reflect.StringLiteralType).value))"
+    }
+    "}"
+  }.join("\n")
+
+local enumContents =
+  new Listing {
+    when (alias.docComment != null) {
+      utils.renderDocComment(alias.docComment!!, "")
+    }
+    "public enum \(module.mapping.name): Decodable, Hashable {"
+    for (member in enumNormalMembers) {
+      "\(module.indent)case \(member.name)(\(member.renderedType))"
+    }
+    ""
+    when (enumNormalMembers.any((it) -> it.type.isPolymorphic)) {
+      synthesizedEquals
+      ""
+    }
+    "\(module.indent)public init(from decoder: Decoder) throws {"
+    "\(module.indent.repeat(2))let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value"
+    "\(module.indent.repeat(2))switch decoded {"
+    for (member in enumNormalMembers) {
+      "\(module.indent.repeat(2))case let decoded as \(member.renderedType):"
+      "\(module.indent.repeat(3))self = \(module.mapping.name).\(member.name)(decoded)"
+    }
+    """
+    \(module.indent.repeat(2))default:
+    \(module.indent.repeat(3))throw DecodingError.typeMismatch(
+    \(module.indent.repeat(4))\(module.mapping.name).self,
+    \(module.indent.repeat(4)).init(
+    \(module.indent.repeat(5))codingPath: decoder.codingPath,
+    \(module.indent.repeat(5))debugDescription: "Expected type \(module.mapping.name), but got \\(String(describing: decoded))"
+    \(module.indent.repeat(4)))
+    \(module.indent.repeat(3)))
+    \(module.indent.repeat(2))}
+    \(module.indent)}
+    """
+    when (enumNormalMembers.any((it) -> it.type.isPolymorphic)) {
+      ""
+      synthesizedHash
+    }
+    "}"
+  }.join("\n")
+
+local synthesizedEquals = new Listing {
+  "\(module.indent)public static func ==(lhs: \(module.mapping.name), rhs: \(module.mapping.name)) -> Bool {"
+  "\(module.indent.repeat(2))switch (lhs, rhs) {"
+  for (member in enumNormalMembers) {
+    "\(module.indent.repeat(2))case let (.\(member.name)(a), .\(member.name)(b)):"
+    when (member.type.isPolymorphic) {
+      "\(module.indent.repeat(3))return a.isDynamicallyEqual(to: b)"
+    } else {
+      "\(module.indent.repeat(3))return a == b"
+    }
+  }
+  "\(module.indent.repeat(2))default:"
+  "\(module.indent.repeat(3))return false"
+  "\(module.indent.repeat(2))}"
+  "\(module.indent)}"
+}.join("\n")
+
+local synthesizedHash = new Listing {
+  "\(module.indent)public func hash(into hasher: inout Hasher) {"
+  "\(module.indent.repeat(2))switch self {"
+  for (member in enumNormalMembers) {
+    "\(module.indent.repeat(2))case let .\(member.name)(value):"
+    "\(module.indent.repeat(3))hasher.combine(value)"
+  }
+  "\(module.indent.repeat(2))}"
+  "\(module.indent)}"
+}.join("\n")
+
+local class EnumMember {
+  name: String
+  type: Type
+  renderedType: String
+  pklType: reflect.Type
+}

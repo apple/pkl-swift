@@ -1,0 +1,5 @@
+name: swift
+title: Pkl Swift Bindings
+version: 0.2.0
+nav:
+  - nav.adoc

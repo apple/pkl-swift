@@ -1,0 +1,148 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+@Unlisted
+module temp.pkl.swift.internal.utils
+
+import "pkl:reflect"
+
+local pcfRenderer: PcfRenderer = new { useCustomStringDelimiters = true }
+
+/// Turn the Pkl string into a Swift string literal.
+///
+/// We can use the pcf renderer here because Pkl and Swift share almost the same grammar for
+/// strings.
+function toSwiftString(str: String): String = pcfRenderer.renderValue(str)
+
+// noinspection UnresolvedElement
+function getSwiftNameAnnotation(source: reflect.Declaration): String? =
+  source
+    .annotations
+    .findOrNull((it) -> it.getClass().toString() == "temp.pkl.swift.swift#Name")
+    ?.value
+
+/// Converts a Pkl declaration (class, property, typealias) into a Swift name.
+/// If a member has an explicit `@swift.Name` annotation, use it.
+///
+/// Otherwise, normalize the name and return it.
+///
+/// Normalization rules:
+///
+/// 1. Any non-letter and non-digit characters get stripped, and each proceding letter gets capitalized.
+/// 2. If a name does not start with a latin alphabet character, prefix with `N`.
+/// 3. Capitalize names so they get exported.
+function toSwiftName(source: reflect.Declaration): String =
+  // Edge case: if we are generating a module class, always call it `Module`.
+  if (source is reflect.Class && source.enclosingDeclaration.moduleClass == source) "Module"
+  else getSwiftNameAnnotation(source) ?? normalizeName(source.name)
+
+function normalizeModuleName(name: String): String =
+  let (normalized = normalizeName(name.replaceAll(".", "_")).toLowerCase())
+    normalized
+
+keywords: List<String> = List(
+  "associatedtype",
+  "class",
+  "deinit",
+  "enum",
+  "extension",
+  "fileprivate",
+  "func",
+  "import",
+  "init",
+  "inout",
+  "internal",
+  "let",
+  "open",
+  "operator",
+  "private",
+  "precedencegroup",
+  "protocol",
+  "public",
+  "rethrows",
+  "static",
+  "struct",
+  "subscript",
+  "typealias",
+  "var",
+  "break",
+  "case" ,
+  "catch",
+  "continue",
+  "default",
+  "defer",
+  "do",
+  "else",
+  "fallthrough",
+  "for",
+  "guard",
+  "if",
+  "in",
+  "repeat",
+  "return",
+  "throw",
+  "switch",
+  "where",
+  "while",
+  "Any",
+  "as",
+  "await",
+  "catch",
+  "false",
+  "is",
+  "nil",
+  "rethrows",
+  "self",
+  "Self",
+  "super",
+  "throw",
+  "throws",
+  "true",
+  "try",
+  "Type",
+  "_"
+)
+
+function renderDocComment(docComment: String, indent: String) =
+  docComment
+    .split(Regex(#"\r?\n"#))
+    .map((it) ->
+      if (it.trim().isBlank) "\(indent)///"
+      else "\(indent)/// \(it)"
+    )
+    .join("\n")
+
+function renderHeaderComment(`module`: reflect.Module) =
+  "// Code generated from Pkl module `\(`module`.name)`. DO NOT EDIT."
+
+function normalizeEnumName(name: String) =
+  if (name == "") "empty"
+  else
+    let (normalized = normalizeName(name))
+      normalized[0].toLowerCase() + normalized.drop(1)
+
+function normalizeName(name: String) =
+  if (keywords.contains(name)) "`\(name)`"
+  else
+    let (parts = name.split(Regex(#"(?u)[^\p{L}\d_]"#)))
+      parts.first + parts.drop(1).map((p) -> p.capitalize()).join("")
+
+function renderImports(imports: List<String>): String =
+  let (distinctImports = imports.distinct)
+    new Listing {
+      for (imp in distinctImports) {
+        "import \(imp)"
+      }
+    }.join("\n") + "\n"

@@ -1,0 +1,11 @@
+= pkl-swift
+
+This library exposes Swift bindings for the Pkl configuration language.
+
+It allows you to embed Pkl into your Swift application, complete with code generation for full type safety and ease of use.
+
+The full documentation for this library can be found on our link:https://pkl-lang.org/swift/current/index.html[documentation site].
+
+To get up and going, reference the link:https://pkl-lang.org/swift/current/quickstart.html[quick start guide].
+
+When upgrading pkl-swift, reference the link:https://pkl-lang.org/pkl/swift/current/CHANGELOG.html[changelog] for details.

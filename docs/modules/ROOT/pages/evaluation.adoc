@@ -1,0 +1,164 @@
+= Evaluator API
+
+:uri-swift-coding-keys-docs: https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types#2904057
+
+pkl-swift provides a rich API for evaluating Pkl files in Swift via `PklSwift.Evaluator`. It can be configured with xref:custom-readers[custom readers], have its own security settings, control
+external property inputs, and more.
+
+Evaluation occurs by spawning the `pkl` cli as a child process, and communicates via message passing.
+
+== Using evaluators
+
+There are two methods for interacting with `PklSwift.Evaluator`:
+
+1. `PklSwift.withEvaluator(options:_:)`
+2. `PklSwift.EvaluatorManager.withEvaluator(options:_:)`
+
+These two methods are distinguished by how they manage the lifecycle of the underlying `pkl` child process.
+`PklSwift.withEvaluator(options:_:)` will spawn a child process per-evaluator, whereas `PklSwift.EvaluatorManager.withEvaluator(options:_:)` will spawn a
+child process for the lifetime of the evaluator manager.
+
+For most use cases, it is sufficient to use `PklSwift.withEvaluator(options:_:)`. If multiple evaluators are desired,
+for example, to maintain separate caches or to have different settings, the evaluator manager should be used.
+
+== Evaluating modules
+
+=== With code generation
+
+Swift structs generated from Pkl modules may be evaluated simply through the generated `loadFrom(source:)` and `loadFrom(evaluator:source:)` methods.
+
+For example, a Pkl module can be evaluated into a generated struct like so:
+
+[source,swift]
+----
+@main struct Main {
+    static func main() async throws {
+        let config = try await AppConfig.loadFrom(source: .path("myconfig.pkl"))
+        print("Got config: \(config)")
+    }
+}
+----
+
+=== Without code generation
+
+Pkl modules may be evaluated directly into Swift structs without using code generation.
+
+For example, given the Pkl module:
+
+.foo.pkl
+[source,pkl]
+----
+foo: String = "hello"
+
+bar: Int = 5
+----
+
+A Swift struct can be created matching the shape of the Pkl module.
+The Swift module must be `Decodable`.
+
+.foo.swift
+[source,swift]
+----
+struct Foo: Decodable {
+    let foo: String
+    let bar: Int
+}
+----
+
+Then, provide `Foo.self` to the `evaluateModule` method:
+
+[source,swift]
+----
+let result = try await withEvaluator { evaluator in
+    try await evaluator.evaluateModule(source: .path("foo.pkl"), as: Foo.self)
+}
+----
+
+If the Swift property name doesn't match the Pkl name, create a nested `CodingKeys` enum that describes how Swift names turn into Pkl names.
+
+For more details, consult the link:{uri-swift-coding-keys-docs}[Swift documentation].
+
+[source,swift]
+----
+struct Foo: Decodable {
+    let myFoo: String
+    let myBar: Innt
+
+    enum CodingKeys: String, CodingKey {
+        case myFoo = "foo"
+        case myBar = "bar"
+    }
+}
+----
+
+== Alternative evaluation modes
+
+=== Textual and multiple file output
+
+In addition to modules, an evaluator may also evaluate a module's `output.text` and `output.files` properties. This mimics the behavior of the CLI.
+
+Take this Pkl module:
+
+.foo.pkl
+[source,pkl]
+----
+foo = "foo"
+
+bar = "bar"
+----
+
+The textual output of this module may be evaluated via `PklSwift.Evaluator.evaluateOutputText(source:)`.
+
+.main.swift
+[source,swift]
+----
+@main struct Main {
+    static func main() async throws {
+        let textOutput = try await withEvaluator { evaluator in
+            try await evaluator.evaluateOutputText(source: .path("my/module.pkl"))
+        }
+        print(textOutput)
+    }
+}
+----
+
+=== Expressions
+
+In addition to evaluating modules and textual/file output, _any_ arbitrary expression may be evaluated within a module.
+In fact, the textual and file output of a module are implemented in terms of evaluating an expression.
+
+.main.swift
+[source,swift]
+----
+@main struct Main {
+    static func main() async throws {
+        let res = try await withEvaluator { evaluator in
+            try await evaluator.evaluateExpression(
+                source: .text("foo = 5"), // <1>
+                expression: "foo + 10", // <2>
+                as: Int.self // <3>
+            )
+        }
+        print("foo is \(res)") // prints "foo is 15"
+    }
+}
+----
+<1> `.text("foo = 5")` causes Pkl to evaluate a synthetic module whose contents are `foo = 5`.
+<2> The expression to be evaluated.
+<3> The expression's result type.
+
+== Evaluator options
+
+An evaluator is configured via options on `PklSwift.EvaluatorOptions`.
+A sensible default set of options is provided on `PklSwift.EvaluatorOptions.preconfigured`.
+Alternatively, they can be built from empty by starting with `PklSwift.EvaluatorOptions.empty`.
+
+[#custom-readers]
+== Custom readers
+
+It is possible to use a custom reader for resources and modules by implementing the `PklSwift.ResourceReader` and `PklSwift.ModuleReader` protocols.
+
+Custom readers must identify the scheme that they are responsible for reading by setting the `scheme` field. For example,
+a reader may be registered to resolve the Pkl expression `read("secret:FOO")` by registering `"secret"` as its scheme.
+
+If a resource matches a scheme identified by a custom reader, its `read()` method will be called to retrieve the contents.

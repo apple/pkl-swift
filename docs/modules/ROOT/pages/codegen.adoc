@@ -1,0 +1,184 @@
+include::ROOT:partial$component-attributes.adoc[]
+
+= Code generation
+
+Pkl code may turn into Swift code by way of code generation.
+
+== Running code generation
+
+Code generation is done through the `pkl-gen-swift` binary. For installation instructions, consult the xref:ROOT:quickstart.adoc#codegen[codegen] section of the quickstart.
+
+Once installed, Swift may be generated from Pkl:
+
+[source,bash]
+----
+pkl-gen-swift pkl/AppConfig.pkl -o Sources/MyProject/Generated/
+----
+
+== How Pkl is turned into Swift
+
+=== Basic types
+
+The below table describes how Pkl types are mapped into Swift types.
+
+[cols="1,1"]
+|===
+| Pkl type | Swift type
+|`Boolean`
+|`Bool`
+
+|`String`
+|`String`
+
+|`Int`
+|`Int`
+
+|`Int8`
+|`Int8`
+
+|`Int16`
+|`Int16`
+
+|`Int32`
+|`Int32`
+
+|`UInt`
+|`UInt`
+
+|`UInt8`
+|`UInt8`
+
+|`UInt16`
+|`UInt16`
+
+|`UInt32`
+|`UInt32`
+
+|`Float`
+|`Float64`
+
+|`Number`
+|`Float64`
+
+|`List<T>`
+|`[T]`
+
+|`Listing<T>`
+|`[T]`
+
+|`Map<K, V>`
+|`[K: V]`
+
+|`Mapping<K, V>`
+|`[K: V]`
+
+|`Set<T>`
+|`Set<T>`
+
+|`Pair<A, B>`
+|Not supported
+
+|`Dynamic`
+|Not supported
+
+|`DataSize`
+|`PklSwift.DataSize`
+
+|`Duration`
+|`PklSwift.Duration`
+
+|`IntSeq`
+|Not supported
+
+|`Class`
+|Not supported
+
+|`TypeAlias`
+|Not supported
+
+|`Any`
+|`AnyHashable?`
+
+|`unknown`
+|`AnyHashable?`
+
+|Unions (`A\|B\|C`)
+|`AnyHashable?` footnote:[To represent unions as enums, they must be assigned to a typealias. For reference, see xref:enums[enums].]
+|===
+
+=== Classes
+
+Classes turn into a variation of structs and protocols, depending on inheritance. Protocols get generated because Swift cannot model polymorphism with structs alone (e.g. a value that is a `Dog` struct is not assignable when an `Animal` struct is expected).
+
+The below table describes how classes get generated.
+
+|===
+| Pkl class | Swift protocol | Swift struct
+| `class Person`
+| <none>
+| `struct Person`
+
+| `open class Person`
+| `protocol Person`
+| `struct PersonImpl: Person`
+
+| `abstract class Person`
+| `protocol Person`
+| <none>
+
+| `class Person extends Being`
+| <none>
+| `struct Person: Being` footnote:[all properties from `class Being` are added to this struct]
+|===
+
+NOTE: Classes with recursive property types will generate an invalid struct. This is a known limitation of Swift.
+
+[[enums]]
+=== Enums
+
+If a typealias is defined as a union of types, it is turned into a Swift enum. Each alternative in the union becomes an enum member.
+
+For example, the following Pkl code:
+
+[source,pkl]
+----
+typealias City = "San Francisco"|"Cupertino"|"London"
+----
+
+Turns into something like this:
+
+[source,swift]
+----
+enum City: String, CaseIterable, Decodable, Hashable {
+    case sanFrancisco = "San Francisco"
+    case cupertino = "Cupertino"
+    case london = "London"
+}
+----
+
+All other typealiases that aren't unions turn into Swift typealiases.
+
+[[name-conflicts]]
+== Resolving name conflicts
+
+When turning Pkl names into Swift names, the code generator follows these rules:
+
+1. Any non-letter and non-digit characters get stripped
+2. Each preceding letter gets capitalized.
+
+As a result, it is possible that two names collide and turn into the same Swift name.
+To resolve these conflicts, the https://pkl-lang.org/package-docs/pkg.pkl-lang.org/pkl-swift/pkl.swift/current/swift/Name.html[`@swift.Name`]
+annotation must be used on at least one of these declarations so the resulting names are distinct.
+
+For example:
+
+[source,pkl]
+[subs="+attributes"]
+----
+import "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{pkl-swift-version}#/swift.pkl"
+
+@swift.Name { value = "MyCoolApplication" }
+class My_Application
+
+class MyApplication
+----
