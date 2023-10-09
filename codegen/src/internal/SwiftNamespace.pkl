@@ -1,0 +1,154 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2023 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+@Unlisted
+module temp.pkl.swift.internal.SwiftNamespace
+
+import "pkl:reflect"
+import "ClassGen.pkl"
+import "EnumGen.pkl"
+import "TypeAliasGen.pkl"
+import "SwiftMapping.pkl"
+import "Gen.pkl"
+import "utils.pkl"
+
+`module`: reflect.Module
+
+/// All mappings used by the module, including imports.
+mappings: List<SwiftMapping>
+
+/// The name of the Pkl module.
+pklModuleName: String
+
+/// The mappings originate from this module.
+moduleMappings: List<SwiftMapping>
+
+/// The Swift namespace in which to place these mappings.
+namespaceName: String
+
+indent: String
+
+local function describeLocation(src: reflect.TypeDeclaration) =
+  let (memberType =
+    if (src is reflect.Class && src.enclosingDeclaration.moduleClass == src) "module"
+    else if (src is reflect.Class) "class"
+    else "typealias"
+  )
+    "* \(memberType) `\(src.reflectee)` (\(src.location.displayUri))"
+
+local function hasUniqueNames(): Boolean =
+  let (names = moduleMappings.map((it) -> it.name))
+    if (names.isDistinct) true
+    else
+      let (duplicateNames = moduleMappings.filter((it) -> moduleMappings.count((m) -> m.name == it.name) > 1))
+      let (locations = duplicateNames.map((it) -> describeLocation(it.source)).join("\n"))
+        throw("""
+          Conflict: multiple Pkl declarations compute to Swift name `\(duplicateNames.first.name)`.
+
+          To resolve this conflict, add a `@swift.Name` annotation to any of the following declarations:
+
+          \(locations)
+
+          For example:
+
+          ```
+          @swift.Name { value = "CrabCakes" }
+          class Crab_Cakes
+          ```
+          """)
+
+local generated: List<Gen>(hasUniqueNames()) = moduleMappings.map((it) ->
+  if (it is SwiftMapping.Class)
+    new ClassGen {
+      indent = module.indent
+      mappings = module.mappings
+      mapping = it
+      namespaceName = it.namespaceName
+    }
+  else if (it is SwiftMapping.Enum)
+    new EnumGen {
+      indent = module.indent
+      mappings = module.mappings
+      mapping = it
+      namespaceName = it.namespaceName
+    }
+  else
+    new TypeAliasGen {
+      indent = module.indent
+      mappings = module.mappings
+      mapping = it
+      namespaceName = it.namespaceName
+    }
+)
+
+local topLevelContents = generated.mapNonNull((g) -> g.topLevelContents)
+
+local convenienceLoaders = """
+  /// Load the Pkl module at the given source and evaluate it into `\(namespaceName).Module`.
+  ///
+  /// - Parameter source: The source of the Pkl module.
+  public static func loadFrom(source: ModuleSource) async throws -> \(namespaceName).Module {
+  \(module.indent)try await PklSwift.withEvaluator { evaluator in
+  \(module.indent.repeat(2))try await loadFrom(evaluator: evaluator, source: source)
+  \(module.indent)}
+  }
+
+  /// Load the Pkl module at the given source and evaluate it with the given evaluator into
+  /// `\(namespaceName).Module`.
+  ///
+  /// - Parameter evaluator: The evaluator to use for evaluation.
+  /// - Parameter source: The module to evaluate.
+  public static func loadFrom(
+  \(module.indent)evaluator: PklSwift.Evaluator,
+  \(module.indent)source: PklSwift.ModuleSource
+  ) async throws -> \(namespaceName).Module {
+  \(module.indent)try await evaluator.evaluateModule(source: source, as: Module.self)
+  }
+  """
+
+contents = new Listing {
+  utils.renderHeaderComment(`module`)
+  """
+  import PklSwift
+
+  public enum \(namespaceName) {}
+
+  """
+  when (topLevelContents.length > 0) {
+    topLevelContents.join("\n")
+  }
+  """
+  extension \(namespaceName) {
+  """
+  for (gen in generated) {
+    when (gen != generated.first) {
+      ""
+    }
+    module.indent + gen.contents.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
+  }
+  when (!`module`.modifiers.contains("open") && !`module`.modifiers.contains("abstract")) {
+    ""
+    module.indent + convenienceLoaders.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
+  }
+  "}"
+}.join("\n")
+
+output {
+  files {
+    ["\(namespaceName).pkl.swift"] {
+      text = contents
+    }
+  }
+}

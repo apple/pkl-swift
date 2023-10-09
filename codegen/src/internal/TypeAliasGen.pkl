@@ -1,0 +1,11 @@
+extends "Gen.pkl"
+
+import "typegen.pkl"
+import "Type.pkl"
+import "pkl:reflect"
+
+typealiaz: reflect.TypeAlias = mapping.source as reflect.TypeAlias
+
+type: Type = typegen.generateType(typealiaz.referent, typealiaz, mappings)
+
+contents = "public typealias \(mapping.name) = \(type.render(namespaceName))"

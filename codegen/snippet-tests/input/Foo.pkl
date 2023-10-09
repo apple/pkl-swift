@@ -1,0 +1,17 @@
+animals: Listing<Animal>
+
+abstract class Being {
+  exists: Boolean
+}
+
+open class Animal extends Being {
+  name: String
+}
+
+class Bird extends Animal {
+  flies: Boolean
+}
+
+class Dog extends Animal {
+  barks: Boolean
+}

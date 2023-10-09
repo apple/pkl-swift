@@ -1,0 +1,34 @@
+module com.example.Simple
+
+/// This is truly a person.
+person: Person
+
+open class Person {
+  /// The name of the person
+  `the name`: String
+
+  /// Some name that matches a keyword
+  enum: String
+}
+
+class ThePerson extends Person {
+  the: String
+}
+
+open class OpenClassExtendingOpenClass {
+  someOtherProp: Boolean?
+}
+
+class ClassWithReallyLongConstructor {
+  theProperty1: String
+
+  theProperty2: String
+
+  theProperty3: String
+
+  theProperty4: String
+
+  theProperty5: String
+
+  theProperty6: String
+}

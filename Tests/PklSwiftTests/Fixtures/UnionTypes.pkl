@@ -1,0 +1,55 @@
+class Banana {
+  isRipe: Boolean
+}
+
+class Grape {
+  isUsedForWine: Boolean
+}
+
+class Apple {
+  isRed: Boolean
+}
+
+abstract class Animal {
+  name: String
+}
+
+typealias Fruit = Banana | Grape | Apple
+
+typealias City = "San Francisco"|"Tokyo"|"Zurich"|"London"
+
+fruit1: Fruit = new Banana {
+  isRipe = true
+}
+
+fruit2: Fruit = new Grape {
+  isUsedForWine = true
+}
+
+fruit3: Fruit = new Apple {
+  isRed = false
+}
+
+city1: City = "San Francisco"
+
+city2: City = "Tokyo"
+
+city3: City = "Zurich"
+
+city4: City = "London"
+
+class Zebra extends Animal { name = "Zebra" }
+
+class Donkey extends Animal { name = "Donkey" }
+
+typealias ZebraOrDonkey = Zebra|Donkey
+
+animal1: ZebraOrDonkey = new Zebra {}
+
+animal2: ZebraOrDonkey = new Donkey {}
+
+typealias AnimalOrString = Animal|String
+
+animalOrString1: AnimalOrString = new Zebra {}
+
+animalOrString2: AnimalOrString = "Zebra"

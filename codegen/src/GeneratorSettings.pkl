@@ -1,0 +1,49 @@
+/// Settings used to configure code generation.
+@swift.Module { name = "pkl_gen_swift" }
+@swift.Name { value = "GeneratorSettings" }
+module temp.pkl.swift.GeneratorSettings
+
+import "pkl:reflect"
+import "swift.pkl"
+
+/// The set of modules to turn into Swift code.
+///
+/// A module's dependencies are also included in code generation.
+/// Therefore, in most cases, it is only necessary to provide the entrypoint for code generation.
+inputs: Listing<String>?
+
+/// The output path to write generated files into.
+///
+/// Defaults to `.out`. Relative paths are resolved against the enclosing directory.
+outputPath: String?
+
+/// If [true], prints the filenames that would be created, but skips writing any files.
+dryRun: Boolean?
+
+/// The Generator.pkl script to use for code generation.
+///
+/// This is an internal setting that's meant for development purposes.
+generateScript: String?
+
+output {
+  local myModuleDirectory =
+    let (myModuleUri = reflect.Module(module).uri)
+      myModuleUri.replaceFirst("file://", "").split("/").dropLast(1).join("/")
+
+  local function resolvePath(path: String): String =
+    if (path.startsWith(Regex("\\w+:")) || path.startsWith("/")) path
+    else myModuleDirectory + "/" + path
+
+  value = (module) {
+    when (module.inputs != null) {
+      inputs = new {
+        for (input in module.inputs!!) {
+          resolvePath(input)
+        }
+      }
+    }
+    when (module.outputPath != null) {
+      outputPath = resolvePath(module.outputPath!!)
+    }
+  }
+}

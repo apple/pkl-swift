@@ -1,0 +1,7 @@
+module com.example.ExtendedSimple
+
+import "Simple.pkl"
+
+class ExtendedSimple extends Simple.Person {
+  eyeColor: String
+}

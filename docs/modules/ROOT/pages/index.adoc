@@ -1,0 +1,16 @@
+= Integration with Swift
+
+Pkl provides a rich integration with Swift. Our integration allows you to embed the Pkl runtime into your Swift program, and also provides code generation from Pkl source code.
+
+To get started, reference the xref:quickstart.adoc[Quickstart guide].
+
+[source,swift]
+----
+@main
+class MyApp {
+    static func main() async throws {
+        let config = try await MyConfig.loadFrom(source: .path("config.pkl"))
+        print("I'm running on host \(config.host)")
+    }
+}
+----

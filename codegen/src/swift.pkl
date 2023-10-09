@@ -1,0 +1,54 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2023 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+@Module { name = "pkl_gen_swift" }
+module temp.pkl.swift.swift
+
+/// A name in Swift; i.e., an identifier.
+typealias SwiftName = String(matches(Regex(#"(?u)\p{L}[\p{L}\d_]+"#)))
+
+/// Metadata for the corresponding Swift module for the annotated Pkl module(s).
+///
+/// This flag
+///
+/// Example:
+///
+/// ```
+/// @swift.Module { name = "MyLibrary" }
+/// module myteam.myproj.MyLibrary
+///
+/// import "<TODO_REPLACE_ME>/pkl.swift@<VERSION>#/swift.pkl"
+/// ```
+class Module extends Annotation {
+  /// The full name of the Swift module
+  name: SwiftName
+}
+
+/// The name for the annotated member when generated to Swift.
+///
+/// This may be used to annotate modules, classes, typealiases, and properties.
+///
+/// If the annotation is applied to a module, it determines the name of the namespace (the `enum` that holds all the
+/// module's members).
+///
+/// Examples:
+///
+/// ```
+/// @swift.Name { value = "ThePerson" }
+/// class Person
+/// ```
+class Name extends Annotation {
+  value: SwiftName
+}

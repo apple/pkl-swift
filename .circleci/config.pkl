@@ -1,0 +1,39 @@
+amends "../../pkl/.circleci/CircleCI.pkl"
+
+version = 2.1
+
+local swiftTest = new RunStep {
+  name = "swift test"
+  command = """
+    swift test --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
+    """
+}
+
+jobs {
+  ["test"] {
+    docker {
+      new { image = "swift:5.9-rhel-ubi9" }
+    }
+    steps {
+      "checkout"
+      module.run("make test-snippets")
+      module.run("make test-pkl")
+      module.run("make generate-fixtures")
+      swiftTest
+    }
+  }
+}
+
+workflows {
+  ["main"] {
+    `when` {
+      equal {
+        "main"
+        "<< pipeline.git.branch >>"
+      }
+    }
+    jobs {
+      "test"
+    }
+  }
+}

@@ -1,0 +1,117 @@
+// ===----------------------------------------------------------------------===//
+// Copyright © 2023 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ===----------------------------------------------------------------------===//
+amends "pkl:test"
+
+import "pkl:reflect"
+
+import "../internal/typegen.pkl"
+
+local class Maps {
+  res1: Map<String, String>
+  res2: Map<String, Map<String, String>>
+  res3: Mapping<String, String>
+  res4: Mapping<String, Listing<Boolean>>
+  res5: Mapping
+}
+
+local reflectedMaps = reflect.Class(Maps)
+
+local class Slices {
+  res1: List<String>
+  res2: List<Map<String, String>>
+  res3: Listing<String>
+  res4: Listing<Mapping<String, String>>
+  res5: List
+  res6: Listing
+}
+
+local reflectedSlices = reflect.Class(Slices)
+
+local class Nullables {
+  res1: String?
+  res2: Boolean?
+  res3: Listing<String?>
+  res4: Listing<String>?
+  res5: Listing<String?>?
+  res6: Mapping<String?, String>
+  res7: Mapping<String, String>?
+  res8: Mapping<String?, String?>?
+}
+
+local reflectedNullables = reflect.Class(Nullables)
+
+local class Pairs {
+  res1: Pair<String, String>
+  res2: Pair<String, String?>
+}
+
+local class Nothing {
+  res1: nothing
+}
+
+local nothingType: reflect.Type = reflect.Class(Nothing).properties["res1"].type
+
+local reflectedPairs = reflect.Class(Pairs)
+
+local mod = reflect.Module(module).moduleClass
+
+local function generateType(typ: reflect.Type) = typegen.generateType(typ, mod, List()).render("")
+
+facts {
+  ["basic types"] {
+    generateType(reflect.stringType) == "String"
+    generateType(reflect.booleanType) == "Bool"
+    generateType(reflect.int8Type) == "Int8"
+    generateType(reflect.int16Type) == "Int16"
+    generateType(reflect.int32Type) == "Int32"
+    generateType(reflect.intType) == "Int"
+    generateType(reflect.floatType) == "Float64"
+    generateType(reflect.uint8Type) == "UInt8"
+    generateType(reflect.uint16Type) == "UInt16"
+    generateType(reflect.uint32Type) == "UInt32"
+    generateType(reflect.uintType) == "UInt"
+    generateType(reflect.anyType) == "AnyHashable?"
+    generateType(reflect.DeclaredType(reflect.Class(Null))) == "Optional<Never>"
+    generateType(reflect.DeclaredType(reflect.TypeAlias(Char))) == "Character"
+    generateType(reflect.dynamicType) == "Object"
+    generateType(reflect.durationType) == "Duration"
+    generateType(reflect.dataSizeType) == "DataSize"
+    generateType(nothingType) == "Never"
+  }
+  ["dictionaries"] {
+    generateType(reflectedMaps.properties["res1"].type) == "[String: String]"
+    generateType(reflectedMaps.properties["res2"].type) == "[String: [String: String]]"
+    generateType(reflectedMaps.properties["res3"].type) == "[String: String]"
+    generateType(reflectedMaps.properties["res4"].type) == "[String: [Bool]]"
+    generateType(reflectedMaps.properties["res5"].type) == "[AnyHashable?: AnyHashable?]"
+  }
+  ["arrays"] {
+    generateType(reflectedSlices.properties["res1"].type) == "[String]"
+    generateType(reflectedSlices.properties["res2"].type) == "[[String: String]]"
+    generateType(reflectedSlices.properties["res3"].type) == "[String]"
+    generateType(reflectedSlices.properties["res4"].type) == "[[String: String]]"
+  }
+  ["nullables"] {
+    generateType(reflectedNullables.properties["res1"].type) == "String?"
+    generateType(reflectedNullables.properties["res2"].type) == "Bool?"
+    generateType(reflectedNullables.properties["res3"].type) == "[String?]"
+    generateType(reflectedNullables.properties["res4"].type) == "[String]?"
+    generateType(reflectedNullables.properties["res5"].type) == "[String?]?"
+    generateType(reflectedNullables.properties["res6"].type) == "[String?: String]"
+    generateType(reflectedNullables.properties["res7"].type) == "[String: String]?"
+    generateType(reflectedNullables.properties["res8"].type) == "[String?: String?]?"
+  }
+}

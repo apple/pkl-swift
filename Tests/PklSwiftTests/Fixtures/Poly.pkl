@@ -1,0 +1,49 @@
+module pkl.swift.example.Poly
+
+import "lib1.pkl"
+
+beings: Listing<lib1.Being> = new {
+  new Animal {
+    name = "Lion"
+  }
+  new Dog {
+    name = "Ruuf"
+    barks = true
+  }
+  new Bird {
+    name = "Duck"
+    flies = false
+    exists = false
+  }
+}
+
+rex: Dog = new {
+  name = "Rex"
+  barks = false
+}
+
+moreBeings: Mapping<String, lib1.Being> = new {
+  ["duck"] = new Bird {
+    name = "Ducky"
+    flies = true
+  }
+  ["dog"] = new Dog {
+    name = "TRex"
+    barks = false
+    hates = rex
+  }
+}
+
+open class Animal extends lib1.Being {
+  name: String
+}
+
+class Bird extends lib1.Being {
+  name: String
+  flies: Boolean
+}
+
+class Dog extends Animal {
+  barks: Boolean
+  hates: Animal?
+}

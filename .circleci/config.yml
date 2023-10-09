@@ -1,0 +1,25 @@
+# Generated from CircleCI.pkl. DO NOT EDIT.
+version: 2.1
+jobs:
+  test:
+    steps:
+    - checkout
+    - run:
+        command: make test-snippets
+    - run:
+        command: make test-pkl
+    - run:
+        command: make generate-fixtures
+    - run:
+        command: swift test --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
+        name: swift test
+    docker:
+    - image: swift:5.9-rhel-ubi9
+workflows:
+  main:
+    jobs:
+    - test
+    when:
+      equal:
+      - main
+      - << pipeline.git.branch >>
