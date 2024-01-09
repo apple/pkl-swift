@@ -9,6 +9,7 @@ jobs:
         name: swift test
     environment:
       PKL_EXEC: bin/pkl-cli-amd64.bin
+      PKL_DBEUG: '1'
     docker:
     - image: swift:5.9-rhel-ubi9
 workflows:

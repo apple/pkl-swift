@@ -16,6 +16,7 @@ jobs {
     }
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
+      ["PKL_DBEUG"] = "1"
     }
     steps {
       "checkout"
