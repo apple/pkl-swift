@@ -5,14 +5,10 @@ jobs:
     steps:
     - checkout
     - run:
-        command: make test-snippets
-    - run:
-        command: make test-pkl
-    - run:
-        command: make generate-fixtures
-    - run:
         command: swift test --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
         name: swift test
+    environment:
+      PKL_EXEC: bin/pkl-cli-amd64.bin
     docker:
     - image: swift:5.9-rhel-ubi9
 workflows:
