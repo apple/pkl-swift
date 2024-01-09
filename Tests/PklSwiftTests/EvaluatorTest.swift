@@ -280,7 +280,7 @@ final class PklSwiftTests: XCTestCase {
 
     func testWithProject() async throws {
         // TODO fixme
-        XCTSkip()
+        throw XCTSkip()
         let project1Dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("project1")
         try FileManager.default.createDirectory(at: project1Dir, withIntermediateDirectories: true)
         try """
