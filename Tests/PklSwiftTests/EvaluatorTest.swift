@@ -277,44 +277,43 @@ final class PklSwiftTests: XCTestCase {
         _ = try await evaluator.evaluateOutputText(source: .text(#"result = let (_ = trace("Hello there")) 1"#))
         XCTAssertEqual(logger.logLines, [#"pkl: TRACE: "Hello there" = "Hello there" (repl:text)\#n"#])
     }
-
-    func testWithProject() async throws {
-        // TODO fixme
-        throw XCTSkip()
-        let project1Dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("project1")
-        try FileManager.default.createDirectory(at: project1Dir, withIntermediateDirectories: true)
-        try """
-        amends "pkl:Project"
-
-        dependencies {
-          ["pkl.experimental"] { uri = "package://<TODO_REPLACE_ME>/pkl.experimental@1.0.0" }
-        }
-        """.write(to: project1Dir.appendingPathComponent("PklProject"), atomically: true, encoding: .utf8)
-        try """
-        {
-          "schemaVersion": 1,
-          "resolvedDependencies": {
-            "package://<TODO_REPLACE_ME>/temp.pkl.experimental@1": {
-              "type": "remote",
-              "uri": "projectpackage://<TODO_REPLACE_ME>/pkl.experimental@1.0.0",
-              "checksums": {
-                "sha256": "<REPLACE_ME>"
-              }
-            }
-          }
-        }
-        """.write(to: project1Dir.appendingPathComponent("PklProject.deps.json"), atomically: true, encoding: .utf8)
-        try """
-        import "@pkl.experimental/URI.pkl"
-
-        uri = URI.parse("https://www.example.com").toString()
-        """.write(to: project1Dir.appendingPathComponent("main.pkl"), atomically: true, encoding: .utf8)
-        try await withProjectEvaluator(projectDir: project1Dir.path) { evaluator in
-            let output = try await evaluator.evaluateOutputText(source: .url(project1Dir.appendingPathComponent("main.pkl")))
-            XCTAssertEqual("""
-            uri = "https://www.example.com"
-
-            """, output)
-        }
-    }
+//
+//    func testWithProject() async throws {
+//        // TODO re-enable me
+//        let project1Dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("project1")
+//        try FileManager.default.createDirectory(at: project1Dir, withIntermediateDirectories: true)
+//        try """
+//        amends "pkl:Project"
+//
+//        dependencies {
+//          ["pkl.experimental"] { uri = "package://<TODO_REPLACE_ME>/pkl.experimental@1.0.0" }
+//        }
+//        """.write(to: project1Dir.appendingPathComponent("PklProject"), atomically: true, encoding: .utf8)
+//        try """
+//        {
+//          "schemaVersion": 1,
+//          "resolvedDependencies": {
+//            "package://<TODO_REPLACE_ME>/temp.pkl.experimental@1": {
+//              "type": "remote",
+//              "uri": "projectpackage://<TODO_REPLACE_ME>/pkl.experimental@1.0.0",
+//              "checksums": {
+//                "sha256": "<REPLACE_ME>"
+//              }
+//            }
+//          }
+//        }
+//        """.write(to: project1Dir.appendingPathComponent("PklProject.deps.json"), atomically: true, encoding: .utf8)
+//        try """
+//        import "@pkl.experimental/URI.pkl"
+//
+//        uri = URI.parse("https://www.example.com").toString()
+//        """.write(to: project1Dir.appendingPathComponent("main.pkl"), atomically: true, encoding: .utf8)
+//        try await withProjectEvaluator(projectDir: project1Dir.path) { evaluator in
+//            let output = try await evaluator.evaluateOutputText(source: .url(project1Dir.appendingPathComponent("main.pkl")))
+//            XCTAssertEqual("""
+//            uri = "https://www.example.com"
+//
+//            """, output)
+//        }
+//    }
 }
