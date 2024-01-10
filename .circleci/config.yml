@@ -5,7 +5,7 @@ jobs:
     steps:
     - checkout
     - run:
-        command: swift test --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
+        command: swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
         name: swift test
     environment:
       PKL_EXEC: bin/pkl-cli-amd64.bin
