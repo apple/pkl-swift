@@ -14,7 +14,7 @@ jobs {
     docker {
       new { image = "swift:5.9-rhel-ubi9" }
     }
-    resource_class = "medium+"
+    resource_class = "large"
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
       ["PKL_DEBUG"] = "1"
