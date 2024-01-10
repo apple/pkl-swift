@@ -15,6 +15,11 @@
 // ===----------------------------------------------------------------------===//
 
 import Foundation
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin.C
+#endif
 
 let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
 
@@ -23,6 +28,7 @@ func debug(_ message: String) {
         return
     }
     FileHandle.standardError.write("[pkl-swift] \(message)\n".data(using: .utf8)!)
+    fflush(stderr)
 }
 
 let longNumberFormatter: NumberFormatter = {
