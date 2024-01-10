@@ -17,7 +17,7 @@ jobs {
     resource_class = "medium+"
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
-      ["PKL_DBEUG"] = "1"
+      ["PKL_DEBUG"] = "1"
     }
     steps {
       "checkout"
