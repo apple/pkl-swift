@@ -5,6 +5,7 @@ version = 2.1
 local swiftTest = new RunStep {
   name = "swift test"
   command = """
+    export PKL_DEBUG=1
     swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
     """
 }
