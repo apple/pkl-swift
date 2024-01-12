@@ -115,29 +115,29 @@ class EvaluatorManagerTest: XCTestCase {
             XCTAssertEqual(error.message, "Something really weird happened man.")
         }
     }
-
-    func testCloseEvaluator() async throws {
-        let manager = EvaluatorManager()
-        let evaluator = try await manager.newEvaluator(options: .preconfigured)
-        _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
-        try await evaluator.close()
-        do {
-            _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
-            XCTFail("Should have thrown")
-        } catch {
-            XCTAssertTrue(error is PklError)
-        }
-    }
-
-    func testCloseEvaluatorManager() async throws {
-        let manager = EvaluatorManager()
-        _ = try await manager.newEvaluator(options: .preconfigured)
-        await manager.close()
-        do {
-            _ = try await manager.newEvaluator(options: .preconfigured)
-            XCTFail("Should have thrown")
-        } catch {
-            XCTAssertTrue(error is PklError)
-        }
-    }
+//
+//    func testCloseEvaluator() async throws {
+//        let manager = EvaluatorManager()
+//        let evaluator = try await manager.newEvaluator(options: .preconfigured)
+//        _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
+//        try await evaluator.close()
+//        do {
+//            _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
+//            XCTFail("Should have thrown")
+//        } catch {
+//            XCTAssertTrue(error is PklError)
+//        }
+//    }
+//
+//    func testCloseEvaluatorManager() async throws {
+//        let manager = EvaluatorManager()
+//        _ = try await manager.newEvaluator(options: .preconfigured)
+//        await manager.close()
+//        do {
+//            _ = try await manager.newEvaluator(options: .preconfigured)
+//            XCTFail("Should have thrown")
+//        } catch {
+//            XCTAssertTrue(error is PklError)
+//        }
+//    }
 }

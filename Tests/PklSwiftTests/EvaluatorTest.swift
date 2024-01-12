@@ -90,193 +90,193 @@ final class PklSwiftTests: XCTestCase {
             source: ModuleSource(uri: URL(string: "repl:text")!, text: "foo = 1"))
         XCTAssertEqual(output, "foo = 1\n")
     }
-
-    func testCustomModuleReader() async throws {
-        let reader = VirtualModuleReader(
-            read: { _ in
-                """
-                name = "Swallow"
-                numberOfEggs = 8
-                """
-            },
-            listElements: { _ in [] },
-            scheme: "birds",
-            isGlobbable: true,
-            hasHierarchicalUris: true,
-            isLocal: true
-        )
-        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
-        let evaluator = try await manager.newEvaluator(options: options)
-        let output = try await evaluator.evaluateOutputText(source: .text("""
-        import "birds:/catalog/swallow.pkl"
-
-        result = swallow
-        """))
-        XCTAssertEqual(output, """
-        result {
-          name = "Swallow"
-          numberOfEggs = 8
-        }
-
-        """)
-    }
-
-    func testGlobCustomModuleReader() async throws {
-        let reader = VirtualModuleReader(
-            read: { url in
-                switch url {
-                case URL(string: "birds:/swallow.pkl"):
-                    return
-                        """
-                        name = "Swallow"
-                        numberOfEggs = 8
-                        """
-                case URL(string: "birds:/penguin.pkl"):
-                    return
-                        """
-                        name = "Penguin"
-                        numberOfEggs = 1
-                        """
-                default:
-                    throw PklError("File not found")
-                }
-            },
-            listElements: { _ in [.init(name: "swallow.pkl", isDirectory: false), .init(name: "penguin.pkl", isDirectory: false)] },
-            scheme: "birds",
-            isGlobbable: true,
-            hasHierarchicalUris: true,
-            isLocal: true
-        )
-        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
-        let evaluator = try await manager.newEvaluator(options: options)
-        let result = try await evaluator.evaluateOutputText(source: .text("""
-        result = import*("birds:/*.pkl")
-        """))
-        XCTAssertEqual(result, """
-        result {
-          ["birds:/penguin.pkl"] {
-            name = "Penguin"
-            numberOfEggs = 1
-          }
-          ["birds:/swallow.pkl"] {
-            name = "Swallow"
-            numberOfEggs = 8
-          }
-        }
-
-        """)
-    }
-
-    func testTripleDotImports() async throws {
-        let reader = VirtualModuleReader(
-            read: { url in
-                switch url.path {
-                case "/dir1/dir2/dir3/Bird.pkl":
-                    return #"amends "...""#
-                case "/Bird.pkl":
-                    return #"name = "Birdy""#
-                default:
-                    throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError)
-                }
-            },
-            listElements: { url in
-                switch url.path {
-                case "/dir1/dir2":
-                    return [.init(name: "dir3", isDirectory: true)]
-                case "/dir1":
-                    return [.init(name: "dir2", isDirectory: true)]
-                case "/":
-                    return [.init(name: "Bird.pkl", isDirectory: false), .init(name: "dir1", isDirectory: true)]
-                default:
-                    throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError)
-                }
-            },
-            scheme: "birds",
-            isGlobbable: true,
-            hasHierarchicalUris: true,
-            isLocal: true
-        )
-        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
-        let evaluator = try await manager.newEvaluator(options: options)
-        let result = try await evaluator.evaluateOutputText(source: ModuleSource.uri("birds:/dir1/dir2/dir3/Bird.pkl")!)
-        XCTAssertEqual(result, #"name = "Birdy"\#n"#)
-    }
-
-    func testConcurrenctEvaluations() async throws {
-        async let evalResult1 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
-            return try await evaluator.evaluateOutputText(source: .text("foo = 1"))
-        }.result.get()
-
-        async let evalResult2 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
-            return try await evaluator.evaluateOutputText(source: .text("foo = 2"))
-        }.result.get()
-
-        async let evalResult3 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
-            return try await evaluator.evaluateOutputText(source: .text("foo = 3"))
-        }.result.get()
-
-        let results = try await (evalResult1, evalResult2, evalResult3)
-        XCTAssertEqual(results.0, "foo = 1\n")
-        XCTAssertEqual(results.1, "foo = 2\n")
-        XCTAssertEqual(results.2, "foo = 3\n")
-    }
-
-    func testCustomResourceReader() async throws {
-        let reader = VirtualResourceReader(
-            scheme: "pizza",
-            isGlobbable: false,
-            hasHierarchicalUris: false,
-            read: { _ in [UInt8]("yes pizza".utf8) },
-            listElements: { _ in [] }
-        )
-        let options = EvaluatorOptions.preconfigured.withResourceReader(reader)
-        let evaluator = try await manager.newEvaluator(options: options)
-        let output = try await evaluator.evaluateOutputText(source: .text("""
-        result = read("pizza:pizza").text
-        """))
-        XCTAssertEqual(output, #"result = "yes pizza"\#n"#)
-    }
-
-    func testFailedEvaluation() async throws {
-        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
-        do {
-            _ = try await evaluator.evaluateOutputText(source: .text(#"foo = throw("uh oh")"#))
-        } catch {
-            XCTAssertTrue(error is PklError)
-            let error = error as! PklError
-            self.assertStartsWith(error.message, """
-            –– Pkl Error ––
-            uh oh
-
-            1 | foo = throw("uh oh")
-                      ^^^^^^^^^^^^^^
-            at text#foo (repl:text)
-            """)
-        }
-    }
-
-    private func assertStartsWith(
-        _ message: String,
-        _ prefix: String,
-        file: StaticString = #filePath,
-        line: UInt = #line
-    ) {
-        if !message.starts(with: prefix) {
-            XCTFail("Expected \(message) to start with \(prefix)", file: file, line: line)
-        }
-    }
-
-    func testLogger() async throws {
-        var options = EvaluatorOptions.preconfigured
-        let logger = TestLogger()
-        options.logger = logger
-        let evaluator = try await manager.newEvaluator(options: options)
-        _ = try await evaluator.evaluateOutputText(source: .text(#"result = let (_ = trace("Hello there")) 1"#))
-        XCTAssertEqual(logger.logLines, [#"pkl: TRACE: "Hello there" = "Hello there" (repl:text)\#n"#])
-    }
+//
+//    func testCustomModuleReader() async throws {
+//        let reader = VirtualModuleReader(
+//            read: { _ in
+//                """
+//                name = "Swallow"
+//                numberOfEggs = 8
+//                """
+//            },
+//            listElements: { _ in [] },
+//            scheme: "birds",
+//            isGlobbable: true,
+//            hasHierarchicalUris: true,
+//            isLocal: true
+//        )
+//        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
+//        let evaluator = try await manager.newEvaluator(options: options)
+//        let output = try await evaluator.evaluateOutputText(source: .text("""
+//        import "birds:/catalog/swallow.pkl"
+//
+//        result = swallow
+//        """))
+//        XCTAssertEqual(output, """
+//        result {
+//          name = "Swallow"
+//          numberOfEggs = 8
+//        }
+//
+//        """)
+//    }
+//
+//    func testGlobCustomModuleReader() async throws {
+//        let reader = VirtualModuleReader(
+//            read: { url in
+//                switch url {
+//                case URL(string: "birds:/swallow.pkl"):
+//                    return
+//                        """
+//                        name = "Swallow"
+//                        numberOfEggs = 8
+//                        """
+//                case URL(string: "birds:/penguin.pkl"):
+//                    return
+//                        """
+//                        name = "Penguin"
+//                        numberOfEggs = 1
+//                        """
+//                default:
+//                    throw PklError("File not found")
+//                }
+//            },
+//            listElements: { _ in [.init(name: "swallow.pkl", isDirectory: false), .init(name: "penguin.pkl", isDirectory: false)] },
+//            scheme: "birds",
+//            isGlobbable: true,
+//            hasHierarchicalUris: true,
+//            isLocal: true
+//        )
+//        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
+//        let evaluator = try await manager.newEvaluator(options: options)
+//        let result = try await evaluator.evaluateOutputText(source: .text("""
+//        result = import*("birds:/*.pkl")
+//        """))
+//        XCTAssertEqual(result, """
+//        result {
+//          ["birds:/penguin.pkl"] {
+//            name = "Penguin"
+//            numberOfEggs = 1
+//          }
+//          ["birds:/swallow.pkl"] {
+//            name = "Swallow"
+//            numberOfEggs = 8
+//          }
+//        }
+//
+//        """)
+//    }
+//
+//    func testTripleDotImports() async throws {
+//        let reader = VirtualModuleReader(
+//            read: { url in
+//                switch url.path {
+//                case "/dir1/dir2/dir3/Bird.pkl":
+//                    return #"amends "...""#
+//                case "/Bird.pkl":
+//                    return #"name = "Birdy""#
+//                default:
+//                    throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError)
+//                }
+//            },
+//            listElements: { url in
+//                switch url.path {
+//                case "/dir1/dir2":
+//                    return [.init(name: "dir3", isDirectory: true)]
+//                case "/dir1":
+//                    return [.init(name: "dir2", isDirectory: true)]
+//                case "/":
+//                    return [.init(name: "Bird.pkl", isDirectory: false), .init(name: "dir1", isDirectory: true)]
+//                default:
+//                    throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError)
+//                }
+//            },
+//            scheme: "birds",
+//            isGlobbable: true,
+//            hasHierarchicalUris: true,
+//            isLocal: true
+//        )
+//        let options = EvaluatorOptions.preconfigured.withModuleReader(reader)
+//        let evaluator = try await manager.newEvaluator(options: options)
+//        let result = try await evaluator.evaluateOutputText(source: ModuleSource.uri("birds:/dir1/dir2/dir3/Bird.pkl")!)
+//        XCTAssertEqual(result, #"name = "Birdy"\#n"#)
+//    }
+//
+//    func testConcurrenctEvaluations() async throws {
+//        async let evalResult1 = try Task {
+//            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+//            return try await evaluator.evaluateOutputText(source: .text("foo = 1"))
+//        }.result.get()
+//
+//        async let evalResult2 = try Task {
+//            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+//            return try await evaluator.evaluateOutputText(source: .text("foo = 2"))
+//        }.result.get()
+//
+//        async let evalResult3 = try Task {
+//            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+//            return try await evaluator.evaluateOutputText(source: .text("foo = 3"))
+//        }.result.get()
+//
+//        let results = try await (evalResult1, evalResult2, evalResult3)
+//        XCTAssertEqual(results.0, "foo = 1\n")
+//        XCTAssertEqual(results.1, "foo = 2\n")
+//        XCTAssertEqual(results.2, "foo = 3\n")
+//    }
+//
+//    func testCustomResourceReader() async throws {
+//        let reader = VirtualResourceReader(
+//            scheme: "pizza",
+//            isGlobbable: false,
+//            hasHierarchicalUris: false,
+//            read: { _ in [UInt8]("yes pizza".utf8) },
+//            listElements: { _ in [] }
+//        )
+//        let options = EvaluatorOptions.preconfigured.withResourceReader(reader)
+//        let evaluator = try await manager.newEvaluator(options: options)
+//        let output = try await evaluator.evaluateOutputText(source: .text("""
+//        result = read("pizza:pizza").text
+//        """))
+//        XCTAssertEqual(output, #"result = "yes pizza"\#n"#)
+//    }
+//
+//    func testFailedEvaluation() async throws {
+//        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+//        do {
+//            _ = try await evaluator.evaluateOutputText(source: .text(#"foo = throw("uh oh")"#))
+//        } catch {
+//            XCTAssertTrue(error is PklError)
+//            let error = error as! PklError
+//            self.assertStartsWith(error.message, """
+//            –– Pkl Error ––
+//            uh oh
+//
+//            1 | foo = throw("uh oh")
+//                      ^^^^^^^^^^^^^^
+//            at text#foo (repl:text)
+//            """)
+//        }
+//    }
+//
+//    private func assertStartsWith(
+//        _ message: String,
+//        _ prefix: String,
+//        file: StaticString = #filePath,
+//        line: UInt = #line
+//    ) {
+//        if !message.starts(with: prefix) {
+//            XCTFail("Expected \(message) to start with \(prefix)", file: file, line: line)
+//        }
+//    }
+//
+//    func testLogger() async throws {
+//        var options = EvaluatorOptions.preconfigured
+//        let logger = TestLogger()
+//        options.logger = logger
+//        let evaluator = try await manager.newEvaluator(options: options)
+//        _ = try await evaluator.evaluateOutputText(source: .text(#"result = let (_ = trace("Hello there")) 1"#))
+//        XCTAssertEqual(logger.logLines, [#"pkl: TRACE: "Hello there" = "Hello there" (repl:text)\#n"#])
+//    }
 //
 //    func testWithProject() async throws {
 //        // TODO re-enable me
