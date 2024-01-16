@@ -1,23 +1,36 @@
 # Generated from CircleCI.pkl. DO NOT EDIT.
 version: 2.1
+orbs:
+  pr-approval: pkl-lang/pr-approval@dev:first
 jobs:
   test:
     steps:
     - checkout
     - run:
         command: |-
-          export PKL_DEBUG=1
           mkdir -p .out/test-results/
           swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
         name: swift test
+    - run:
+        command: make test-snippets
+    - run:
+        command: make test-pkl
+    - run:
+        command: make generate-fixtures
     - store_test_results:
         path: .out/test-results/
     environment:
       PKL_EXEC: bin/pkl-cli-macos-amd64.bin
-      PKL_DEBUG: '1'
     macos:
       xcode: 15.2.0
 workflows:
+  prb:
+    jobs:
+    - test
+    when:
+      matches:
+        value: << pipeline.git.branch >>
+        pattern: ^pull/\d+(/head)?$
   main:
     jobs:
     - test

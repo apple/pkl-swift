@@ -15,6 +15,12 @@ main {
   }
 }
 
+prb {
+  jobs {
+    "test"
+  }
+}
+
 jobs {
   ["test"] {
     macos {
@@ -36,20 +42,6 @@ jobs {
       new StoreTestResults {
         path = ".out/test-results/"
       }
-    }
-  }
-}
-
-workflows {
-  ["main"] {
-    `when` {
-      equal {
-        "main"
-        "<< pipeline.git.branch >>"
-      }
-    }
-    jobs {
-      "test"
     }
   }
 }
