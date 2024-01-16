@@ -67,7 +67,6 @@ jobs {
       new RunStep { command = "make test-snippets" }
       new RunStep { command = "make test-pkl" }
       new RunStep { command = "make generate-fixtures" }
-      new RunStep { command = ""}
       new StoreTestResults {
         path = ".out/test-results/"
       }

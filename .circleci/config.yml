@@ -17,8 +17,6 @@ jobs:
         command: make test-pkl
     - run:
         command: make generate-fixtures
-    - run:
-        command: ''
     - store_test_results:
         path: .out/test-results/
     environment:
