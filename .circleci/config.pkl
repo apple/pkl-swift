@@ -12,10 +12,13 @@ local swiftTest = new RunStep {
 
 jobs {
   ["test"] {
-    docker {
-      new { image = "swift:5.9-rhel-ubi9" }
+    macos {
+      xcode = "15.2.0"
     }
-    resource_class = "large"
+//     docker {
+//       new { image = "swift:5.9-rhel-ubi9" }
+//     }
+//     resource_class = "large"
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
       ["PKL_DEBUG"] = "1"
