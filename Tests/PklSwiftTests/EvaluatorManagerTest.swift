@@ -51,34 +51,34 @@ class FakeMessageTransport: MessageTransport {
 }
 
 class EvaluatorManagerTest: XCTestCase {
-//    func testConcurrentEvaluatorManagers() async throws {
-//        let manager1 = EvaluatorManager()
-//        let manager2 = EvaluatorManager()
-//        let manager3 = EvaluatorManager()
-//        async let evalautor1 = try manager1.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 1\""))
-//        async let evalautor2 = try manager2.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 2\""))
-//        async let evalautor3 = try manager3.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 3\""))
-//        let (result1, result2, result3) = try await (evalautor1, evalautor2, evalautor3)
-//        XCTAssertEqual(result1, "res = \"evaluator 1\"\n")
-//        XCTAssertEqual(result2, "res = \"evaluator 2\"\n")
-//        XCTAssertEqual(result3, "res = \"evaluator 3\"\n")
-//        await manager1.close()
-//        await manager2.close()
-//        await manager3.close()
-//    }
-//
-//    func testConcurrentEvaluations() async throws {
-//        let manager = EvaluatorManager()
-//        let evaluator = try await manager.newEvaluator(options: .preconfigured)
-//        async let task1 = try evaluator.evaluateOutputText(source: .text("res = 1"))
-//        async let task2 = try evaluator.evaluateOutputText(source: .text("res = 2"))
-//        async let task3 = try evaluator.evaluateOutputText(source: .text("res = 3"))
-//        let (result1, result2, result3) = try await (task1, task2, task3)
-//        XCTAssertEqual(result1, "res = 1\n")
-//        XCTAssertEqual(result2, "res = 2\n")
-//        XCTAssertEqual(result3, "res = 3\n")
-//        await manager.close()
-//    }
+    func testConcurrentEvaluatorManagers() async throws {
+        let manager1 = EvaluatorManager()
+        let manager2 = EvaluatorManager()
+        let manager3 = EvaluatorManager()
+        async let evalautor1 = try manager1.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 1\""))
+        async let evalautor2 = try manager2.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 2\""))
+        async let evalautor3 = try manager3.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 3\""))
+        let (result1, result2, result3) = try await (evalautor1, evalautor2, evalautor3)
+        XCTAssertEqual(result1, "res = \"evaluator 1\"\n")
+        XCTAssertEqual(result2, "res = \"evaluator 2\"\n")
+        XCTAssertEqual(result3, "res = \"evaluator 3\"\n")
+        await manager1.close()
+        await manager2.close()
+        await manager3.close()
+    }
+
+    func testConcurrentEvaluations() async throws {
+        let manager = EvaluatorManager()
+        let evaluator = try await manager.newEvaluator(options: .preconfigured)
+        async let task1 = try evaluator.evaluateOutputText(source: .text("res = 1"))
+        async let task2 = try evaluator.evaluateOutputText(source: .text("res = 2"))
+        async let task3 = try evaluator.evaluateOutputText(source: .text("res = 3"))
+        let (result1, result2, result3) = try await (task1, task2, task3)
+        XCTAssertEqual(result1, "res = 1\n")
+        XCTAssertEqual(result2, "res = 2\n")
+        XCTAssertEqual(result3, "res = 3\n")
+        await manager.close()
+    }
 
     func testInterruptionDuringNewEvaluator() async throws {
         let transport = FakeMessageTransport()
@@ -115,29 +115,29 @@ class EvaluatorManagerTest: XCTestCase {
             XCTAssertEqual(error.message, "Something really weird happened man.")
         }
     }
-//
-//    func testCloseEvaluator() async throws {
-//        let manager = EvaluatorManager()
-//        let evaluator = try await manager.newEvaluator(options: .preconfigured)
-//        _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
-//        try await evaluator.close()
-//        do {
-//            _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
-//            XCTFail("Should have thrown")
-//        } catch {
-//            XCTAssertTrue(error is PklError)
-//        }
-//    }
-//
-//    func testCloseEvaluatorManager() async throws {
-//        let manager = EvaluatorManager()
-//        _ = try await manager.newEvaluator(options: .preconfigured)
-//        await manager.close()
-//        do {
-//            _ = try await manager.newEvaluator(options: .preconfigured)
-//            XCTFail("Should have thrown")
-//        } catch {
-//            XCTAssertTrue(error is PklError)
-//        }
-//    }
+
+    func testCloseEvaluator() async throws {
+        let manager = EvaluatorManager()
+        let evaluator = try await manager.newEvaluator(options: .preconfigured)
+        _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
+        try await evaluator.close()
+        do {
+            _ = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
+            XCTFail("Should have thrown")
+        } catch {
+            XCTAssertTrue(error is PklError)
+        }
+    }
+
+    func testCloseEvaluatorManager() async throws {
+        let manager = EvaluatorManager()
+        _ = try await manager.newEvaluator(options: .preconfigured)
+        await manager.close()
+        do {
+            _ = try await manager.newEvaluator(options: .preconfigured)
+            XCTFail("Should have thrown")
+        } catch {
+            XCTAssertTrue(error is PklError)
+        }
+    }
 }

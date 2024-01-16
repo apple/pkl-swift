@@ -7,7 +7,7 @@ local swiftTest = new RunStep {
   command = """
     export PKL_DEBUG=1
     mkdir -p .out/test-results/
-    swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
+    swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
     """
 }
 
@@ -27,9 +27,12 @@ jobs {
     steps {
       "checkout"
       swiftTest
-//       module.run("make test-snippets")
-//       module.run("make test-pkl")
-//       module.run("make generate-fixtures")
+      module.run("make test-snippets")
+      module.run("make test-pkl")
+      module.run("make generate-fixtures")
+      new StoreTestResults {
+        path = ".out/test-results/"
+      }
     }
   }
 }
