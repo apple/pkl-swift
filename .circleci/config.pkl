@@ -96,7 +96,7 @@ jobs {
 
   ["pkl-package"] {
     docker {
-      new { image = "cimg/base" }
+      new { image = "cimg/base:current" }
     }
     steps {
       // TODO(oss) remove --skip-publish-check

@@ -48,7 +48,7 @@ jobs:
         paths:
         - out/
     docker:
-    - image: cimg/base
+    - image: cimg/base:current
   do-release:
     steps:
     - attach_workspace:
