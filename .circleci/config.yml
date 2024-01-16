@@ -7,10 +7,11 @@ jobs:
     - run:
         command: |-
           export PKL_DEBUG=1
+          mkdir -p .out/test-results/
           swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/junit.xml -Xswiftc -warnings-as-errors
         name: swift test
     environment:
-      PKL_EXEC: bin/pkl-cli-amd64.bin
+      PKL_EXEC: bin/pkl-cli-macos-amd64.bin
       PKL_DEBUG: '1'
     macos:
       xcode: 15.2.0
