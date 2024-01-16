@@ -1,14 +1,18 @@
-amends "../../pkl/.circleci/CircleCI.pkl"
+amends ".../pkl/.circleci/PklCI.pkl"
 
-version = 2.1
 
 local swiftTest = new RunStep {
   name = "swift test"
   command = """
-    export PKL_DEBUG=1
     mkdir -p .out/test-results/
     swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
     """
+}
+
+main {
+  jobs {
+    "test"
+  }
 }
 
 jobs {
@@ -22,14 +26,13 @@ jobs {
 //     resource_class = "large"
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-macos-amd64.bin"
-      ["PKL_DEBUG"] = "1"
     }
     steps {
       "checkout"
       swiftTest
-      module.run("make test-snippets")
-      module.run("make test-pkl")
-      module.run("make generate-fixtures")
+      new RunStep { command = "make test-snippets" }
+      new RunStep { command = "make test-pkl" }
+      new RunStep { command = "make generate-fixtures" }
       new StoreTestResults {
         path = ".out/test-results/"
       }

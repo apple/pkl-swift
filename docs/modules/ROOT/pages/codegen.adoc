@@ -166,16 +166,18 @@ When turning Pkl names into Swift names, the code generator follows these rules:
 1. Any non-letter and non-digit characters get stripped
 2. Each preceding letter gets capitalized.
 
+// TODO(oss) confirm link
 As a result, it is possible that two names collide and turn into the same Swift name.
-To resolve these conflicts, the https://pkl-lang.org/package-docs/<TODO_REPLACE_ME>/pkl.swift/current/swift/Name.html[`@swift.Name`]
+To resolve these conflicts, the https://pkl-lang.org/package-docs/pkg.pkl-lang.org/pkl-swift/pkl.swift/current/swift/Name.html[`@swift.Name`]
 annotation must be used on at least one of these declarations so the resulting names are distinct.
 
 For example:
 
+// TODO(oss) confirm link
 [source,pkl]
 [subs="+attributes"]
 ----
-import "package://<TODO_REPLACE_ME>/pkl.swift@{pkl-swift-version}#/swift.pkl"
+import "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{pkl-swift-version}#/swift.pkl"
 
 @swift.Name { value = "MyCoolApplication" }
 class My_Application

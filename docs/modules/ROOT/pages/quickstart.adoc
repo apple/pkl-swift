@@ -1,5 +1,6 @@
 include::ROOT:component-attributes.adoc[]
 :uri-jpkl: https://pkl-lang.org/main/current/pkl-cli/index.html#java-executable
+// TODO(oss) add these urls
 :uri-pkl-gen-swift-macos: TODO_REPLACE_ME
 :uri-pkl-gen-swift-linux-aarch64: TODO_REPLACE_ME
 :uri-pkl-gen-swift-linux-amd64: TODO_REPLACE_ME

@@ -45,7 +45,8 @@ public struct PklSwiftGenerator {
         if let generateScript = self.settings.generateScript {
             return URL(fileURLWithPath: generateScript).path
         } else {
-            return "package://<TODO_REPLACE_ME>/pkl.swift@0.1.0#/Generator.pkl"
+            // TODO(oss) confirm this
+            return "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@0.1.0#/Generator.pkl"
         }
     }
 

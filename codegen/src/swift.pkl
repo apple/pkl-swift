@@ -29,7 +29,7 @@ typealias SwiftName = String(matches(Regex(#"(?u)\p{L}[\p{L}\d_]+"#)))
 /// @swift.Module { name = "MyLibrary" }
 /// module myteam.myproj.MyLibrary
 ///
-/// import "<TODO_REPLACE_ME>/pkl.swift@<VERSION>#/swift.pkl"
+/// import "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@<VERSION>#/swift.pkl"
 /// ```
 class Module extends Annotation {
   /// The full name of the Swift module

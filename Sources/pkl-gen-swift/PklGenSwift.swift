@@ -86,7 +86,8 @@ struct PklGenSwift: AsyncParsableCommand {
         if let generateScript = self.generateScript {
             return URL(fileURLWithPath: generateScript).path
         } else {
-            return "package://<TODO_REPLACE_ME>/pkl.swift@\(VERSION)#/Generator.pkl"
+            // TODO(oss) // confirm this
+            return "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@\(VERSION)#/Generator.pkl"
         }
     }
 
