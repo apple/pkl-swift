@@ -13,6 +13,7 @@ ifeq ($(UNAME), Darwin)
 else
 	PKL_GEN_SWIFT_RELEASE := $(shell swift build --configuration release --product pkl-gen-swift --show-bin-path)/pkl-gen-swift
 endif
+PKL_EXEC ?= pkl
 
 .PHONY: help
 help:
@@ -44,7 +45,7 @@ test-swift-lib: generate-fixtures
 
 .PHONY: test-pkl
 test-pkl: $(PKL_CODEGEN_INPUTS)
-	@pkl test codegen/src/tests/*.pkl --junit-reports .out/tests/
+	$(PKL_EXEC) test codegen/src/tests/*.pkl --junit-reports .out/test-results/
 
 .PHONY: clean
 clean: clean-snippets clean-fixtures clean-build
@@ -82,6 +83,9 @@ $(PKL_GEN_SWIFT_RELEASE): $(SWIFT_INPUTS)
 		--product pkl-gen-swift \
 		--configuration release
 endif
+
+pkl-package:
+	$(PKL_EXEC) project package codegen/src/
 
 pkl-gen-swift-release: $(PKL_GEN_SWIFT_RELEASE)
 

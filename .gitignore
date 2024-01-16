@@ -14,5 +14,6 @@ DerivedData/
 
 .env
 .out/
+out/
 
 .cicd/

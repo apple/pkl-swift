@@ -1,8 +1,8 @@
 amends "pkl:Project"
 
 package {
-  name = "temp.pkl.swift"
-  baseUri = "package://github.com/pkl-lang/pkl-swift/releases/\(version)/\(name)"
+  name = "pkl.swift"
+  baseUri = "package://pkg.pkl-lang.org/pkl-swift/\(name)"
   packageZipUrl = "https://github.com/pkl-lang/pkl-swift/releases/\(name)@\(version).zip"
   version = read("../../VERSION.txt").text
   authors {

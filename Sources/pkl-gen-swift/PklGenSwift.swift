@@ -123,12 +123,10 @@ struct PklGenSwift: AsyncParsableCommand {
         if self.dryRun == true {
             generatorSettings.dryRun = true
         }
-        if let generateScript = self.generateScript {
-            generatorSettings.generateScript = generateScript
-        }
         if let outputPath = self.outputPath {
             generatorSettings.outputPath = outputPath
         }
+        generatorSettings.generateScript = self.generateScriptUrl()
         return generatorSettings
     }
 

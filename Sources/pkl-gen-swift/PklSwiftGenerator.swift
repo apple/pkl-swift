@@ -41,15 +41,6 @@ public struct PklSwiftGenerator {
         }
     }
 
-    private func generateScriptUrl() -> String {
-        if let generateScript = self.settings.generateScript {
-            return URL(fileURLWithPath: generateScript).path
-        } else {
-            // TODO(oss) confirm this
-            return "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@0.1.0#/Generator.pkl"
-        }
-    }
-
     private func tempFile() -> URL {
         let fileName = ProcessInfo.processInfo.globallyUniqueString + ".pkl"
         return URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
@@ -58,7 +49,7 @@ public struct PklSwiftGenerator {
     private mutating func runModule(evaluator: Evaluator, pklInputModule: String) async throws {
         let out = resolvePaths(self.settings.outputPath ?? ".out")
         let moduleToEvaluate = """
-        amends "\(self.generateScriptUrl())"
+        amends "\(self.settings.generateScript!)"
 
         import "\(pklInputModule)" as theModule
 
