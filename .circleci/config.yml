@@ -37,7 +37,7 @@ jobs:
         paths:
         - out/
     environment:
-      PKL_EXEC: bin/pkl-cli-macos-amd64.bin
+      PKL_EXEC: bin/pkl-cli-amd64.bin
     macos:
       xcode: 15.2.0
   pkl-package:
