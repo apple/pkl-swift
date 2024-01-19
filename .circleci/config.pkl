@@ -93,10 +93,13 @@ jobs {
     docker {
       new { image = "cimg/base:current" }
     }
+    environment {
+      ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
+    }
     steps {
       // TODO(oss) remove --skip-publish-check
       new RunStep {
-        command = "pkl project package --skip-publish-check --output-path out/pkl-package/ codegen/src/*"
+        command = #"bash -c "$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/*""#
       }
       new PersistToWorkspaceStep {
         paths {

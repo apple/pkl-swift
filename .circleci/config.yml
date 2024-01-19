@@ -42,11 +42,13 @@ jobs:
   pkl-package:
     steps:
     - run:
-        command: pkl project package --skip-publish-check --output-path out/pkl-package/ codegen/src/*
+        command: bash -c "$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/*"
     - persist_to_workspace:
         root: '.'
         paths:
         - out/
+    environment:
+      PKL_EXEC: bin/pkl-cli-amd64.bin
     docker:
     - image: cimg/base:current
   do-release:
