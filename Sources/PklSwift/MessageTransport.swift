@@ -124,7 +124,14 @@ public class ChildProcessMessageTransport: MessageTransport {
         if self.process == nil {
             return
         }
-        self.process!.terminate()
+        #if os(Linux)
+        // workaround: https://github.com/apple/swift-corelibs-foundation/issues/4772
+        if let process = self.process, process.isRunning {
+            kill(process.processIdentifier, SIGKILL)
+        }
+        #else
+        self.process?.terminate()
+        #endif
         self.process!.waitUntilExit()
         self.process = nil
     }
