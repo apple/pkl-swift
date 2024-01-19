@@ -38,10 +38,26 @@ release {
       }
     }
     new {
+      ["pkl-gen-swift-linux-amd64"] {
+        requires {
+          "test"
+        }
+      }
+    }
+    new {
+      ["pkl-gen-swift-linux-aarch64"] {
+        requires {
+          "test"
+        }
+      }
+    }
+    new {
       ["do-release"] {
         requires {
           "pkl-package"
           "pkl-gen-swift-macos"
+          "pkl-gen-swift-linux-amd64"
+          "pkl-gen-swift-linux-aarch64"
         }
         context {
           "Pkl release"
@@ -66,7 +82,7 @@ jobs {
     steps {
       "checkout"
       // need to use jpkl because of an issue where pkl refuses to exit
-      "yum install -y java"
+      new RunStep { command = "yum install -y java" }
       swiftTest
       new RunStep { command = "make test-snippets" }
       new RunStep { command = "make test-pkl" }
@@ -84,6 +100,7 @@ jobs {
     steps {
       "checkout"
       new RunStep {
+        name = "Build pkl-gen-swift"
         // TODO why isn't this building a universal binary?
         command = """
           make pkl-gen-swift-release
@@ -93,6 +110,29 @@ jobs {
           """
       }
       new PersistToWorkspaceStep { paths { "out/" }; root = "." }
+    }
+  }
+
+  for (arch in List("aarch64", "amd64")) {
+    ["pkl-gen-swift-linux-\(arch)"] {
+      docker {
+        new {
+          image = "swift:5.9-rhel-ubi9"
+        }
+      }
+      resource_class = if (arch == "amd64") "xlarge" else "arm.xlarge"
+      steps {
+        "checkout"
+        new RunStep {
+          name = "Build pkl-gen-swift"
+          command = """
+            make pkl-gen-swift-release
+            mkdir -p out/pkl-gen-swift/
+            cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-\(arch).bin
+            """
+        }
+        new PersistToWorkspaceStep { paths { "out/" }; root = "." }
+      }
     }
   }
 
@@ -130,25 +170,15 @@ jobs {
         name = "Do release"
         // language=bash
         command = #"""
-          EXPECTED_VERSION=$(< VERSION.txt)
+          EXPECTED_VERSION=$(cat VERSION.txt)
 
-          if [[ ! "${EXPECTED_VERSION}" = "${CIRCLE_TAG}" ]]; then
+          if [ "${EXPECTED_VERSION}" != "${CIRCLE_TAG}" ]; then
             echo "Mismatching versions!"
             echo "VERSION.txt has ${EXPECTED_VERSION}"
             echo "Git tag is ${CIRCLE_TAG}"
             echo "Update VERSION.txt to match the tag, and re-tag."
             exit 1
           fi
-
-          echo "Creating release for Swift library"
-          export GH_TOKEN="${GITHUB_TOKEN}"
-          gh release create "${CIRCLE_TAG}" \
-            --title "pkl-swift ${CIRCLE_TAG}" \
-            --target "${CIRCLE_SHA1}" \
-            --verify-tag \
-            --notes "Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${VERSION}" \
-            --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
-            out/pkl-gen-swift/*
 
           echo "Creating release for Pkl package"
           gh release create "pkl.swift@${CIRCLE_TAG}" \
@@ -157,6 +187,16 @@ jobs {
             --notes "This holds the release assets for the pkl.swift Pkl package." \
             --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
             out/pkl-package/*
+
+          echo "Creating release for Swift library"
+          export GH_TOKEN="${GITHUB_TOKEN}"
+          gh release create "${CIRCLE_TAG}" \
+            --title "pkl-swift ${CIRCLE_TAG}" \
+            --target "${CIRCLE_SHA1}" \
+            --verify-tag \
+            --notes "Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${CIRCLE_TAG}" \
+            --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
+            out/pkl-gen-swift/*
           """#
       }
     }

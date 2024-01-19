@@ -6,7 +6,8 @@ jobs:
   test:
     steps:
     - checkout
-    - yum install -y java
+    - run:
+        command: yum install -y java
     - run:
         command: |-
           mkdir -p .out/test-results/
@@ -34,12 +35,45 @@ jobs:
           mkdir -p out/pkl-gen-swift/
           cp .build/x86_64-apple-macosx/release/pkl-gen-swift out/pkl-gen-swift/pkl-gen-swift-macos.bin
           # cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
+        name: Build pkl-gen-swift
     - persist_to_workspace:
         root: '.'
         paths:
         - out/
     macos:
       xcode: 15.2.0
+  pkl-gen-swift-linux-aarch64:
+    steps:
+    - checkout
+    - run:
+        command: |-
+          make pkl-gen-swift-release
+          mkdir -p out/pkl-gen-swift/
+          cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-aarch64.bin
+        name: Build pkl-gen-swift
+    - persist_to_workspace:
+        root: '.'
+        paths:
+        - out/
+    resource_class: arm.xlarge
+    docker:
+    - image: swift:5.9-rhel-ubi9
+  pkl-gen-swift-linux-amd64:
+    steps:
+    - checkout
+    - run:
+        command: |-
+          make pkl-gen-swift-release
+          mkdir -p out/pkl-gen-swift/
+          cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-amd64.bin
+        name: Build pkl-gen-swift
+    - persist_to_workspace:
+        root: '.'
+        paths:
+        - out/
+    resource_class: xlarge
+    docker:
+    - image: swift:5.9-rhel-ubi9
   pkl-package:
     steps:
     - checkout
@@ -58,25 +92,15 @@ jobs:
         at: '.'
     - run:
         command: |-
-          EXPECTED_VERSION=$(< VERSION.txt)
+          EXPECTED_VERSION=$(cat VERSION.txt)
 
-          if [[ ! "${EXPECTED_VERSION}" = "${CIRCLE_TAG}" ]]; then
+          if [ "${EXPECTED_VERSION}" != "${CIRCLE_TAG}" ]; then
             echo "Mismatching versions!"
             echo "VERSION.txt has ${EXPECTED_VERSION}"
             echo "Git tag is ${CIRCLE_TAG}"
             echo "Update VERSION.txt to match the tag, and re-tag."
             exit 1
           fi
-
-          echo "Creating release for Swift library"
-          export GH_TOKEN="${GITHUB_TOKEN}"
-          gh release create "${CIRCLE_TAG}" \
-            --title "pkl-swift ${CIRCLE_TAG}" \
-            --target "${CIRCLE_SHA1}" \
-            --verify-tag \
-            --notes "Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${VERSION}" \
-            --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
-            out/pkl-gen-swift/*
 
           echo "Creating release for Pkl package"
           gh release create "pkl.swift@${CIRCLE_TAG}" \
@@ -85,6 +109,16 @@ jobs:
             --notes "This holds the release assets for the pkl.swift Pkl package." \
             --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
             out/pkl-package/*
+
+          echo "Creating release for Swift library"
+          export GH_TOKEN="${GITHUB_TOKEN}"
+          gh release create "${CIRCLE_TAG}" \
+            --title "pkl-swift ${CIRCLE_TAG}" \
+            --target "${CIRCLE_SHA1}" \
+            --verify-tag \
+            --notes "Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${CIRCLE_TAG}" \
+            --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
+            out/pkl-gen-swift/*
         name: Do release
     environment:
       PKL_EXEC: bin/pkl-cli-macos-amd64.bin
@@ -129,10 +163,28 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
+    - pkl-gen-swift-linux-amd64:
+        requires:
+        - test
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - pkl-gen-swift-linux-aarch64:
+        requires:
+        - test
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
     - do-release:
         requires:
         - pkl-package
         - pkl-gen-swift-macos
+        - pkl-gen-swift-linux-amd64
+        - pkl-gen-swift-linux-aarch64
         context:
         - Pkl release
         filters:
