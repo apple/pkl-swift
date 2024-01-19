@@ -31,13 +31,12 @@ jobs:
         command: |-
           make pkl-gen-swift-release
           mkdir -p out/pkl-gen-swift/
-          cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
+          cp .build/x86_64-apple-macosx/release/pkl-gen-swift out/pkl-gen-swift/pkl-gen-swift-macos.bin
+          # cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
     - persist_to_workspace:
         root: '.'
         paths:
         - out/
-    environment:
-      PKL_EXEC: bin/pkl-cli-macos-amd64.bin
     macos:
       xcode: 15.2.0
   pkl-package:
