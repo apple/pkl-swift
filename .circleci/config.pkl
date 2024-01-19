@@ -43,6 +43,9 @@ release {
           "pkl-package"
           "pkl-gen-swift-macos"
         }
+        context {
+          "Pkl release"
+        }
       }
     }
   }
@@ -93,13 +96,11 @@ jobs {
     docker {
       new { image = "cimg/base:current" }
     }
-    environment {
-      ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
-    }
     steps {
-      // TODO(oss) remove --skip-publish-check
+      "checkout"
+      // TODO(oss) remove --skip-publish-check and change path to Pkl
       new RunStep {
-        command = #"bash -c "$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/*""#
+        command = #"bin/pkl-cli-amd64.bin project package --skip-publish-check --output-path out/pkl-package/ codegen/src/"#
       }
       new PersistToWorkspaceStep {
         paths {
@@ -119,25 +120,39 @@ jobs {
       ["PKL_EXEC"] = "bin/pkl-cli-macos-amd64.bin"
     }
     steps {
+      "checkout"
       new AttachWorkspaceStep { at = "." }
       new RunStep {
+        name = "Do release"
+        // language=bash
         command = #"""
+          EXPECTED_VERSION=$(< VERSION.txt)
+
+          if [[ ! "${EXPECTED_VERSION}" = "${CIRCLE_TAG}" ]]; then
+            echo "Mismatching versions!"
+            echo "VERSION.txt has ${EXPECTED_VERSION}"
+            echo "Git tag is ${CIRCLE_TAG}"
+            echo "Update VERSION.txt to match the tag, and re-tag."
+            exit 1
+          fi
+
           echo "Creating release for Swift library"
-          gh release create ${CIRCLE_TAG} \
+          export GH_TOKEN="${GITHUB_TOKEN}"
+          gh release create "${CIRCLE_TAG}" \
             --title "pkl-swift ${CIRCLE_TAG}" \
             --target "${CIRCLE_SHA1}" \
             --verify-tag \
             --notes "Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${VERSION}" \
             --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
-            out/pkl-gen-swift/
+            out/pkl-gen-swift/*
 
           echo "Creating release for Pkl package"
-          gh release create ${CIRCLE_TAG} \
-            --title "pkl.swift@${CIRCLE_TAG}" \
+          gh release create "pkl.swift@${CIRCLE_TAG}" \
+            --title "Pkl package ${CIRCLE_TAG}" \
             --target "${CIRCLE_SHA1}" \
-            --notes "This holds the release assets for the pkl.swift package. Release notes: https://pkl-lang.org/swift/CHANGELOG.html#release-${VERSION}" \
+            --notes "This holds the release assets for the pkl.swift Pkl package." \
             --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
-            out/pkl-package/
+            out/pkl-package/*
           """#
       }
     }
