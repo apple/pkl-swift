@@ -20,7 +20,7 @@ jobs:
     - store_test_results:
         path: .out/test-results/
     environment:
-      PKL_EXEC: bin/pkl-cli-macos-amd64.bin
+      PKL_EXEC: bin/pkl-cli-amd64.bin
     resource_class: xlarge
     docker:
     - image: swift:5.9-rhel-ubi9
@@ -37,7 +37,7 @@ jobs:
         paths:
         - out/
     environment:
-      PKL_EXEC: bin/pkl-cli-amd64.bin
+      PKL_EXEC: bin/pkl-cli-macos-amd64.bin
     macos:
       xcode: 15.2.0
   pkl-package:
