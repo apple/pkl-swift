@@ -50,13 +50,10 @@ release {
 
 jobs {
   ["test"] {
-    macos {
-      xcode = "15.2.0"
+    docker {
+      new { image = "swift:5.9-rhel-ubi9" }
     }
-//     docker {
-//       new { image = "swift:5.9-rhel-ubi9" }
-//     }
-//     resource_class = "large"
+    resource_class = "xlarge"
     // TODO(oss) remove me, and download Pkl from CI
     environment {
       ["PKL_EXEC"] = "bin/pkl-cli-macos-amd64.bin"

@@ -1,7 +1,7 @@
 # Generated from CircleCI.pkl. DO NOT EDIT.
 version: 2.1
 orbs:
-  pr-approval: pkl-lang/pr-approval@dev:first
+  pr-approval: pkl-lang/pr-approval@dev:third
 jobs:
   test:
     steps:
@@ -21,8 +21,9 @@ jobs:
         path: .out/test-results/
     environment:
       PKL_EXEC: bin/pkl-cli-macos-amd64.bin
-    macos:
-      xcode: 15.2.0
+    resource_class: xlarge
+    docker:
+    - image: swift:5.9-rhel-ubi9
   pkl-gen-swift-macos:
     steps:
     - checkout
