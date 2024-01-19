@@ -53,16 +53,20 @@ release {
 
 jobs {
   ["test"] {
-    macos {
-      xcode = "15.2.0"
+    docker {
+      new {
+        image = "swift:5.9-rhel-ubi9"
+      }
     }
-    resource_class = "macos.m1.large.gen1"
+    resource_class = "xlarge"
     // TODO(oss) remove me, and download Pkl from CI
     environment {
-      ["PKL_EXEC"] = "bin/pkl-cli-macos-amd64.bin"
+      ["PKL_EXEC"] = "bin/jpkl"
     }
     steps {
       "checkout"
+      // need to use jpkl because of an issue where pkl refuses to exit
+      "yum install -y java"
       swiftTest
       new RunStep { command = "make test-snippets" }
       new RunStep { command = "make test-pkl" }
