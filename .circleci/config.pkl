@@ -77,12 +77,10 @@ jobs {
     resource_class = "xlarge"
     // TODO(oss) remove me, and download Pkl from CI
     environment {
-      ["PKL_EXEC"] = "bin/jpkl"
+      ["PKL_EXEC"] = "bin/pkl-cli-macos-amd64"
     }
     steps {
       "checkout"
-      // need to use jpkl because of an issue where pkl refuses to exit
-      new RunStep { command = "yum install -y java" }
       swiftTest
       new RunStep { command = "make test-snippets" }
       new RunStep { command = "make test-pkl" }
@@ -97,6 +95,7 @@ jobs {
     macos {
       xcode = "15.2.0"
     }
+    resource_class = "macos.m1.large.gen1"
     steps {
       "checkout"
       new RunStep {
@@ -189,7 +188,6 @@ jobs {
             out/pkl-package/*
 
           echo "Creating release for Swift library"
-          export GH_TOKEN="${GITHUB_TOKEN}"
           gh release create "${CIRCLE_TAG}" \
             --title "${CIRCLE_TAG}" \
             --target "${CIRCLE_SHA1}" \

@@ -7,8 +7,6 @@ jobs:
     steps:
     - checkout
     - run:
-        command: yum install -y java
-    - run:
         command: |-
           mkdir -p .out/test-results/
           swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
@@ -22,7 +20,7 @@ jobs:
     - store_test_results:
         path: .out/test-results/
     environment:
-      PKL_EXEC: bin/jpkl
+      PKL_EXEC: bin/pkl-cli-macos-amd64
     resource_class: xlarge
     docker:
     - image: swift:5.9-rhel-ubi9
@@ -40,6 +38,7 @@ jobs:
         root: '.'
         paths:
         - out/
+    resource_class: macos.m1.large.gen1
     macos:
       xcode: 15.2.0
   pkl-gen-swift-linux-aarch64:
@@ -111,7 +110,6 @@ jobs:
             out/pkl-package/*
 
           echo "Creating release for Swift library"
-          export GH_TOKEN="${GITHUB_TOKEN}"
           gh release create "${CIRCLE_TAG}" \
             --title "${CIRCLE_TAG}" \
             --target "${CIRCLE_SHA1}" \
@@ -127,14 +125,7 @@ jobs:
 workflows:
   prb:
     jobs:
-    - hold:
-        type: approval
-    - pr-approval/authenticate:
-        context: pkl-pr-approval
-    - test:
-        requires:
-        - hold
-        - pr-approval/authenticate
+    - test
     when:
       matches:
         value: << pipeline.git.branch >>
@@ -148,11 +139,7 @@ workflows:
       - << pipeline.git.branch >>
   release:
     jobs:
-    - hold:
-        type: approval
     - test:
-        requires:
-        - hold
         filters:
           branches:
             ignore: /.*/
@@ -161,7 +148,6 @@ workflows:
     - pkl-package:
         requires:
         - test
-        - hold
         filters:
           branches:
             ignore: /.*/
@@ -170,7 +156,6 @@ workflows:
     - pkl-gen-swift-macos:
         requires:
         - test
-        - hold
         filters:
           branches:
             ignore: /.*/
@@ -179,7 +164,6 @@ workflows:
     - pkl-gen-swift-linux-amd64:
         requires:
         - test
-        - hold
         filters:
           branches:
             ignore: /.*/
@@ -188,7 +172,6 @@ workflows:
     - pkl-gen-swift-linux-aarch64:
         requires:
         - test
-        - hold
         filters:
           branches:
             ignore: /.*/
@@ -200,7 +183,6 @@ workflows:
         - pkl-gen-swift-macos
         - pkl-gen-swift-linux-amd64
         - pkl-gen-swift-linux-aarch64
-        - hold
         context:
         - Pkl release
         filters:
