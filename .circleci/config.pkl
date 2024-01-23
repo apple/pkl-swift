@@ -77,7 +77,7 @@ jobs {
     resource_class = "xlarge"
     // TODO(oss) remove me, and download Pkl from CI
     environment {
-      ["PKL_EXEC"] = "bin/pkl-cli-amd64"
+      ["PKL_EXEC"] = "bin/pkl-cli-amd64.bin"
     }
     steps {
       "checkout"
