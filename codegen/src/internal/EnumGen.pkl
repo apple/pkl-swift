@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Unlisted
-module temp.pkl.swift.internal.EnumGen
+module pkl.swift.internal.EnumGen
 
 extends "Gen.pkl"
 

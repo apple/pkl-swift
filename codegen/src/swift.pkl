@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Module { name = "pkl_gen_swift" }
-module temp.pkl.swift.swift
+module pkl.swift.swift
 
 /// A name in Swift; i.e., an identifier.
 typealias SwiftName = String(matches(Regex(#"(?u)\p{L}[\p{L}\d_]+"#)))

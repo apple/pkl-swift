@@ -15,7 +15,7 @@
 // ===----------------------------------------------------------------------===//
 /// Representation of a type in Swift.
 @Unlisted
-abstract module temp.pkl.swift.internal.Type
+abstract module pkl.swift.internal.Type
 
 import "Type.pkl"
 

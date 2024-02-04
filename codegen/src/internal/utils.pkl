@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Unlisted
-module temp.pkl.swift.internal.utils
+module pkl.swift.internal.utils
 
 import "pkl:reflect"
 
@@ -30,7 +30,7 @@ function toSwiftString(str: String): String = pcfRenderer.renderValue(str)
 function getSwiftNameAnnotation(source: reflect.Declaration): String? =
   source
     .annotations
-    .findOrNull((it) -> it.getClass().toString() == "temp.pkl.swift.swift#Name")
+    .findOrNull((it) -> it.getClass().toString() == "pkl.swift.swift#Name")
     ?.value
 
 /// Converts a Pkl declaration (class, property, typealias) into a Swift name.
