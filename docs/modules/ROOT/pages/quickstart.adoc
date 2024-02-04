@@ -60,7 +60,7 @@ On macOS:
 [source,bash]
 [subs="+attributes"]
 ----
-curl {uri-pkl-gen-swift-macos} -o pkl-gen-swift
+curl -L {uri-pkl-gen-swift-macos} -o pkl-gen-swift
 
 chmod +x pkl-gen-swift
 ----
