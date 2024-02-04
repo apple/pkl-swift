@@ -1,7 +1,7 @@
 /// Settings used to configure code generation.
 @swift.Module { name = "pkl_gen_swift" }
 @swift.Name { value = "GeneratorSettings" }
-module temp.pkl.swift.GeneratorSettings
+module pkl.swift.GeneratorSettings
 
 import "pkl:reflect"
 import "swift.pkl"

@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Unlisted
-abstract module temp.pkl.swift.internal.Gen
+abstract module pkl.swift.internal.Gen
 
 import "SwiftMapping.pkl"
 
