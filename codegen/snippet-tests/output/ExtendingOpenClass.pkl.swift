@@ -9,7 +9,7 @@ public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEq
 
 extension ExtendingOpenClass {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "ExtendingOpenClass"
+        public static let registeredIdentifier: String = "ExtendingOpenClass"
 
         public var res1: MyClass
 
@@ -22,7 +22,7 @@ extension ExtendingOpenClass {
     }
 
     public struct MyClass: MyOpenClass {
-        public static var registeredIdentifier: String = "ExtendingOpenClass#MyClass"
+        public static let registeredIdentifier: String = "ExtendingOpenClass#MyClass"
 
         public var myBoolean: Bool
 
@@ -37,7 +37,7 @@ extension ExtendingOpenClass {
     public typealias MyOpenClass = ExtendingOpenClass_MyOpenClass
 
     public struct MyOpenClassImpl: MyOpenClass {
-        public static var registeredIdentifier: String = "ExtendingOpenClass#MyOpenClass"
+        public static let registeredIdentifier: String = "ExtendingOpenClass#MyOpenClass"
 
         public var myStr: String
 
@@ -47,7 +47,7 @@ extension ExtendingOpenClass {
     }
 
     public struct MyClass2: lib3.GoGoGo {
-        public static var registeredIdentifier: String = "ExtendingOpenClass#MyClass2"
+        public static let registeredIdentifier: String = "ExtendingOpenClass#MyClass2"
 
         public var myBoolean: Bool
 

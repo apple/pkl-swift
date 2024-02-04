@@ -9,7 +9,7 @@ public protocol pkl_swift_lib1_Being: PklRegisteredType, DynamicallyEquatable, H
 
 extension pkl_swift_lib1 {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "pkl.swift.lib1"
+        public static let registeredIdentifier: String = "pkl.swift.lib1"
 
         public init() {}
     }

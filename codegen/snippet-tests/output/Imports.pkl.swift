@@ -5,7 +5,7 @@ public enum Imports {}
 
 extension Imports {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Imports"
+        public static let registeredIdentifier: String = "Imports"
 
         public var foo: Foo.Module
 

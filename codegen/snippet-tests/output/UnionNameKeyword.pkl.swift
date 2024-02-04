@@ -11,7 +11,7 @@ extension UnionNameKeyword {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "UnionNameKeyword"
+        public static let registeredIdentifier: String = "UnionNameKeyword"
 
         public var type: `Type`
 

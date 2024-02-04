@@ -11,7 +11,7 @@ extension lib3 {
     public typealias GoGoGo = lib3_GoGoGo
 
     public struct GoGoGoImpl: GoGoGo {
-        public static var registeredIdentifier: String = "lib3#GoGoGo"
+        public static let registeredIdentifier: String = "lib3#GoGoGo"
 
         public var duck: String
 
@@ -21,7 +21,7 @@ extension lib3 {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "lib3"
+        public static let registeredIdentifier: String = "lib3"
 
         public init() {}
     }

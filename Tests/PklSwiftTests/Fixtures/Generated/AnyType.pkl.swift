@@ -5,7 +5,7 @@ public enum AnyType {}
 
 extension AnyType {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "AnyType"
+        public static let registeredIdentifier: String = "AnyType"
 
         public var bird: AnyHashable?
 
@@ -63,7 +63,7 @@ extension AnyType {
     }
 
     public struct Bird: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "AnyType#Bird"
+        public static let registeredIdentifier: String = "AnyType#Bird"
 
         public var species: String
 

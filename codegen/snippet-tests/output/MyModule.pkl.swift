@@ -11,7 +11,7 @@ extension MyModule {
     public typealias Module = MyModule_Module
 
     public struct ModuleImpl: Module {
-        public static var registeredIdentifier: String = "MyModule"
+        public static let registeredIdentifier: String = "MyModule"
 
         public var foo: String
 

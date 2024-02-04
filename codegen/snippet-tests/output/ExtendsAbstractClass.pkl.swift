@@ -9,7 +9,7 @@ public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable,
 
 extension ExtendsAbstractClass {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "ExtendsAbstractClass"
+        public static let registeredIdentifier: String = "ExtendsAbstractClass"
 
         public var a: any A
 
@@ -36,7 +36,7 @@ extension ExtendsAbstractClass {
     public typealias A = ExtendsAbstractClass_A
 
     public struct B: A {
-        public static var registeredIdentifier: String = "ExtendsAbstractClass#B"
+        public static let registeredIdentifier: String = "ExtendsAbstractClass#B"
 
         public var c: String
 

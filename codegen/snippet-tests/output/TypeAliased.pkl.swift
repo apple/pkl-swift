@@ -5,7 +5,7 @@ public enum TypeAliased {}
 
 extension TypeAliased {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "TypeAliased"
+        public static let registeredIdentifier: String = "TypeAliased"
 
         public var myMap: StringyMap
 

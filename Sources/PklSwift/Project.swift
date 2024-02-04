@@ -18,7 +18,7 @@ import Foundation
 
 /// The Swift representation of `pkl.Project`
 public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectFile {
-    public static var registeredIdentifier: String = "pkl.Project"
+    public static let registeredIdentifier: String = "pkl.Project"
 
     let package: Package?
 
@@ -70,7 +70,7 @@ extension Project: Decodable {
 extension Project {
     /// The Swift representation of `pkl.Project#RemoteDependency`
     public struct RemoteDependency: PklRegisteredType, DependencyDeclaredInProjectFile, Decodable, Hashable {
-        public static var registeredIdentifier: String = "pkl.Project#RemoteDependency"
+        public static let registeredIdentifier: String = "pkl.Project#RemoteDependency"
 
         let uri: String
         let checksums: Checksums?
@@ -78,7 +78,7 @@ extension Project {
 
     /// The Swift representation of `pkl.Project#Package`
     public struct Package: PklRegisteredType, Hashable {
-        public static var registeredIdentifier: String = "pkl.Project#Package"
+        public static let registeredIdentifier: String = "pkl.Project#Package"
 
         let name: String
         let baseUri: String

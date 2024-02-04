@@ -13,7 +13,7 @@ extension OpenModule {
     public typealias Module = OpenModule_Module
 
     public struct ModuleImpl: Module {
-        public static var registeredIdentifier: String = "OpenModule"
+        public static let registeredIdentifier: String = "OpenModule"
 
         public var foo: String
 

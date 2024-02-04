@@ -5,7 +5,7 @@ public enum ApiTypes {}
 
 extension ApiTypes {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "ApiTypes"
+        public static let registeredIdentifier: String = "ApiTypes"
 
         public var res1: Pair<Int, String>
 

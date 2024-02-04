@@ -113,7 +113,7 @@ extension Enums {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Enums"
+        public static let registeredIdentifier: String = "Enums"
 
         /// City of tomorrow!
         public var city: City
@@ -145,7 +145,7 @@ extension Enums {
     }
 
     public struct Horse: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Enums#Horse"
+        public static let registeredIdentifier: String = "Enums#Horse"
 
         public var neigh: Bool
 
@@ -155,7 +155,7 @@ extension Enums {
     }
 
     public struct Zebra: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Enums#Zebra"
+        public static let registeredIdentifier: String = "Enums#Zebra"
 
         public var stripes: String
 
@@ -165,7 +165,7 @@ extension Enums {
     }
 
     public struct Monkey: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Enums#Monkey"
+        public static let registeredIdentifier: String = "Enums#Monkey"
 
         public var tail: String
 

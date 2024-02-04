@@ -10,7 +10,7 @@ extension ExplicitlyCoolName {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "ExplicitName"
+        public static let registeredIdentifier: String = "ExplicitName"
 
         public var MyCoolProp: SomethingVeryFunny
 
@@ -24,7 +24,7 @@ extension ExplicitlyCoolName {
     }
 
     public struct SomethingVeryFunny: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "ExplicitName#SomethingFunny"
+        public static let registeredIdentifier: String = "ExplicitName#SomethingFunny"
 
         public init() {}
     }
