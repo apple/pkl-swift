@@ -88,7 +88,7 @@ jobs:
           echo 'export PKL_EXEC=/tmp/pkl/pkl' >> $BASH_ENV
         name: Downloading pkl
     - run:
-        command: $PKL_EXEC project package --output-path out/pkl-package/ codegen/src/
+        command: $PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/
     - persist_to_workspace:
         root: '.'
         paths:
@@ -114,7 +114,7 @@ jobs:
 
           echo "Creating release for Pkl package"
           gh release create "pkl.swift@${CIRCLE_TAG}" \
-            --title "Pkl package ${CIRCLE_TAG}" \
+            --title "pkl.swift@${CIRCLE_TAG}" \
             --target "${CIRCLE_SHA1}" \
             --notes "This holds the release assets for the pkl.swift Pkl package." \
             --repo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" \
