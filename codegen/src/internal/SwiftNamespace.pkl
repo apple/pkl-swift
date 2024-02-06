@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Unlisted
-module temp.pkl.swift.internal.SwiftNamespace
+module pkl.swift.internal.SwiftNamespace
 
 import "pkl:reflect"
 import "ClassGen.pkl"

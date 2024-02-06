@@ -15,7 +15,7 @@
 // ===----------------------------------------------------------------------===//
 /// Utilities for generating Swift types from Pkl.
 @Unlisted
-module temp.pkl.swift.internal.typegen
+module pkl.swift.internal.typegen
 
 import "pkl:reflect"
 import "Type.pkl"

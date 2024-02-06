@@ -60,7 +60,7 @@ On macOS:
 [source,bash]
 [subs="+attributes"]
 ----
-curl {uri-pkl-gen-swift-macos} -o pkl-gen-swift
+curl -L {uri-pkl-gen-swift-macos} -o pkl-gen-swift
 
 chmod +x pkl-gen-swift
 ----
@@ -106,7 +106,7 @@ Once defined, evaluate the Pkl module into Swift data.
 [source,swift]
 ----
 func main() async throws {
-	let config = try await AppConfig.loadFromPath("pkl/local/appConfig.pkl")
+	let config = try await AppConfig.loadFrom(source: .path("pkl/local/appConfig.pkl"))
 	print("I'm running on host \(config.host)\n")
 }
 ----

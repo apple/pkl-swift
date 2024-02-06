@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 @Unlisted
-module temp.pkl.swift.internal.gatherer
+module pkl.swift.internal.gatherer
 
 import "pkl:reflect"
 import "typegen.pkl"

@@ -1,4 +1,4 @@
-// Code generated from Pkl module `temp.pkl.swift.GeneratorSettings`. DO NOT EDIT.
+// Code generated from Pkl module `pkl.swift.GeneratorSettings`. DO NOT EDIT.
 import PklSwift
 
 public enum GeneratorSettings {}
@@ -6,7 +6,7 @@ public enum GeneratorSettings {}
 extension GeneratorSettings {
   /// Settings used to configure code generation.
   public struct Module: PklRegisteredType, Decodable, Hashable {
-    public static let registeredIdentifier: String = "temp.pkl.swift.GeneratorSettings"
+    public static let registeredIdentifier: String = "pkl.swift.GeneratorSettings"
 
     /// The set of modules to turn into Swift code.
     ///

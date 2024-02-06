@@ -1,5 +1,20 @@
 = Changelog
 
+[[release-0.2.3]]
+== 0.2.3 (2024-02-04)
+
+=== Fixes
+
+* Fixes one more Pkl module whose name was incorrect
+
+[[release-0.2.2]]
+== 0.2.2 (2024-02-04)
+
+=== Fixes
+
+* Fixes an issue where module names in Pkl module pkl.swift do not match the package name
+* Fix some documentation issues on the website
+
 [[release-0.2.1]]
 == 0.2.1 (2024-02-02)
 

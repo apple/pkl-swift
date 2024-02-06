@@ -16,7 +16,7 @@
 /// Generates Swift sources from Pkl
 @swift.Module { name = "pkl_gen_swift" }
 @ModuleInfo { minPklVersion = "0.24.0" }
-module temp.pkl.swift.Generator
+module pkl.swift.Generator
 
 import "pkl:reflect"
 import "internal/gatherer.pkl"
@@ -53,7 +53,7 @@ function isEnumLike(decl: reflect.TypeDeclaration) =
 function getSwiftModuleName(decl: reflect.TypeDeclaration): String? =
   decl.enclosingDeclaration
     .annotations
-    .findOrNull((it) -> it.getClass().toString() == "temp.pkl.swift.swift#Module")
+    .findOrNull((it) -> it.getClass().toString() == "pkl.swift.swift#Module")
     ?.name
 
 function gatherEnums(decl: List<reflect.TypeDeclaration>): List<SwiftMapping> =
