@@ -82,7 +82,7 @@ For more details, consult the link:{uri-swift-coding-keys-docs}[Swift documentat
 ----
 struct Foo: Decodable {
     let myFoo: String
-    let myBar: Innt
+    let myBar: Int
 
     enum CodingKeys: String, CodingKey {
         case myFoo = "foo"
