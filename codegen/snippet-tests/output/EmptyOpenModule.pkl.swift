@@ -10,7 +10,7 @@ extension EmptyOpenModule {
     public typealias Module = EmptyOpenModule_Module
 
     public struct ModuleImpl: Module {
-        public static var registeredIdentifier: String = "EmptyOpenModule"
+        public static let registeredIdentifier: String = "EmptyOpenModule"
 
         public init() {}
     }

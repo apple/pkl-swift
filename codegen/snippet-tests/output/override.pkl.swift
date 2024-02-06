@@ -9,7 +9,7 @@ public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable 
 
 extension override {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "override"
+        public static let registeredIdentifier: String = "override"
 
         public var foo: any Foo
 
@@ -36,7 +36,7 @@ extension override {
     public typealias Foo = override_Foo
 
     public struct Bar: Foo {
-        public static var registeredIdentifier: String = "override#Bar"
+        public static let registeredIdentifier: String = "override#Bar"
 
         public var myProp: String
 

@@ -5,7 +5,7 @@ public enum ExtendedModule {}
 
 extension ExtendedModule {
     public struct Module: OpenModule.Module {
-        public static var registeredIdentifier: String = "ExtendedModule"
+        public static let registeredIdentifier: String = "ExtendedModule"
 
         public var foo: String
 

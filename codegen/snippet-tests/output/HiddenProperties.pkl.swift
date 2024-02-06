@@ -5,7 +5,7 @@ public enum HiddenProperties {}
 
 extension HiddenProperties {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "HiddenProperties"
+        public static let registeredIdentifier: String = "HiddenProperties"
 
         public var propC: String
 

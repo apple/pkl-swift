@@ -5,13 +5,13 @@ public enum com_example_ExtendedSimple {}
 
 extension com_example_ExtendedSimple {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "com.example.ExtendedSimple"
+        public static let registeredIdentifier: String = "com.example.ExtendedSimple"
 
         public init() {}
     }
 
     public struct ExtendedSimple: com_example_Simple.Person {
-        public static var registeredIdentifier: String = "com.example.ExtendedSimple#ExtendedSimple"
+        public static let registeredIdentifier: String = "com.example.ExtendedSimple#ExtendedSimple"
 
         public var eyeColor: String
 

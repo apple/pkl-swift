@@ -9,7 +9,7 @@ public protocol pkl_swift_example_Poly_Animal: pkl_swift_lib1_Being {
 
 extension pkl_swift_example_Poly {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "pkl.swift.example.Poly"
+        public static let registeredIdentifier: String = "pkl.swift.example.Poly"
 
         public var beings: [any pkl_swift_lib1.Being]
 
@@ -56,7 +56,7 @@ extension pkl_swift_example_Poly {
     }
 
     public struct Dog: Animal {
-        public static var registeredIdentifier: String = "pkl.swift.example.Poly#Dog"
+        public static let registeredIdentifier: String = "pkl.swift.example.Poly#Dog"
 
         public var barks: Bool
 
@@ -103,7 +103,7 @@ extension pkl_swift_example_Poly {
     public typealias Animal = pkl_swift_example_Poly_Animal
 
     public struct AnimalImpl: Animal {
-        public static var registeredIdentifier: String = "pkl.swift.example.Poly#Animal"
+        public static let registeredIdentifier: String = "pkl.swift.example.Poly#Animal"
 
         public var name: String
 
@@ -116,7 +116,7 @@ extension pkl_swift_example_Poly {
     }
 
     public struct Bird: pkl_swift_lib1.Being {
-        public static var registeredIdentifier: String = "pkl.swift.example.Poly#Bird"
+        public static let registeredIdentifier: String = "pkl.swift.example.Poly#Bird"
 
         public var name: String
 

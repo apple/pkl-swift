@@ -148,7 +148,7 @@ local struct: String = new Listing {
   "public struct \(classInfo.struct.name): "
   structSuperclasses
   " {\n"
-  "\(module.indent)public static var registeredIdentifier: String = \(utils.toSwiftString(classInfo.source.reflectee.toString()))\n\n"
+  "\(module.indent)public static let registeredIdentifier: String = \(utils.toSwiftString(classInfo.source.reflectee.toString()))\n\n"
   when (!properties.isEmpty) {
     for (pklPropertyName, field in properties) {
       when (pklPropertyName != properties.keys.first) {

@@ -5,7 +5,7 @@ public enum Classes {}
 
 extension Classes {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Classes"
+        public static let registeredIdentifier: String = "Classes"
 
         public var animals: [Animal]
 
@@ -15,7 +15,7 @@ extension Classes {
     }
 
     public struct Animal: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Classes#Animal"
+        public static let registeredIdentifier: String = "Classes#Animal"
 
         public var name: String
 

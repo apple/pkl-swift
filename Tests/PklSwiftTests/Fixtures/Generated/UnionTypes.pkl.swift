@@ -108,7 +108,7 @@ extension UnionTypes {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "UnionTypes"
+        public static let registeredIdentifier: String = "UnionTypes"
 
         public var fruit1: Fruit
 
@@ -160,7 +160,7 @@ extension UnionTypes {
     }
 
     public struct Banana: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "UnionTypes#Banana"
+        public static let registeredIdentifier: String = "UnionTypes#Banana"
 
         public var isRipe: Bool
 
@@ -170,7 +170,7 @@ extension UnionTypes {
     }
 
     public struct Grape: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "UnionTypes#Grape"
+        public static let registeredIdentifier: String = "UnionTypes#Grape"
 
         public var isUsedForWine: Bool
 
@@ -180,7 +180,7 @@ extension UnionTypes {
     }
 
     public struct Apple: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "UnionTypes#Apple"
+        public static let registeredIdentifier: String = "UnionTypes#Apple"
 
         public var isRed: Bool
 
@@ -192,7 +192,7 @@ extension UnionTypes {
     public typealias Animal = UnionTypes_Animal
 
     public struct Zebra: Animal {
-        public static var registeredIdentifier: String = "UnionTypes#Zebra"
+        public static let registeredIdentifier: String = "UnionTypes#Zebra"
 
         public var name: String
 
@@ -202,7 +202,7 @@ extension UnionTypes {
     }
 
     public struct Donkey: Animal {
-        public static var registeredIdentifier: String = "UnionTypes#Donkey"
+        public static let registeredIdentifier: String = "UnionTypes#Donkey"
 
         public var name: String
 

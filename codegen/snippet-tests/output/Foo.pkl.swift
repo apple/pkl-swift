@@ -13,7 +13,7 @@ public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
 
 extension Foo {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Foo"
+        public static let registeredIdentifier: String = "Foo"
 
         public var animals: [any Animal]
 
@@ -42,7 +42,7 @@ extension Foo {
     public typealias Animal = Foo_Animal
 
     public struct AnimalImpl: Animal {
-        public static var registeredIdentifier: String = "Foo#Animal"
+        public static let registeredIdentifier: String = "Foo#Animal"
 
         public var name: String
 
@@ -57,7 +57,7 @@ extension Foo {
     public typealias Being = Foo_Being
 
     public struct Bird: Animal {
-        public static var registeredIdentifier: String = "Foo#Bird"
+        public static let registeredIdentifier: String = "Foo#Bird"
 
         public var flies: Bool
 
@@ -73,7 +73,7 @@ extension Foo {
     }
 
     public struct Dog: Animal {
-        public static var registeredIdentifier: String = "Foo#Dog"
+        public static let registeredIdentifier: String = "Foo#Dog"
 
         public var barks: Bool
 

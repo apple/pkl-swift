@@ -34,7 +34,7 @@ extension union {
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "union"
+        public static let registeredIdentifier: String = "union"
 
         /// A city
         public var city: City

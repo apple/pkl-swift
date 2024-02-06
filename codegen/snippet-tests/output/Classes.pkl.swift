@@ -9,7 +9,7 @@ public protocol Classes_Animal: PklRegisteredType, DynamicallyEquatable, Hashabl
 
 extension Classes {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Classes"
+        public static let registeredIdentifier: String = "Classes"
 
         public var animals: [any Animal]
 
@@ -38,7 +38,7 @@ extension Classes {
     public typealias Animal = Classes_Animal
 
     public struct AnimalImpl: Animal {
-        public static var registeredIdentifier: String = "Classes#Animal"
+        public static let registeredIdentifier: String = "Classes#Animal"
 
         public var name: String
 

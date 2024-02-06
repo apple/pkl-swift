@@ -11,7 +11,7 @@ extension Override2 {
     public typealias Module = Override2_Module
 
     public struct ModuleImpl: Module {
-        public static var registeredIdentifier: String = "Override2"
+        public static let registeredIdentifier: String = "Override2"
 
         /// Doc comments
         public var foo: String
@@ -22,7 +22,7 @@ extension Override2 {
     }
 
     public struct MySubclass: Module {
-        public static var registeredIdentifier: String = "Override2#MySubclass"
+        public static let registeredIdentifier: String = "Override2#MySubclass"
 
         /// Doc comments
         public var foo: String

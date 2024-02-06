@@ -5,7 +5,7 @@ public enum Collections {}
 
 extension Collections {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "Collections"
+        public static let registeredIdentifier: String = "Collections"
 
         public var res1: [Int]
 

@@ -15,7 +15,7 @@ public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredTyp
 
 extension com_example_Simple {
     public struct Module: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "com.example.Simple"
+        public static let registeredIdentifier: String = "com.example.Simple"
 
         /// This is truly a person.
         public var person: any Person
@@ -43,7 +43,7 @@ extension com_example_Simple {
     public typealias Person = com_example_Simple_Person
 
     public struct PersonImpl: Person {
-        public static var registeredIdentifier: String = "com.example.Simple#Person"
+        public static let registeredIdentifier: String = "com.example.Simple#Person"
 
         /// The name of the person
         public var theName: String
@@ -63,7 +63,7 @@ extension com_example_Simple {
     }
 
     public struct ThePerson: Person {
-        public static var registeredIdentifier: String = "com.example.Simple#ThePerson"
+        public static let registeredIdentifier: String = "com.example.Simple#ThePerson"
 
         public var the: String
 
@@ -89,7 +89,7 @@ extension com_example_Simple {
     public typealias OpenClassExtendingOpenClass = com_example_Simple_OpenClassExtendingOpenClass
 
     public struct OpenClassExtendingOpenClassImpl: OpenClassExtendingOpenClass {
-        public static var registeredIdentifier: String = "com.example.Simple#OpenClassExtendingOpenClass"
+        public static let registeredIdentifier: String = "com.example.Simple#OpenClassExtendingOpenClass"
 
         public var someOtherProp: Bool?
 
@@ -99,7 +99,7 @@ extension com_example_Simple {
     }
 
     public struct ClassWithReallyLongConstructor: PklRegisteredType, Decodable, Hashable {
-        public static var registeredIdentifier: String = "com.example.Simple#ClassWithReallyLongConstructor"
+        public static let registeredIdentifier: String = "com.example.Simple#ClassWithReallyLongConstructor"
 
         public var theProperty1: String
 
