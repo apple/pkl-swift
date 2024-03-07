@@ -8,4 +8,4 @@ The full documentation for this library can be found on our link:https://pkl-lan
 
 To get up and going, reference the link:https://pkl-lang.org/swift/current/quickstart.html[quick start guide].
 
-When upgrading pkl-swift, reference the link:https://pkl-lang.org/pkl/swift/current/CHANGELOG.html[changelog] for details.
+When upgrading pkl-swift, reference the link:https://pkl-lang.org/swift/current/CHANGELOG.html[changelog] for details.
