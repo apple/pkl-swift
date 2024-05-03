@@ -77,9 +77,8 @@ class FixturesTest: XCTestCase {
         XCTAssertEqual(
             result,
             ApiTypes.Module(
-                res1: Pair(42, "Hello"),
-                res2: .hours(10),
-                res3: .gibibytes(1.2345)
+                res1: .hours(10),
+                res2: .gibibytes(1.2345)
             )
         )
     }

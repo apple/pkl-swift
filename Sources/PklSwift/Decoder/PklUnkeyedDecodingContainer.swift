@@ -49,11 +49,6 @@ extension _PklDecoder {
                     throw error("Expected an array at slot 2, but got \(value[1].debugDataTypeDescription)")
                 }
                 self.members = members
-            } else if value.count == 3 {
-                guard pklType == .pair else {
-                    throw error("Expected to find a Pair type marker, but found \(pklType)")
-                }
-                self.members = Array(value[1...2])
             } else {
                 throw error("Expected 2 or 3 values, but found \(value.count)")
             }

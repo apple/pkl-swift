@@ -144,15 +144,5 @@ mappedHigherOrderTypes: Mapping<Class|TypeAlias, (reflect.DeclaredType, reflect.
             generateType(typeArg, enclosing, seenMappings)
         )
       }
-  [Pair] = (type, enclosing, seenMappings) -> new Type.Declared {
-    typeName = "Pair"
-    swiftModuleName = "Pkl"
-    local typeArgKey = type.typeArguments.getOrNull(0)
-    local typeArgValue = type.typeArguments.getOrNull(1)
-    typeArguments = List(
-      if (typeArgKey == null) anyType else generateType(typeArgKey, enclosing, seenMappings),
-      if (typeArgValue == null) anyType else generateType(typeArgValue, enclosing, seenMappings)
-    )
-  }
 }
 

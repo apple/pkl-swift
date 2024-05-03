@@ -7,16 +7,13 @@ extension ApiTypes {
     public struct Module: PklRegisteredType, Decodable, Hashable {
         public static let registeredIdentifier: String = "ApiTypes"
 
-        public var res1: Pair<Int, String>
+        public var res1: Duration
 
-        public var res2: Duration
+        public var res2: DataSize
 
-        public var res3: DataSize
-
-        public init(res1: Pair<Int, String>, res2: Duration, res3: DataSize) {
+        public init(res1: Duration, res2: DataSize) {
             self.res1 = res1
             self.res2 = res2
-            self.res3 = res3
         }
     }
 
