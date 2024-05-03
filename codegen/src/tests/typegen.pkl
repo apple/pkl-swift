@@ -53,18 +53,11 @@ local class Nullables {
 
 local reflectedNullables = reflect.Class(Nullables)
 
-local class Pairs {
-  res1: Pair<String, String>
-  res2: Pair<String, String?>
-}
-
 local class Nothing {
   res1: nothing
 }
 
 local nothingType: reflect.Type = reflect.Class(Nothing).properties["res1"].type
-
-local reflectedPairs = reflect.Class(Pairs)
 
 local mod = reflect.Module(module).moduleClass
 
