@@ -122,6 +122,7 @@ struct CreateEvaluatorRequest: ClientRequestMessage {
     var cacheDir: String?
     var outputFormat: String?
     var project: ProjectOrDependency?
+    var http: Http?
 }
 
 struct ProjectOrDependency: Codable {

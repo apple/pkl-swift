@@ -143,8 +143,8 @@ public actor EvaluatorManager {
     }
 
     /// Convenience method for constructing a project evaluator with preconfigured base options.
-    public func withProjectEvaluator<T>(projectDir: String, _ action: (Evaluator) async throws -> T) async throws -> T {
-        try await self.withProjectEvaluator(projectDir: projectDir, options: .preconfigured, action)
+    public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
+        try await self.withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
     }
 
     /// Constructs an evaluator that is configured by the project within the project dir.
@@ -155,20 +155,20 @@ public actor EvaluatorManager {
     /// After the action completes or throws, the evaluator is closed.
     ///
     /// - Parameters:
-    ///   - projectDir: The project directory that contains the PklProject file.
+    ///   - projectBaseURI: The project base path that contains the PklProject file.
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withProjectEvaluator<T>(projectDir: String, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
-        let evalautor = try await newProjectEvaluator(projectDir: projectDir, options: options)
+    public func withProjectEvaluator<T>(projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+        let evaluator = try await newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)
         var closed = false
         do {
-            let result = try await action(evalautor)
-            try await evalautor.close()
+            let result = try await action(evaluator)
+            try await evaluator.close()
             closed = true
             return result
         } catch {
             if !closed {
-                try await evalautor.close()
+                try await evaluator.close()
             }
             throw error
         }
@@ -176,7 +176,8 @@ public actor EvaluatorManager {
 
     /// Creates a new evaluator with the provided options.
     ///
-    /// To create an evaluator that understands project dependencies, use ``newProjectEvaluator(projectDir:options:)``.
+    /// To create an evaluator that understands project dependencies, use
+    /// ``newProjectEvaluator(projectBaseURI:options:)``.
     ///
     /// - Parameter options: The options used to configure the evaluator.
     public func newEvaluator(options: EvaluatorOptions) async throws -> Evaluator {
@@ -209,15 +210,15 @@ public actor EvaluatorManager {
     //  Any `evaluatorSettings` set within the PklProject file overwrites any fields set on `options`.
     ///
     /// - Parameters:
-    ///   - projectDir: The project directory containing the `PklProject` file.
+    ///   - projectBaseURI: The project base path containing the `PklProject` file.
     ///   - options: The base options used to configure the evaluator.
-    public func newProjectEvaluator(projectDir: String, options: EvaluatorOptions) async throws -> Evaluator {
+    public func newProjectEvaluator(projectBaseURI: URL, options: EvaluatorOptions) async throws -> Evaluator {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
         return try await self.withEvaluator(options: .preconfigured) { projectEvaluator in
             let project = try await projectEvaluator.evaluateOutputValue(
-                source: .path("\(projectDir)/PklProject"),
+                source: .path("\(projectBaseURI)/PklProject"),
                 asType: Project.self
             )
             return try await self.newEvaluator(options: options.withProject(project))

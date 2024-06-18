@@ -14,15 +14,13 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import Foundation
-
 /// The Swift representation of `pkl.Project`
 public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectFile {
     public static let registeredIdentifier: String = "pkl.Project"
 
     let package: Package?
 
-    let evaluatorSettings: Project.EvaluatorSettings
+    let evaluatorSettings: PklEvaluatorSettings
 
     let projectFileUri: String
 
@@ -52,7 +50,7 @@ extension Project: Decodable {
     public init(from decoder: Decoder) throws {
         let dec = try decoder.container(keyedBy: PklCodingKey.self)
         let package = try dec.decode(Package?.self, forKey: PklCodingKey(stringValue: "package")!)
-        let evaluatorSettings = try dec.decode(EvaluatorSettings.self, forKey: PklCodingKey(stringValue: "evaluatorSettings")!)
+        let evaluatorSettings = try dec.decode(PklEvaluatorSettings.self, forKey: PklCodingKey(stringValue: "evaluatorSettings")!)
         let projectFileUri = try dec.decode(String.self, forKey: PklCodingKey(stringValue: "projectFileUri")!)
         let tests = try dec.decode([String].self, forKey: PklCodingKey(stringValue: "tests")!)
         let dependencies = try dec.decode([String: PklAny].self, forKey: PklCodingKey(stringValue: "dependencies")!)
@@ -98,16 +96,10 @@ extension Project {
         let uri: String
     }
 
-    /// The Swift representation of `pkl.Project#EvaluatorSettings
-    public struct EvaluatorSettings: Decodable, Hashable {
-        let externalProperties: [String: String]?
-        let env: [String: String]?
-        let allowedModules: [String]?
-        let allowedResources: [String]?
-        let noCache: Bool?
-        let modulePath: [String]?
-        let timeout: Duration?
-        let moduleCacheDir: String?
-        let rootDir: String?
-    }
+    @available(
+            *,
+            deprecated,
+            message: "Replaced by PklEvaluatorSettings, independent of Project",
+            renamed: "PklEvaluatorSettings")
+    public typealias EvaluatorSettings = PklEvaluatorSettings
 }

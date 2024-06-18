@@ -36,17 +36,14 @@ public func withEvaluator<T>(_ action: (Evaluator) async throws -> T) async thro
     try await withEvaluator(options: .preconfigured, action)
 }
 
-/// Like ``withProjectEvaluator(projectDir:options:_:)``, but configured with preconfigured otions.
+/// Like ``withProjectEvaluator(projectBaseURI:options:_:)``, but configured with preconfigured options.
 ///
 /// - Parameters:
-///   - projectDir: The directory containing the PklProject file.
+///   - projectBaseURI: The base path containing the PklProject file.
 ///   - action: The action to perform.
 /// - Returns: The result of the action.
-public func withProjectEvaluator<T>(
-    projectDir: String,
-    _ action: (Evaluator) async throws -> T
-) async throws -> T {
-    try await withProjectEvaluator(projectDir: projectDir, options: .preconfigured, action)
+public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
+    try await withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
 }
 
 /// Convenience method for initializing an evaluator from the project.
@@ -56,17 +53,17 @@ public func withProjectEvaluator<T>(
 ///
 /// After `action` completes, the evaluator is closed.
 /// - Parameters:
-///   - projectDir: The directory containing the PklProject file.
+///   - projectBaseURI: The base path containing the PklProject file.
 ///   - options: The base options used to configure the evaluator.
 ///   - action: The action to perform.
 /// - Returns: The result of the action.
 public func withProjectEvaluator<T>(
-    projectDir: String,
-    options: EvaluatorOptions,
-    _ action: (Evaluator) async throws -> T
+        projectBaseURI: URL,
+        options: EvaluatorOptions,
+        _ action: (Evaluator) async throws -> T
 ) async throws -> T {
     try await withEvaluatorManager { manager in
-        let evaluator = try await manager.newProjectEvaluator(projectDir: projectDir, options: options)
+        let evaluator = try await manager.newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)
         return try await action(evaluator)
     }
 }

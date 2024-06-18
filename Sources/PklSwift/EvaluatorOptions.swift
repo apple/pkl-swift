@@ -18,20 +18,21 @@ import Foundation
 
 public struct EvaluatorOptions {
     public init(
-        allowedModules: [String]? = nil,
-        allowedResources: [String]? = nil,
-        resourceReaders: [ResourceReader]? = nil,
-        moduleReaders: [ModuleReader]? = nil,
-        modulePaths: [String]? = nil,
-        env: [String: String]? = nil,
-        properties: [String: String]? = nil,
-        timeout: Swift.Duration? = nil,
-        rootDir: String? = nil,
-        cacheDir: String? = nil,
-        outputFormat: String? = nil,
-        logger: Logger = Loggers.noop,
-        projectDir: String? = nil,
-        declaredProjectDependencies: [String: ProjectDependency]? = nil
+            allowedModules: [String]? = nil,
+            allowedResources: [String]? = nil,
+            resourceReaders: [ResourceReader]? = nil,
+            moduleReaders: [ModuleReader]? = nil,
+            modulePaths: [String]? = nil,
+            env: [String: String]? = nil,
+            properties: [String: String]? = nil,
+            timeout: Swift.Duration? = nil,
+            rootDir: String? = nil,
+            cacheDir: String? = nil,
+            outputFormat: String? = nil,
+            logger: Logger = Loggers.noop,
+            projectBaseURI: URL? = nil,
+            http: Http? = nil,
+            declaredProjectDependencies: [String: ProjectDependency]? = nil
     ) {
         self.allowedModules = allowedModules
         self.allowedResources = allowedResources
@@ -45,7 +46,8 @@ public struct EvaluatorOptions {
         self.cacheDir = cacheDir
         self.outputFormat = outputFormat
         self.logger = logger
-        self.projectDir = projectDir
+        self.projectBaseURI = projectBaseURI
+        self.http = http
         self.declaredProjectDependencies = declaredProjectDependencies
     }
 
@@ -106,13 +108,19 @@ public struct EvaluatorOptions {
     /// It is meant to be set by lower level logic in Swift code that first evaluates the PklProject,
     /// which then configures ``EvaluatorOptions`` accordingly.
     ///
-    /// To emulate the CLI's `--project-dir` flag, create an evaluator with ``withProjectEvaluator(projectDir:_:)``,
+    /// To emulate the CLI's `--project-dir` flag, create an evaluator with ``withProjectEvaluator(projectBaseURI:_:)``,
     /// or ``EvaluatorManager/newProjectEvaluator()``.
-    public var projectDir: String?
+    public var projectBaseURI: URL?
 
-    /// The set of dependencies available to modules within ``projectDir``.
+    /// Settings that control how Pkl talks to HTTP(S) servers.
     ///
-    /// When importing dependencies, a `PklProject.deps.json` file must exist within ``projectDir``
+    /// Added in Pkl 0.26.
+    /// These fields are ignored if targeting Pkl 0.25.
+    public var http: Http?
+
+    /// The set of dependencies available to modules within ``projectBaseURI``.
+    ///
+    /// When importing dependencies, a `PklProject.deps.json` file must exist within ``projectBaseURI``
     /// that contains the project's resolved dependencies.
     public var declaredProjectDependencies: [String: ProjectDependency]?
 }
@@ -153,18 +161,19 @@ extension EvaluatorOptions {
             rootDir: self.rootDir,
             cacheDir: self.cacheDir,
             outputFormat: self.outputFormat,
-            project: self.project()
+            project: self.project(),
+            http: self.http
         )
     }
 
     func project() -> ProjectOrDependency? {
-        guard let projectDir else {
+        guard let projectBaseURI else {
             return nil
         }
         return .init(
             packageUri: nil,
             type: "project",
-            projectFileUri: "file://\(projectDir)/PklProject",
+            projectFileUri: "file://\(projectBaseURI)/PklProject",
             checksums: nil,
             dependencies: self.declaredProjectDependenciesToMessage(self.declaredProjectDependencies)
         )
@@ -227,28 +236,15 @@ extension EvaluatorOptions {
     /// Builds options that configures the evaluator with settings set on the project.
     ///
     /// Skips any settings that are nil.
-    public func withProjectEvaluatorSettings(_ evaluatorSettings: Project.EvaluatorSettings) -> EvaluatorOptions {
+    public func withProjectEvaluatorSettings(_ evaluatorSettings: PklEvaluatorSettings) -> EvaluatorOptions {
         var options = self
-        if evaluatorSettings.externalProperties != nil {
-            options.properties = evaluatorSettings.externalProperties
-        }
-        if evaluatorSettings.env != nil {
-            options.env = evaluatorSettings.env
-        }
-        if evaluatorSettings.allowedModules != nil {
-            options.allowedModules = evaluatorSettings.allowedModules
-        }
-        if evaluatorSettings.allowedResources != nil {
-            options.allowedResources = evaluatorSettings.allowedResources
-        }
-        if evaluatorSettings.noCache == true {
-            options.cacheDir = nil
-        } else if evaluatorSettings.moduleCacheDir != nil {
-            options.cacheDir = evaluatorSettings.moduleCacheDir
-        }
-        if evaluatorSettings.rootDir != nil {
-            options.rootDir = evaluatorSettings.rootDir
-        }
+        options.properties = evaluatorSettings.externalProperties ?? properties
+        options.env = evaluatorSettings.env ?? env
+        options.allowedModules = evaluatorSettings.allowedModules ?? allowedModules
+        options.allowedResources = evaluatorSettings.allowedResources ?? allowedResources
+        options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? cacheDir)
+        options.rootDir = evaluatorSettings.rootDir ?? rootDir
+        options.http = evaluatorSettings.http ?? http
         return options
     }
 
@@ -277,7 +273,8 @@ extension EvaluatorOptions {
     /// Builds options with dependencies from the input project.
     public func withProjectDependencies(_ project: Project) -> EvaluatorOptions {
         var options = self
-        options.projectDir = String(URL(string: project.projectFileUri)!.path.dropLast("/PklProject".count))
+        options.projectBaseURI = URL(string: project.projectFileUri)!
+        options.projectBaseURI?.deleteLastPathComponent()
         options.declaredProjectDependencies = self.projectDependencies(project)
         return options
     }
