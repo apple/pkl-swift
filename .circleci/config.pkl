@@ -23,7 +23,7 @@ local swiftTest = new RunStep {
     """
 }
 
-local pklVersion = "0.25.1"
+local pklVersion = "0.26.0"
 local pklBinary = "https://repo1.maven.org/maven2/org/pkl-lang/pkl-cli-linux-amd64/\(pklVersion)/pkl-cli-linux-amd64-\(pklVersion).bin"
 
 local downloadPkl = new RunStep {
