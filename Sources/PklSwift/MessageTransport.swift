@@ -16,6 +16,7 @@
 
 import Foundation
 import MessagePack
+import SemanticVersion
 
 protocol MessageTransport {
     /// Send a message to the Pkl server.
@@ -66,32 +67,6 @@ public class ChildProcessMessageTransport: MessageTransport {
         self.pklCommand = pklCommand
     }
 
-    private func getPklCommand() throws -> [String] {
-        if let exec = ProcessInfo.processInfo.environment["PKL_EXEC"] {
-            return exec.components(separatedBy: " ")
-        }
-        guard let path = ProcessInfo.processInfo.environment["PATH"] else {
-            throw PklError("Unable to find `pkl` command on PATH.")
-        }
-        for dir in path.components(separatedBy: ":") {
-            do {
-                let contents = try FileManager.default.contentsOfDirectory(atPath: dir)
-                if let pkl = contents.first(where: { $0 == "pkl" }) {
-                    let file = NSString.path(withComponents: [dir, pkl])
-                    if FileManager.default.isExecutableFile(atPath: file) {
-                        return [file]
-                    }
-                }
-            } catch {
-                if error._domain == NSCocoaErrorDomain {
-                    continue
-                }
-                throw error
-            }
-        }
-        throw PklError("Unable to find `pkl` command on PATH.")
-    }
-
     private func ensureProcessStarted() throws {
         if self.process?.isRunning == true { return }
         let pklCommand = try getPklCommand()
@@ -140,7 +115,7 @@ public class ChildProcessMessageTransport: MessageTransport {
         switch messageType {
         case MessageType.CREATE_EVALUATOR_RESPONSE:
             return try self.decoder.decode(as: CreateEvaluatorResponse.self)
-        case MessageType.EVALUATOR_RESPOSNE:
+        case MessageType.EVALUATOR_RESPONSE:
             return try self.decoder.decode(as: EvaluateResponse.self)
         case MessageType.READ_MODULE_REQUEST:
             return try self.decoder.decode(as: ReadModuleRequest.self)

@@ -63,7 +63,7 @@ enum MessageType: Int, Codable {
     case CREATE_EVALUATOR_RESPONSE = 0x21
     case CLOSE_EVALUATOR = 0x22
     case EVALUATOR_REQUEST = 0x23
-    case EVALUATOR_RESPOSNE = 0x24
+    case EVALUATOR_RESPONSE = 0x24
     case LOG_MESSAGE = 0x25
     case READ_RESOURCE_REQUEST = 0x26
     case READ_RESOURCE_RESPONSE = 0x27
@@ -87,7 +87,7 @@ extension MessageType {
         case is EvaluateRequest:
             return MessageType.EVALUATOR_REQUEST
         case is EvaluateResponse:
-            return MessageType.EVALUATOR_RESPOSNE
+            return MessageType.EVALUATOR_RESPONSE
         case is LogMessage:
             return MessageType.LOG_MESSAGE
         case is ListResourcesRequest:

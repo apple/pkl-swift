@@ -16,6 +16,7 @@
 
 import Foundation
 import MessagePack
+import SemanticVersion
 
 /// Perfoms `action`, returns its result and then closes the manager.
 ///
@@ -35,6 +36,57 @@ public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws ->
         }
         throw error
     }
+}
+
+/// Resolve the (CLI) command to invoke Pkl.
+///
+/// First, checks the `PKL_EXEC` environment variable. If that is not set, searches the `PATH` for a directory
+/// containing `pkl`.
+func getPklCommand() throws -> [String] {
+    if let exec = ProcessInfo.processInfo.environment["PKL_EXEC"] {
+        return exec.components(separatedBy: " ")
+    }
+    guard let path = ProcessInfo.processInfo.environment["PATH"] else {
+        throw PklError("Unable to read PATH environment variable.")
+    }
+    for dir in path.components(separatedBy: ":") {
+        do {
+            let contents = try FileManager.default.contentsOfDirectory(atPath: dir)
+            if let pkl = contents.first(where: { $0 == "pkl" }) {
+                let file = NSString.path(withComponents: [dir, pkl])
+                if FileManager.default.isExecutableFile(atPath: file) {
+                    return [file]
+                }
+            }
+        } catch {
+            if error._domain == NSCocoaErrorDomain {
+                continue
+            }
+            throw error
+        }
+    }
+    throw PklError("Unable to find `pkl` command on PATH.")
+}
+
+/// Get the version of the `pkl-server` being used.
+func getVersion() throws -> SemanticVersion {
+    let pklCommand = try getPklCommand()
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: pklCommand[0])
+    process.arguments = Array(pklCommand.dropFirst()) + ["--version"]
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
+    try process.run()
+    guard let outputData = try pipe.fileHandleForReading.readToEnd(),
+          let output = String(data: outputData, encoding: .ascii)?.split(separator: " "),
+          output.count > 2,
+          output[0] == "Pkl"
+    else {
+        throw PklError("Could not get version from Pkl binary")
+    }
+
+    return SemanticVersion(String(output[1]))!
 }
 
 /// Provides handlers for managing the lifecycles of Pkl evaluators. If binding to Pkl as a child process, an evaluator
@@ -127,16 +179,16 @@ public actor EvaluatorManager {
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
     public func withEvaluator<T>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
-        let evalautor = try await newEvaluator(options: options)
+        let evaluator = try await newEvaluator(options: options)
         var closed = false
         do {
-            let result = try await action(evalautor)
-            try await evalautor.close()
+            let result = try await action(evaluator)
+            try await evaluator.close()
             closed = true
             return result
         } catch {
             if !closed {
-                try await evalautor.close()
+                try await evaluator.close()
             }
             throw error
         }
@@ -183,6 +235,10 @@ public actor EvaluatorManager {
     public func newEvaluator(options: EvaluatorOptions) async throws -> Evaluator {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
+        }
+        let version = try getVersion()
+        guard options.http == nil || version >= pklVersion0_26 else {
+            throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }
         let req = options.toMessage()
         guard let response = try await ask(req) as? CreateEvaluatorResponse else {
@@ -288,3 +344,11 @@ enum PklBugError: Error {
     case invalidEvaluatorId(String)
     case unknownMessage(String)
 }
+
+let pklVersion0_25 = SemanticVersion("0.25.0")!
+let pklVersion0_26 = SemanticVersion("0.26.0")!
+
+let supportedPklVersions = [
+    pklVersion0_25,
+    pklVersion0_26,
+]

@@ -24,11 +24,12 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.3"),
+        .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
     ],
     targets: [
         .target(
             name: "PklSwift",
-            dependencies: ["MessagePack", "PklSwiftInternals"]
+            dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"]
         ),
         .target(
             name: "PklSwiftInternals"
