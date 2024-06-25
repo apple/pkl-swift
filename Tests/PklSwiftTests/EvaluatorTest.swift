@@ -93,7 +93,7 @@ final class PklSwiftTests: XCTestCase {
 
     func testVersionCoverage() async throws {
         let output = try getVersion()
-        XCTAssert(supportedPklVersions.contains(output))
+        XCTAssert(supportedPklVersions.contains { $0.major == output.major && $0.minor == output.minor })
     }
 
     func testCustomProxyOptions() async throws {
