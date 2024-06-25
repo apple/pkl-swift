@@ -3,16 +3,42 @@ version: '2.1'
 orbs:
   pr-approval: apple/pr-approval@0.1.0
 jobs:
-  test:
+  test-pkl-0-25-3:
     steps:
     - checkout
     - run:
         command: |-
-          mkdir /tmp/pkl
-          curl -L "https://repo1.maven.org/maven2/org/pkl-lang/pkl-cli-linux-amd64/0.25.1/pkl-cli-linux-amd64-0.25.1.bin" > /tmp/pkl/pkl
-          chmod +x /tmp/pkl/pkl
-          echo 'export PKL_EXEC=/tmp/pkl/pkl' >> $BASH_ENV
-        name: Downloading pkl
+          PKL=$(mktemp /tmp/pkl-0.25.3-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.25.3/pkl-linux-amd64" > $PKL
+          chmod +x $PKL
+          echo "export PKL_EXEC=$PKL" >> $BASH_ENV
+        name: Downloading pkl-0.25.3
+    - run:
+        command: |-
+          mkdir -p .out/test-results/
+          swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
+        name: swift test
+    - run:
+        command: make test-snippets
+    - run:
+        command: make test-pkl
+    - run:
+        command: make generate-fixtures
+    - store_test_results:
+        path: .out/test-results/
+    resource_class: xlarge
+    docker:
+    - image: swift:5.9-rhel-ubi9
+  test-pkl-0-26-0:
+    steps:
+    - checkout
+    - run:
+        command: |-
+          PKL=$(mktemp /tmp/pkl-0.26.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.26.0/pkl-linux-amd64" > $PKL
+          chmod +x $PKL
+          echo "export PKL_EXEC=$PKL" >> $BASH_ENV
+        name: Downloading pkl-0.26.0
     - run:
         command: |-
           mkdir -p .out/test-results/
@@ -82,11 +108,11 @@ jobs:
     - checkout
     - run:
         command: |-
-          mkdir /tmp/pkl
-          curl -L "https://repo1.maven.org/maven2/org/pkl-lang/pkl-cli-linux-amd64/0.25.1/pkl-cli-linux-amd64-0.25.1.bin" > /tmp/pkl/pkl
-          chmod +x /tmp/pkl/pkl
-          echo 'export PKL_EXEC=/tmp/pkl/pkl' >> $BASH_ENV
-        name: Downloading pkl
+          PKL=$(mktemp /tmp/pkl-0.26.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.26.0/pkl-linux-amd64" > $PKL
+          chmod +x $PKL
+          echo "export PKL_EXEC=$PKL" >> $BASH_ENV
+        name: Downloading pkl-0.26.0
     - run:
         command: $PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/
     - persist_to_workspace:
@@ -164,7 +190,11 @@ workflows:
         type: approval
     - pr-approval/authenticate:
         context: pkl-pr-approval
-    - test:
+    - test-pkl-0-25-3:
+        requires:
+        - hold
+        - pr-approval/authenticate
+    - test-pkl-0-26-0:
         requires:
         - hold
         - pr-approval/authenticate
@@ -174,14 +204,21 @@ workflows:
         pattern: ^pull/\d+(/head)?$
   main:
     jobs:
-    - test
+    - test-pkl-0-25-3
+    - test-pkl-0-26-0
     when:
       equal:
       - main
       - << pipeline.git.branch >>
   release:
     jobs:
-    - test:
+    - test-pkl-0-25-3:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-pkl-0-26-0:
         filters:
           branches:
             ignore: /.*/
@@ -189,7 +226,8 @@ workflows:
             only: /^v?\d+\.\d+\.\d+$/
     - pkl-package:
         requires:
-        - test
+        - test-pkl-0-25-3
+        - test-pkl-0-26-0
         filters:
           branches:
             ignore: /.*/
@@ -197,7 +235,8 @@ workflows:
             only: /^v?\d+\.\d+\.\d+$/
     - pkl-gen-swift-macos:
         requires:
-        - test
+        - test-pkl-0-25-3
+        - test-pkl-0-26-0
         filters:
           branches:
             ignore: /.*/
@@ -205,7 +244,8 @@ workflows:
             only: /^v?\d+\.\d+\.\d+$/
     - pkl-gen-swift-linux-amd64:
         requires:
-        - test
+        - test-pkl-0-25-3
+        - test-pkl-0-26-0
         filters:
           branches:
             ignore: /.*/
@@ -213,7 +253,8 @@ workflows:
             only: /^v?\d+\.\d+\.\d+$/
     - pkl-gen-swift-linux-aarch64:
         requires:
-        - test
+        - test-pkl-0-25-3
+        - test-pkl-0-26-0
         filters:
           branches:
             ignore: /.*/
