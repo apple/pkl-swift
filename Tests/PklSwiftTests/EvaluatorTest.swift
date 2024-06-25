@@ -107,9 +107,9 @@ final class PklSwiftTests: XCTestCase {
                 proxy: Proxy(
                         address: "http://my.proxy.example.com:5080",
                         noProxy: ["myhost.com:1337", "myotherhost.org:42"]))
-        let evaluator = try await manager.newEvaluator(options: options)
         var err = nil as Error?
         do {
+            let evaluator = try await manager.newEvaluator(options: options)
             let _ = try await evaluator.evaluateOutputText(source: .uri("https://example.com")!)
         } catch {
             err = error
