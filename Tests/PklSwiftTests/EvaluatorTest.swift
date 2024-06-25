@@ -101,9 +101,12 @@ final class PklSwiftTests: XCTestCase {
         let expected = version < pklVersion0_26
                 ? "http options are not supported on Pkl versions lower than 0.26"
                 : "ConnectException: Error connecting to host `example.com`"
-
         var options = EvaluatorOptions.preconfigured
-        options.http = Http(caCertificates: nil, proxy: Proxy(address: "http://localhost:42", noProxy: nil))
+        options.http = Http(
+                caCertificates: nil,
+                proxy: Proxy(
+                        address: "http://my.proxy.example.com:5080",
+                        noProxy: ["myhost.com:1337", "myotherhost.org:42"]))
         let evaluator = try await manager.newEvaluator(options: options)
         var err = nil as Error?
         do {

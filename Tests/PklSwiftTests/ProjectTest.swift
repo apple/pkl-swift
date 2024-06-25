@@ -82,15 +82,6 @@ class ProjectTest: XCTestCase {
           timeout = 5.min
           moduleCacheDir = "/bar/buzz"
           rootDir = "/buzzy"
-          http {
-            proxy {
-              address = "http://my.proxy.example.com:5080"
-              noProxy {
-                "myhost.com:1337"
-                "myotherhost.org:42"
-              }
-            }
-          }
         }
 
         dependencies {
@@ -115,11 +106,7 @@ class ProjectTest: XCTestCase {
                 timeout: .minutes(5),
                 moduleCacheDir: "/bar/buzz",
                 rootDir: "/buzzy",
-                http: Http(
-                        caCertificates: nil,
-                        proxy: Proxy(
-                                address: "http://my.proxy.example.com:5080",
-                                noProxy: ["myhost.com:1337", "myotherhost.org:42"]))
+                http: nil
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",
