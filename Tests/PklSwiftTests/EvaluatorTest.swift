@@ -107,15 +107,13 @@ final class PklSwiftTests: XCTestCase {
                 proxy: Proxy(
                         address: "http://my.proxy.example.com:5080",
                         noProxy: ["myhost.com:1337", "myotherhost.org:42"]))
-        var err = nil as Error?
         do {
             let evaluator = try await manager.newEvaluator(options: options)
             let _ = try await evaluator.evaluateOutputText(source: .uri("https://example.com")!)
+            XCTFail("Should have thrown an error")
         } catch {
-            err = error
+            XCTAssert("\(error)".contains(expected))
         }
-        XCTAssertNotNil(err)
-        XCTAssert("\(err!)".contains(expected))
     }
 
     func testCustomModuleReader() async throws {

@@ -68,7 +68,7 @@ func getPklCommand() throws -> [String] {
     throw PklError("Unable to find `pkl` command on PATH.")
 }
 
-/// Get the version of the `pkl-server` being used.
+/// Get the version of the Pkl being used.
 func getVersion() throws -> SemanticVersion {
     let pklCommand = try getPklCommand()
     let process = Process()
@@ -79,7 +79,7 @@ func getVersion() throws -> SemanticVersion {
     debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
     try process.run()
     guard let outputData = try pipe.fileHandleForReading.readToEnd(),
-          let output = String(data: outputData, encoding: .ascii)?.split(separator: " "),
+          let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
           output.count > 2,
           output[0] == "Pkl"
     else {

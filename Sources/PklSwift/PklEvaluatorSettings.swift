@@ -47,11 +47,11 @@ public struct Proxy: Codable, Hashable {
     /// The proxy to use for HTTP(S) connections.
     ///
     /// Only HTTP proxies are supported.
-    /// The address must start with "http://", and cannot contain anything other than a host and an optional port.
+    /// The address must start with `"http://"`, and cannot contain anything other than a host and an optional port.
     ///
     /// Example:
     /// ```
-    /// address = "http://my.proxy.example.com:5080"
+    /// "http://my.proxy.example.com:5080"
     /// ```
     var address: String?
 

@@ -238,13 +238,13 @@ extension EvaluatorOptions {
     /// Skips any settings that are nil.
     public func withProjectEvaluatorSettings(_ evaluatorSettings: PklEvaluatorSettings) -> EvaluatorOptions {
         var options = self
-        options.properties = evaluatorSettings.externalProperties ?? properties
-        options.env = evaluatorSettings.env ?? env
-        options.allowedModules = evaluatorSettings.allowedModules ?? allowedModules
-        options.allowedResources = evaluatorSettings.allowedResources ?? allowedResources
-        options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? cacheDir)
-        options.rootDir = evaluatorSettings.rootDir ?? rootDir
-        options.http = evaluatorSettings.http ?? http
+        options.properties = evaluatorSettings.externalProperties ?? self.properties
+        options.env = evaluatorSettings.env ?? self.env
+        options.allowedModules = evaluatorSettings.allowedModules ?? self.allowedModules
+        options.allowedResources = evaluatorSettings.allowedResources ?? self.allowedResources
+        options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? self.cacheDir)
+        options.rootDir = evaluatorSettings.rootDir ?? self.rootDir
+        options.http = evaluatorSettings.http ?? self.http
         return options
     }
 
