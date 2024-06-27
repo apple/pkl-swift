@@ -92,20 +92,20 @@ final class PklSwiftTests: XCTestCase {
     }
 
     func testVersionCoverage() async throws {
-        let output = try getVersion()
+        let output = SemanticVersion(try await EvaluatorManager().getVersion())!
         XCTAssert(supportedPklVersions.contains { $0.major == output.major && $0.minor == output.minor })
     }
 
     func testCustomProxyOptions() async throws {
-        let version = try getVersion()
+        let version = SemanticVersion(try await EvaluatorManager().getVersion())!
         let expected = version < pklVersion0_26
                 ? "http options are not supported on Pkl versions lower than 0.26"
                 : "ConnectException: Error connecting to host `example.com`"
         var options = EvaluatorOptions.preconfigured
-        options.http = Http(
+        options.http = .init(
                 caCertificates: nil,
-                proxy: Proxy(
-                        address: "http://my.proxy.example.com:5080",
+                proxy: .init(
+                        address: "http://localhost:1",
                         noProxy: ["myhost.com:1337", "myotherhost.org:42"]))
         do {
             let evaluator = try await manager.newEvaluator(options: options)

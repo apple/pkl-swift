@@ -15,11 +15,13 @@
 // ===----------------------------------------------------------------------===//
 
 import XCTest
+import SemanticVersion
 
 @testable import PklSwift
 
 class ProjectTest: XCTestCase {
     func testLoadProject() async throws {
+        let version = SemanticVersion(try await EvaluatorManager().getVersion())!
         let tempDir = NSTemporaryDirectory()
         try FileManager.default.createDirectory(atPath: tempDir + "/subdir", withIntermediateDirectories: true)
         let otherProjectFile = URL(fileURLWithPath: tempDir, isDirectory: true)
@@ -38,6 +40,20 @@ class ProjectTest: XCTestCase {
 
         let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("PklProject")
+        let httpSetting = version < pklVersion0_26 ? "" : """
+            http {
+              proxy {
+                address = "http://proxy.mock.example.com:1"
+                noProxy {
+                  "example.com"
+                  "foo.bar.org"
+                }
+              }
+            }
+            """
+        let httpExpectation = version < pklVersion0_26 ? nil : Http(
+                caCertificates: nil,
+                proxy: .init(address: "http://proxy.mock.example.com:1", noProxy: ["example.com", "foo.bar.org"]))
         try #"""
         amends "pkl:Project"
 
@@ -82,6 +98,7 @@ class ProjectTest: XCTestCase {
           timeout = 5.min
           moduleCacheDir = "/bar/buzz"
           rootDir = "/buzzy"
+          \#(httpSetting)
         }
 
         dependencies {
@@ -106,7 +123,7 @@ class ProjectTest: XCTestCase {
                 timeout: .minutes(5),
                 moduleCacheDir: "/bar/buzz",
                 rootDir: "/buzzy",
-                http: nil
+                http: httpExpectation
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",

@@ -68,27 +68,6 @@ func getPklCommand() throws -> [String] {
     throw PklError("Unable to find `pkl` command on PATH.")
 }
 
-/// Get the version of the Pkl being used.
-func getVersion() throws -> SemanticVersion {
-    let pklCommand = try getPklCommand()
-    let process = Process()
-    process.executableURL = URL(fileURLWithPath: pklCommand[0])
-    process.arguments = Array(pklCommand.dropFirst()) + ["--version"]
-    let pipe = Pipe()
-    process.standardOutput = pipe
-    debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
-    try process.run()
-    guard let outputData = try pipe.fileHandleForReading.readToEnd(),
-          let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
-          output.count > 2,
-          output[0] == "Pkl"
-    else {
-        throw PklError("Could not get version from Pkl binary")
-    }
-
-    return SemanticVersion(String(output[1]))!
-}
-
 /// Provides handlers for managing the lifecycles of Pkl evaluators. If binding to Pkl as a child process, an evaluator
 /// manager represents a single child process.
 ///
@@ -107,6 +86,8 @@ public actor EvaluatorManager {
 
     var isClosed: Bool = false
 
+    var pklVersion: String?
+
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
         self.init(transport: ChildProcessMessageTransport())
@@ -122,6 +103,32 @@ public actor EvaluatorManager {
                 await self.closeError(error: error)
             }
         }
+    }
+
+    /// Get the semantic version as a String of the Pkl interpreter being used.
+    func getVersion() throws -> String {
+        if let pklVersion {
+            return pklVersion
+        }
+
+        let pklCommand = try getPklCommand()
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: pklCommand[0])
+        process.arguments = Array(pklCommand.dropFirst()) + ["--version"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
+        try process.run()
+        guard let outputData = try pipe.fileHandleForReading.readToEnd(),
+              let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
+              output.count > 2,
+              output[0] == "Pkl"
+        else {
+            throw PklError("Could not get version from Pkl binary")
+        }
+
+        self.pklVersion = String(output[1])
+        return self.pklVersion!
     }
 
     private func listenForIncomingMessages() async throws {
@@ -236,7 +243,7 @@ public actor EvaluatorManager {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
-        let version = try getVersion()
+        let version = SemanticVersion(try getVersion())!
         guard options.http == nil || version >= pklVersion0_26 else {
             throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }

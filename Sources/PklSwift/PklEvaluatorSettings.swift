@@ -78,8 +78,7 @@ public struct Proxy: Codable, Hashable {
     /// Example:
     ///
     /// ```
-    /// noProxy = [
-    ///   "127.0.0.1",
+    /// [ "127.0.0.1",
     ///   "169.254.0.0/16",
     ///   "example.com",
     ///   "localhost:5050" ]
