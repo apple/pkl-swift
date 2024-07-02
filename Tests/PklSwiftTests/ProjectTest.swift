@@ -43,7 +43,7 @@ class ProjectTest: XCTestCase {
         let httpSetting = version < pklVersion0_26 ? "" : """
             http {
               proxy {
-                address = "http://proxy.mock.example.com:1"
+                address = "http://localhost:1"
                 noProxy {
                   "example.com"
                   "foo.bar.org"
@@ -53,7 +53,7 @@ class ProjectTest: XCTestCase {
             """
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
                 caCertificates: nil,
-                proxy: .init(address: "http://proxy.mock.example.com:1", noProxy: ["example.com", "foo.bar.org"]))
+                proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"]))
         try #"""
         amends "pkl:Project"
 
