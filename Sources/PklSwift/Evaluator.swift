@@ -58,9 +58,9 @@ public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) a
 ///   - action: The action to perform.
 /// - Returns: The result of the action.
 public func withProjectEvaluator<T>(
-        projectBaseURI: URL,
-        options: EvaluatorOptions,
-        _ action: (Evaluator) async throws -> T
+    projectBaseURI: URL,
+    options: EvaluatorOptions,
+    _ action: (Evaluator) async throws -> T
 ) async throws -> T {
     try await withEvaluatorManager { manager in
         let evaluator = try await manager.newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)

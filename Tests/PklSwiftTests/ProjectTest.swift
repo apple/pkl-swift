@@ -14,14 +14,14 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import XCTest
 import SemanticVersion
+import XCTest
 
 @testable import PklSwift
 
 class ProjectTest: XCTestCase {
     func testLoadProject() async throws {
-        let version = SemanticVersion(try await EvaluatorManager().getVersion())!
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
         let tempDir = NSTemporaryDirectory()
         try FileManager.default.createDirectory(atPath: tempDir + "/subdir", withIntermediateDirectories: true)
         let otherProjectFile = URL(fileURLWithPath: tempDir, isDirectory: true)
@@ -41,19 +41,20 @@ class ProjectTest: XCTestCase {
         let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("PklProject")
         let httpSetting = version < pklVersion0_26 ? "" : """
-            http {
-              proxy {
-                address = "http://localhost:1"
-                noProxy {
-                  "example.com"
-                  "foo.bar.org"
-                }
-              }
+        http {
+          proxy {
+            address = "http://localhost:1"
+            noProxy {
+              "example.com"
+              "foo.bar.org"
             }
-            """
+          }
+        }
+        """
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
-                caCertificates: nil,
-                proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"]))
+            caCertificates: nil,
+            proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
+        )
         try #"""
         amends "pkl:Project"
 

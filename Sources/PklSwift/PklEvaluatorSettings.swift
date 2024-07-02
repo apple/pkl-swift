@@ -85,4 +85,3 @@ public struct Proxy: Codable, Hashable {
     /// ```
     var noProxy: [String]?
 }
-

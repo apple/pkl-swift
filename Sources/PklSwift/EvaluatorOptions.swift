@@ -18,21 +18,21 @@ import Foundation
 
 public struct EvaluatorOptions {
     public init(
-            allowedModules: [String]? = nil,
-            allowedResources: [String]? = nil,
-            resourceReaders: [ResourceReader]? = nil,
-            moduleReaders: [ModuleReader]? = nil,
-            modulePaths: [String]? = nil,
-            env: [String: String]? = nil,
-            properties: [String: String]? = nil,
-            timeout: Swift.Duration? = nil,
-            rootDir: String? = nil,
-            cacheDir: String? = nil,
-            outputFormat: String? = nil,
-            logger: Logger = Loggers.noop,
-            projectBaseURI: URL? = nil,
-            http: Http? = nil,
-            declaredProjectDependencies: [String: ProjectDependency]? = nil
+        allowedModules: [String]? = nil,
+        allowedResources: [String]? = nil,
+        resourceReaders: [ResourceReader]? = nil,
+        moduleReaders: [ModuleReader]? = nil,
+        modulePaths: [String]? = nil,
+        env: [String: String]? = nil,
+        properties: [String: String]? = nil,
+        timeout: Swift.Duration? = nil,
+        rootDir: String? = nil,
+        cacheDir: String? = nil,
+        outputFormat: String? = nil,
+        logger: Logger = Loggers.noop,
+        projectBaseURI: URL? = nil,
+        http: Http? = nil,
+        declaredProjectDependencies: [String: ProjectDependency]? = nil
     ) {
         self.allowedModules = allowedModules
         self.allowedResources = allowedResources

@@ -185,7 +185,6 @@ extension MessagePackValue {
         case .ext:
             // TODO: implement this?
             fatalError("Cannot convert \(self) to \(T.self)")
-
         case .timestamp:
             // TODO: implement this?
             fatalError("Cannot convert \(self) to \(T.self)")

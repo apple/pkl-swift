@@ -97,9 +97,10 @@ extension Project {
     }
 
     @available(
-            *,
-            deprecated,
-            message: "Replaced by PklEvaluatorSettings, independent of Project",
-            renamed: "PklEvaluatorSettings")
+        *,
+        deprecated,
+        message: "Replaced by PklEvaluatorSettings, independent of Project",
+        renamed: "PklEvaluatorSettings"
+    )
     public typealias EvaluatorSettings = PklEvaluatorSettings
 }

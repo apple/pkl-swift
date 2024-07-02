@@ -122,8 +122,7 @@ public actor EvaluatorManager {
         guard let outputData = try pipe.fileHandleForReading.readToEnd(),
               let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
               output.count > 2,
-              output[0] == "Pkl"
-        else {
+              output[0] == "Pkl" else {
             throw PklError("Could not get version from Pkl binary")
         }
 
@@ -243,7 +242,7 @@ public actor EvaluatorManager {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
-        let version = SemanticVersion(try getVersion())!
+        let version = try SemanticVersion(getVersion())!
         guard options.http == nil || version >= pklVersion0_26 else {
             throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }

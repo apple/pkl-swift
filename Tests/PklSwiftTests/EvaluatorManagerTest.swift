@@ -14,8 +14,8 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import XCTest
 import SemanticVersion
+import XCTest
 
 @testable import PklSwift
 

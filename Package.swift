@@ -5,7 +5,7 @@ let package = Package(
     name: "pkl-swift",
     platforms: [
         // required because of `Duration` API
-        .macOS(.v13)
+        .macOS(.v13),
     ],
     products: [
         .library(
