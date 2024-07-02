@@ -15,6 +15,8 @@
 // ===----------------------------------------------------------------------===//
 amends "package://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.circleci@1.0.1#/PklCI.pkl"
 
+import "pkl:semver"
+
 local swiftTest = new RunStep {
   name = "swift test"
   command = """
@@ -23,59 +25,78 @@ local swiftTest = new RunStep {
     """
 }
 
-local pklVersion = "0.25.1"
-local pklBinary = "https://repo1.maven.org/maven2/org/pkl-lang/pkl-cli-linux-amd64/\(pklVersion)/pkl-cli-linux-amd64-\(pklVersion).bin"
+local class PklDistribution {
+  /// The version of this distribution
+  version: String(semver.isValid(this))
 
-local downloadPkl = new RunStep {
-  name = "Downloading pkl"
-  command = """
-    mkdir /tmp/pkl
-    curl -L "\(pklBinary)" > /tmp/pkl/pkl
-    chmod +x /tmp/pkl/pkl
-    echo 'export PKL_EXEC=/tmp/pkl/pkl' >> $BASH_ENV
-    """
+  /// Normalized version for use in task names
+  fixed normalizedVersion: String = version.replaceAll(".", "-")
+
+  /// The URL to download this distribution
+  fixed downloadUrl: String = "https://github.com/apple/pkl/releases/download/\(version)/pkl-linux-amd64"
+
+  fixed downloadRunStep: RunStep = new {
+    name = "Downloading pkl-\(version)"
+    command = """
+      PKL=$(mktemp /tmp/pkl-\(version)-XXXXXX)
+      curl -L "\(downloadUrl)" > $PKL
+      chmod +x $PKL
+      echo "export PKL_EXEC=$PKL" >> $BASH_ENV
+      """
+  }
 }
+
+local pklCurrent: PklDistribution = new {
+  version = "0.26.0"
+}
+
+local pklDistributions: Listing<PklDistribution> = new {
+  new { version = "0.25.3" }
+  pklCurrent
+}
+
+local testJobs = jobs.keys.filter((it) -> it.startsWith("test"))
 
 main {
   jobs {
-    "test"
+    ...testJobs
   }
 }
 
 prb {
   jobs {
-    "test"
+    ...testJobs
   }
 }
 
 release {
   jobs {
-    "test"
+    ...testJobs
     new {
       ["pkl-package"] {
         requires {
-          "test"
+          ...testJobs
         }
       }
     }
     new {
       ["pkl-gen-swift-macos"] {
         requires {
-          "test"
+          ...testJobs
         }
       }
     }
     new {
       ["pkl-gen-swift-linux-amd64"] {
         requires {
-          "test"
+          ...testJobs
         }
       }
     }
     new {
       ["pkl-gen-swift-linux-aarch64"] {
         requires {
-          "test"
+          ...testJobs
         }
       }
     }
@@ -100,22 +121,24 @@ triggerDocsBuild = "release"
 triggerPackageDocsBuild = "release"
 
 jobs {
-  ["test"] {
-    docker {
-      new {
-        image = "swift:5.9-rhel-ubi9"
+  for (distribution in pklDistributions) {
+    ["test-pkl-\(distribution.normalizedVersion)"] {
+      docker {
+        new {
+          image = "swift:5.9-rhel-ubi9"
+        }
       }
-    }
-    resource_class = "xlarge"
-    steps {
-      "checkout"
-      downloadPkl
-      swiftTest
-      new RunStep { command = "make test-snippets" }
-      new RunStep { command = "make test-pkl" }
-      new RunStep { command = "make generate-fixtures" }
-      new StoreTestResults {
-        path = ".out/test-results/"
+      resource_class = "xlarge"
+      steps {
+        "checkout"
+        distribution.downloadRunStep
+        swiftTest
+        new RunStep { command = "make test-snippets" }
+        new RunStep { command = "make test-pkl" }
+        new RunStep { command = "make generate-fixtures" }
+        new StoreTestResults {
+          path = ".out/test-results/"
+        }
       }
     }
   }
@@ -168,7 +191,7 @@ jobs {
     }
     steps {
       "checkout"
-      downloadPkl
+      pklCurrent.downloadRunStep
       new RunStep {
         // TODO remove skip-publish-check after initial release
         command = #"$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/"#

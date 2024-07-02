@@ -16,6 +16,7 @@
 
 import Foundation
 import MessagePack
+import SemanticVersion
 
 /// Perfoms `action`, returns its result and then closes the manager.
 ///
@@ -37,6 +38,36 @@ public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws ->
     }
 }
 
+/// Resolve the (CLI) command to invoke Pkl.
+///
+/// First, checks the `PKL_EXEC` environment variable. If that is not set, searches the `PATH` for a directory
+/// containing `pkl`.
+func getPklCommand() throws -> [String] {
+    if let exec = ProcessInfo.processInfo.environment["PKL_EXEC"] {
+        return exec.components(separatedBy: " ")
+    }
+    guard let path = ProcessInfo.processInfo.environment["PATH"] else {
+        throw PklError("Unable to read PATH environment variable.")
+    }
+    for dir in path.components(separatedBy: ":") {
+        do {
+            let contents = try FileManager.default.contentsOfDirectory(atPath: dir)
+            if let pkl = contents.first(where: { $0 == "pkl" }) {
+                let file = NSString.path(withComponents: [dir, pkl])
+                if FileManager.default.isExecutableFile(atPath: file) {
+                    return [file]
+                }
+            }
+        } catch {
+            if error._domain == NSCocoaErrorDomain {
+                continue
+            }
+            throw error
+        }
+    }
+    throw PklError("Unable to find `pkl` command on PATH.")
+}
+
 /// Provides handlers for managing the lifecycles of Pkl evaluators. If binding to Pkl as a child process, an evaluator
 /// manager represents a single child process.
 ///
@@ -55,6 +86,8 @@ public actor EvaluatorManager {
 
     var isClosed: Bool = false
 
+    var pklVersion: String?
+
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
         self.init(transport: ChildProcessMessageTransport())
@@ -70,6 +103,31 @@ public actor EvaluatorManager {
                 await self.closeError(error: error)
             }
         }
+    }
+
+    /// Get the semantic version as a String of the Pkl interpreter being used.
+    func getVersion() throws -> String {
+        if let pklVersion {
+            return pklVersion
+        }
+
+        let pklCommand = try getPklCommand()
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: pklCommand[0])
+        process.arguments = Array(pklCommand.dropFirst()) + ["--version"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
+        try process.run()
+        guard let outputData = try pipe.fileHandleForReading.readToEnd(),
+              let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
+              output.count > 2,
+              output[0] == "Pkl" else {
+            throw PklError("Could not get version from Pkl binary")
+        }
+
+        self.pklVersion = String(output[1])
+        return self.pklVersion!
     }
 
     private func listenForIncomingMessages() async throws {
@@ -127,24 +185,24 @@ public actor EvaluatorManager {
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
     public func withEvaluator<T>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
-        let evalautor = try await newEvaluator(options: options)
+        let evaluator = try await newEvaluator(options: options)
         var closed = false
         do {
-            let result = try await action(evalautor)
-            try await evalautor.close()
+            let result = try await action(evaluator)
+            try await evaluator.close()
             closed = true
             return result
         } catch {
             if !closed {
-                try await evalautor.close()
+                try await evaluator.close()
             }
             throw error
         }
     }
 
     /// Convenience method for constructing a project evaluator with preconfigured base options.
-    public func withProjectEvaluator<T>(projectDir: String, _ action: (Evaluator) async throws -> T) async throws -> T {
-        try await self.withProjectEvaluator(projectDir: projectDir, options: .preconfigured, action)
+    public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
+        try await self.withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
     }
 
     /// Constructs an evaluator that is configured by the project within the project dir.
@@ -155,20 +213,20 @@ public actor EvaluatorManager {
     /// After the action completes or throws, the evaluator is closed.
     ///
     /// - Parameters:
-    ///   - projectDir: The project directory that contains the PklProject file.
+    ///   - projectBaseURI: The project base path that contains the PklProject file.
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withProjectEvaluator<T>(projectDir: String, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
-        let evalautor = try await newProjectEvaluator(projectDir: projectDir, options: options)
+    public func withProjectEvaluator<T>(projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+        let evaluator = try await newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)
         var closed = false
         do {
-            let result = try await action(evalautor)
-            try await evalautor.close()
+            let result = try await action(evaluator)
+            try await evaluator.close()
             closed = true
             return result
         } catch {
             if !closed {
-                try await evalautor.close()
+                try await evaluator.close()
             }
             throw error
         }
@@ -176,12 +234,17 @@ public actor EvaluatorManager {
 
     /// Creates a new evaluator with the provided options.
     ///
-    /// To create an evaluator that understands project dependencies, use ``newProjectEvaluator(projectDir:options:)``.
+    /// To create an evaluator that understands project dependencies, use
+    /// ``newProjectEvaluator(projectBaseURI:options:)``.
     ///
     /// - Parameter options: The options used to configure the evaluator.
     public func newEvaluator(options: EvaluatorOptions) async throws -> Evaluator {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
+        }
+        let version = try SemanticVersion(getVersion())!
+        guard options.http == nil || version >= pklVersion0_26 else {
+            throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }
         let req = options.toMessage()
         guard let response = try await ask(req) as? CreateEvaluatorResponse else {
@@ -209,15 +272,15 @@ public actor EvaluatorManager {
     //  Any `evaluatorSettings` set within the PklProject file overwrites any fields set on `options`.
     ///
     /// - Parameters:
-    ///   - projectDir: The project directory containing the `PklProject` file.
+    ///   - projectBaseURI: The project base path containing the `PklProject` file.
     ///   - options: The base options used to configure the evaluator.
-    public func newProjectEvaluator(projectDir: String, options: EvaluatorOptions) async throws -> Evaluator {
+    public func newProjectEvaluator(projectBaseURI: URL, options: EvaluatorOptions) async throws -> Evaluator {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
         return try await self.withEvaluator(options: .preconfigured) { projectEvaluator in
             let project = try await projectEvaluator.evaluateOutputValue(
-                source: .path("\(projectDir)/PklProject"),
+                source: .path("\(projectBaseURI)/PklProject"),
                 asType: Project.self
             )
             return try await self.newEvaluator(options: options.withProject(project))
@@ -287,3 +350,11 @@ enum PklBugError: Error {
     case invalidEvaluatorId(String)
     case unknownMessage(String)
 }
+
+let pklVersion0_25 = SemanticVersion("0.25.0")!
+let pklVersion0_26 = SemanticVersion("0.26.0")!
+
+let supportedPklVersions = [
+    pklVersion0_25,
+    pklVersion0_26,
+]

@@ -14,13 +14,14 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import Foundation
+import SemanticVersion
 import XCTest
 
 @testable import PklSwift
 
 class ProjectTest: XCTestCase {
     func testLoadProject() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
         let tempDir = NSTemporaryDirectory()
         try FileManager.default.createDirectory(atPath: tempDir + "/subdir", withIntermediateDirectories: true)
         let otherProjectFile = URL(fileURLWithPath: tempDir, isDirectory: true)
@@ -39,6 +40,21 @@ class ProjectTest: XCTestCase {
 
         let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("PklProject")
+        let httpSetting = version < pklVersion0_26 ? "" : """
+        http {
+          proxy {
+            address = "http://localhost:1"
+            noProxy {
+              "example.com"
+              "foo.bar.org"
+            }
+          }
+        }
+        """
+        let httpExpectation = version < pklVersion0_26 ? nil : Http(
+            caCertificates: nil,
+            proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
+        )
         try #"""
         amends "pkl:Project"
 
@@ -83,6 +99,7 @@ class ProjectTest: XCTestCase {
           timeout = 5.min
           moduleCacheDir = "/bar/buzz"
           rootDir = "/buzzy"
+          \#(httpSetting)
         }
 
         dependencies {
@@ -97,7 +114,7 @@ class ProjectTest: XCTestCase {
                 source: .url(file),
                 asType: Project.self
             )
-            let expectedSettings = PklSwift.Project.EvaluatorSettings(
+            let expectedSettings = PklSwift.PklEvaluatorSettings(
                 externalProperties: ["myprop": "1"],
                 env: ["myenv": "2"],
                 allowedModules: ["foo:"],
@@ -106,7 +123,8 @@ class ProjectTest: XCTestCase {
                 modulePath: ["/bar/baz"],
                 timeout: .minutes(5),
                 moduleCacheDir: "/bar/buzz",
-                rootDir: "/buzzy"
+                rootDir: "/buzzy",
+                http: httpExpectation
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",
@@ -160,7 +178,8 @@ class ProjectTest: XCTestCase {
                         modulePath: nil,
                         timeout: nil,
                         moduleCacheDir: nil,
-                        rootDir: nil
+                        rootDir: nil,
+                        http: nil
                     ),
                     projectFileUri: "\(otherProjectFile)",
                     tests: [],

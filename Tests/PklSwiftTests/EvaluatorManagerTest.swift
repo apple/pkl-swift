@@ -14,7 +14,7 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import Foundation
+import SemanticVersion
 import XCTest
 
 @testable import PklSwift
@@ -55,10 +55,10 @@ class EvaluatorManagerTest: XCTestCase {
         let manager1 = EvaluatorManager()
         let manager2 = EvaluatorManager()
         let manager3 = EvaluatorManager()
-        async let evalautor1 = try manager1.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 1\""))
-        async let evalautor2 = try manager2.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 2\""))
-        async let evalautor3 = try manager3.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 3\""))
-        let (result1, result2, result3) = try await (evalautor1, evalautor2, evalautor3)
+        async let evaluator1 = try manager1.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 1\""))
+        async let evaluator2 = try manager2.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 2\""))
+        async let evaluator3 = try manager3.newEvaluator(options: .preconfigured).evaluateOutputText(source: .text("res = \"evaluator 3\""))
+        let (result1, result2, result3) = try await (evaluator1, evaluator2, evaluator3)
         XCTAssertEqual(result1, "res = \"evaluator 1\"\n")
         XCTAssertEqual(result2, "res = \"evaluator 2\"\n")
         XCTAssertEqual(result3, "res = \"evaluator 3\"\n")

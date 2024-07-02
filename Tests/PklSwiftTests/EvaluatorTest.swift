@@ -14,9 +14,9 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
-import Foundation
 @testable import MessagePack
 @testable import PklSwift
+import SemanticVersion
 import XCTest
 
 class TestLogger: Logger {
@@ -89,6 +89,33 @@ final class PklSwiftTests: XCTestCase {
         let output = try await evaluator.evaluateOutputText(
             source: ModuleSource(uri: URL(string: "repl:text")!, text: "foo = 1"))
         XCTAssertEqual(output, "foo = 1\n")
+    }
+
+    func testVersionCoverage() async throws {
+        let output = try await SemanticVersion(EvaluatorManager().getVersion())!
+        XCTAssert(supportedPklVersions.contains { $0.major == output.major && $0.minor == output.minor })
+    }
+
+    func testCustomProxyOptions() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        let expected = version < pklVersion0_26
+            ? "http options are not supported on Pkl versions lower than 0.26"
+            : "ConnectException: Error connecting to host `example.com`"
+        var options = EvaluatorOptions.preconfigured
+        options.http = .init(
+            caCertificates: nil,
+            proxy: .init(
+                address: "http://localhost:1",
+                noProxy: ["myhost.com:1337", "myotherhost.org:42"]
+            )
+        )
+        do {
+            let evaluator = try await manager.newEvaluator(options: options)
+            let _ = try await evaluator.evaluateOutputText(source: .uri("https://example.com")!)
+            XCTFail("Should have thrown an error")
+        } catch {
+            XCTAssert("\(error)".contains(expected))
+        }
     }
 
     func testCustomModuleReader() async throws {
