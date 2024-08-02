@@ -15,11 +15,6 @@
 // ===----------------------------------------------------------------------===//
 
 import Foundation
-#if os(Linux)
-import Glibc
-#else
-import Darwin.C
-#endif
 
 let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
 
