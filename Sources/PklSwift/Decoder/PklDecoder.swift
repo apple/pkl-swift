@@ -205,6 +205,7 @@ extension _PklDecoder {
                         ))
                 }
                 var arr: [AnyHashable?] = []
+                arr.reserveCapacity(pklArray.count)
                 for v in pklArray {
                     try arr.append(self.decodePolymorphic(v, codingPath: codingPath)?.value)
                 }
