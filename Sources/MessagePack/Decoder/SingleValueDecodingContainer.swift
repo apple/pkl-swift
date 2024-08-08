@@ -16,7 +16,7 @@
 
 import Foundation
 
-#if os(Linux)
+#if os(Linux) || os(Windows)
 let NSEC_PER_SEC: UInt64 = 1_000_000_000
 #endif
 
