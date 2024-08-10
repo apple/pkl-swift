@@ -36,7 +36,7 @@ extension ModuleSource {
     /// - Parameter path: The file path component.
     public static func path(_ path: String) -> ModuleSource {
         let path = resolvePaths(path)
-        return ModuleSource(uri: URL(string: "file://\(path)")!, text: nil)
+        return ModuleSource(uri: URL(fileURLWithPath: path), text: nil)
     }
 
     /// Creates a synthetic ``ModuleSource`` with the given text.
