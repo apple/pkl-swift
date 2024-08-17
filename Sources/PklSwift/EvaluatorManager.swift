@@ -17,7 +17,14 @@
 import Foundation
 import MessagePack
 import SemanticVersion
-
+#if os(Windows)
+    import WinSDK.System
+    let ENV_SEPARATOR=";"
+    let PKL_EXEC_NAME="pkl.exe"
+#else
+    let ENV_SEPARATOR=":"
+    let PKL_EXEC_NAME="pkl"
+#endif
 /// Perfoms `action`, returns its result and then closes the manager.
 ///
 /// - Parameter action: The action to perform
@@ -38,21 +45,32 @@ public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws ->
     }
 }
 
+func getenv(_ key: String) -> String? {
+#if os(Windows)
+    let key = key.lowercased()
+    return ProcessInfo.processInfo.environment.first { (envKey: String, value: String) in
+        return key == envKey.lowercased()
+    }?.value
+#else
+    return ProcessInfo.processInfo.environment[key]
+#endif
+}
+
 /// Resolve the (CLI) command to invoke Pkl.
 ///
 /// First, checks the `PKL_EXEC` environment variable. If that is not set, searches the `PATH` for a directory
 /// containing `pkl`.
 func getPklCommand() throws -> [String] {
-    if let exec = ProcessInfo.processInfo.environment["PKL_EXEC"] {
+    if let exec = getenv("PKL_EXEC") {
         return exec.components(separatedBy: " ")
     }
-    guard let path = ProcessInfo.processInfo.environment["PATH"] else {
+    guard let path = getenv("PATH") else {
         throw PklError("Unable to read PATH environment variable.")
     }
-    for dir in path.components(separatedBy: ":") {
+    for dir in path.components(separatedBy: ENV_SEPARATOR) {
         do {
             let contents = try FileManager.default.contentsOfDirectory(atPath: dir)
-            if let pkl = contents.first(where: { $0 == "pkl" }) {
+            if let pkl = contents.first(where: { $0 == PKL_EXEC_NAME }) {
                 let file = NSString.path(withComponents: [dir, pkl])
                 if FileManager.default.isExecutableFile(atPath: file) {
                     return [file]
