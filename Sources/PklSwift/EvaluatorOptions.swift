@@ -32,7 +32,9 @@ public struct EvaluatorOptions {
         logger: Logger = Loggers.noop,
         projectBaseURI: URL? = nil,
         http: Http? = nil,
-        declaredProjectDependencies: [String: ProjectDependency]? = nil
+        declaredProjectDependencies: [String: ProjectDependency]? = nil,
+        externalModuleReaders: [String: ExternalReader]? = nil,
+        externalResourceReaders: [String: ExternalReader]? = nil
     ) {
         self.allowedModules = allowedModules
         self.allowedResources = allowedResources
@@ -49,6 +51,8 @@ public struct EvaluatorOptions {
         self.projectBaseURI = projectBaseURI
         self.http = http
         self.declaredProjectDependencies = declaredProjectDependencies
+        self.externalModuleReaders = externalModuleReaders
+        self.externalResourceReaders = externalResourceReaders
     }
 
     /// Regular expression patterns that control what modules are allowed to be imported in a Pkl program.
@@ -123,6 +127,18 @@ public struct EvaluatorOptions {
     /// When importing dependencies, a `PklProject.deps.json` file must exist within ``projectBaseURI``
     /// that contains the project's resolved dependencies.
     public var declaredProjectDependencies: [String: ProjectDependency]?
+
+    /// Registered external commands that implement module reader schemes.
+    ///
+    /// Added in Pkl 0.27.
+    /// If the underlying Pkl does not support external readers, evaluation will fail when a registered scheme is used.
+    public var externalModuleReaders: [String: ExternalReader]?
+
+    /// Registered external commands that implement resource reader schemes.
+    ///
+    /// Added in Pkl 0.27.
+    /// If the underlying Pkl does not support external readers, evaluation will fail when a registered scheme is used.
+    public var externalResourceReaders: [String: ExternalReader]?
 }
 
 extension EvaluatorOptions {
@@ -162,7 +178,9 @@ extension EvaluatorOptions {
             cacheDir: self.cacheDir,
             outputFormat: self.outputFormat,
             project: self.project(),
-            http: self.http
+            http: self.http,
+            externalModuleReaders: self.externalModuleReaders,
+            externalResourceReaders: self.externalResourceReaders
         )
     }
 
@@ -245,6 +263,8 @@ extension EvaluatorOptions {
         options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? self.cacheDir)
         options.rootDir = evaluatorSettings.rootDir ?? self.rootDir
         options.http = evaluatorSettings.http ?? self.http
+        options.externalModuleReaders = evaluatorSettings.externalModuleReaders ?? options.externalModuleReaders
+        options.externalResourceReaders = evaluatorSettings.externalResourceReaders ?? options.externalResourceReaders
         return options
     }
 

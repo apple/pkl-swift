@@ -31,35 +31,104 @@ protocol MessageTransport {
 
 extension Pipe: Reader {
     public func read(into: UnsafeMutableRawBufferPointer) throws -> Int {
-        let data = try fileHandleForReading.read(upToCount: into.count)
-        if data == nil {
-            return 0
-        }
-        data!.copyBytes(to: into)
-        return data!.count
+        try fileHandleForReading.read(into: into)
     }
 
     public func close() throws {
-        fileHandleForReading.closeFile()
+        try fileHandleForReading.close()
+    }
+}
+
+extension FileHandle: Reader {
+    public func read(into: UnsafeMutableRawBufferPointer) throws -> Int {
+        guard let data = try read(upToCount: into.count) else { return 0 }
+        data.copyBytes(to: into)
+        return data.count
+    }
+
+    public func close() throws {
+        closeFile()
     }
 }
 
 extension Pipe: Writer {
     public func write(_ buffer: UnsafeRawBufferPointer) throws {
-        try fileHandleForWriting.write(contentsOf: buffer)
+        try fileHandleForWriting.write(buffer)
+    }
+}
+
+extension FileHandle: Writer {
+    public func write(_ buffer: UnsafeRawBufferPointer) throws {
+        try self.write(contentsOf: buffer)
+    }
+}
+
+/// A ``MessageTransport`` base class that implements core message handling logic
+public class BaseMessageTransport: MessageTransport {
+    var reader: Reader!
+    var writer: Writer!
+    var encoder: MessagePackEncoder!
+    var decoder: MessagePackDecoder!
+
+    var running: Bool { true }
+
+    func send(_ message: ClientMessage) throws {
+        debug("Sending message: \(message)")
+
+        let messageType = MessageType.getMessageType(message)
+        try self.encoder.encodeArrayHeader(2)
+        try self.encoder.encode(messageType)
+        try self.encoder.encode(message)
+    }
+
+    fileprivate func decodeMessage(_ messageType: MessageType) throws -> ServerMessage {
+        switch messageType {
+        case MessageType.READ_MODULE_REQUEST:
+            return try self.decoder.decode(as: ReadModuleRequest.self)
+        case MessageType.READ_RESOURCE_REQUEST:
+            return try self.decoder.decode(as: ReadResourceRequest.self)
+        case MessageType.LIST_MODULES_REQUEST:
+            return try self.decoder.decode(as: ListModulesRequest.self)
+        case MessageType.LIST_RESOURCES_REQUEST:
+            return try self.decoder.decode(as: ListResourcesRequest.self)
+        default:
+            fatalError("Unreachable code")
+        }
+    }
+
+    func close() {}
+
+    func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
+        AsyncThrowingStream { continuation in
+            Task {
+                while self.running {
+                    do {
+                        let arrayLength = try decoder.decodeArrayLength()
+                        assert(arrayLength == 2)
+                        let code = try decoder.decode(as: MessageType.self)
+                        let message = try decodeMessage(code)
+                        debug("Received message: \(message)")
+                        continuation.yield(message)
+                    } catch {
+                        if self.running {
+                            continuation.finish(throwing: error)
+                        }
+                    }
+                }
+                continuation.finish()
+            }
+        }
     }
 }
 
 /// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
-public class ChildProcessMessageTransport: MessageTransport {
-    var reader: Pipe!
-    var writer: Pipe!
-    var encoder: MessagePackEncoder!
-    var decoder: MessagePackDecoder!
+public class ServerMessageTransport: BaseMessageTransport {
     var process: Process?
     let pklCommand: [String]?
 
-    convenience init() {
+    override var running: Bool { self.process?.isRunning == true }
+
+    override convenience init() {
         self.init(pklCommand: nil)
     }
 
@@ -75,8 +144,8 @@ public class ChildProcessMessageTransport: MessageTransport {
         var arguments = Array(pklCommand.dropFirst())
         arguments.append("server")
         self.process!.arguments = arguments
-        self.reader = .init()
-        self.writer = .init()
+        self.reader = Pipe()
+        self.writer = Pipe()
         self.encoder = .init(writer: self.writer)
         self.decoder = .init(reader: self.reader)
         self.process!.standardOutput = self.reader
@@ -85,17 +154,25 @@ public class ChildProcessMessageTransport: MessageTransport {
         try self.process!.run()
     }
 
-    func send(_ message: ClientMessage) throws {
+    override func send(_ message: ClientMessage) throws {
         try self.ensureProcessStarted()
-        debug("Sending message: \(message)")
-
-        let messageType = MessageType.getMessageType(message)
-        try self.encoder.encodeArrayHeader(2)
-        try self.encoder.encode(messageType)
-        try self.encoder.encode(message)
+        try super.send(message)
     }
 
-    func close() {
+    override fileprivate func decodeMessage(_ messageType: MessageType) throws -> ServerMessage {
+        switch messageType {
+        case MessageType.CREATE_EVALUATOR_RESPONSE:
+            return try self.decoder.decode(as: CreateEvaluatorResponse.self)
+        case MessageType.EVALUATE_RESPONSE:
+            return try self.decoder.decode(as: EvaluateResponse.self)
+        case MessageType.LOG_MESSAGE:
+            return try self.decoder.decode(as: LogMessage.self)
+        default:
+            return try super.decodeMessage(messageType)
+        }
+    }
+
+    override func close() {
         if self.process == nil {
             return
         }
@@ -111,45 +188,36 @@ public class ChildProcessMessageTransport: MessageTransport {
         self.process = nil
     }
 
-    private func decodeMessage(_ messageType: MessageType) throws -> ServerMessage {
+    override func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
+        try self.ensureProcessStarted()
+        return try super.getMessages()
+    }
+}
+
+public class ExternalReaderMessageTransport: BaseMessageTransport {
+    override var running: Bool { self._running }
+    private var _running = true
+
+    init(reader: Reader, writer: Writer) {
+        super.init()
+        self.reader = reader
+        self.writer = writer
+        self.encoder = .init(writer: self.writer)
+        self.decoder = .init(reader: self.reader)
+    }
+
+    override fileprivate func decodeMessage(_ messageType: MessageType) throws -> ServerMessage {
         switch messageType {
-        case MessageType.CREATE_EVALUATOR_RESPONSE:
-            return try self.decoder.decode(as: CreateEvaluatorResponse.self)
-        case MessageType.EVALUATOR_RESPONSE:
-            return try self.decoder.decode(as: EvaluateResponse.self)
-        case MessageType.READ_MODULE_REQUEST:
-            return try self.decoder.decode(as: ReadModuleRequest.self)
-        case MessageType.LOG_MESSAGE:
-            return try self.decoder.decode(as: LogMessage.self)
-        case MessageType.READ_RESOURCE_REQUEST:
-            return try self.decoder.decode(as: ReadResourceRequest.self)
-        case MessageType.LIST_MODULES_REQUEST:
-            return try self.decoder.decode(as: ListModulesRequest.self)
-        case MessageType.LIST_RESOURCES_REQUEST:
-            return try self.decoder.decode(as: ListResourcesRequest.self)
+        case MessageType.INITIALIZE_MODULE_READER_REQUEST:
+            return try self.decoder.decode(as: InitializeModuleReaderRequest.self)
+        case MessageType.INITIALIZE_RESOURCE_READER_REQUEST:
+            return try self.decoder.decode(as: InitializeResourceReaderRequest.self)
         default:
-            fatalError("Unreachable code")
+            return try super.decodeMessage(messageType)
         }
     }
 
-    func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
-        try self.ensureProcessStarted()
-        return AsyncThrowingStream { continuation in
-            Task {
-                while self.process?.isRunning == true {
-                    do {
-                        let arrayLength = try decoder.decodeArrayLength()
-                        assert(arrayLength == 2)
-                        let code = try decoder.decode(as: MessageType.self)
-                        let message = try decodeMessage(code)
-                        debug("Received message: \(message)")
-                        continuation.yield(message)
-                    } catch {
-                        continuation.finish(throwing: error)
-                    }
-                }
-                continuation.finish()
-            }
-        }
+    override func close() {
+        self._running = false
     }
 }

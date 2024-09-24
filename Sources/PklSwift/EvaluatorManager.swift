@@ -108,7 +108,7 @@ public actor EvaluatorManager {
 
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
-        self.init(transport: ChildProcessMessageTransport())
+        self.init(transport: ServerMessageTransport())
     }
 
     // Used for testing only.

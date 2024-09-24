@@ -62,8 +62,8 @@ enum MessageType: Int, Codable {
     case CREATE_EVALUATOR_REQUEST = 0x20
     case CREATE_EVALUATOR_RESPONSE = 0x21
     case CLOSE_EVALUATOR = 0x22
-    case EVALUATOR_REQUEST = 0x23
-    case EVALUATOR_RESPONSE = 0x24
+    case EVALUATE_REQUEST = 0x23
+    case EVALUATE_RESPONSE = 0x24
     case LOG_MESSAGE = 0x25
     case READ_RESOURCE_REQUEST = 0x26
     case READ_RESOURCE_RESPONSE = 0x27
@@ -73,6 +73,10 @@ enum MessageType: Int, Codable {
     case LIST_RESOURCES_RESPONSE = 0x2B
     case LIST_MODULES_REQUEST = 0x2C
     case LIST_MODULES_RESPONSE = 0x2D
+    case INITIALIZE_MODULE_READER_REQUEST = 0x100
+    case INITIALIZE_MODULE_READER_RESPONSE = 0x101
+    case INITIALIZE_RESOURCE_READER_REQUEST = 0x102
+    case INITIALIZE_RESOURCE_READER_RESPONSE = 0x103
 }
 
 extension MessageType {
@@ -85,9 +89,9 @@ extension MessageType {
         case is CloseEvaluatorRequest:
             return MessageType.CLOSE_EVALUATOR
         case is EvaluateRequest:
-            return MessageType.EVALUATOR_REQUEST
+            return MessageType.EVALUATE_REQUEST
         case is EvaluateResponse:
-            return MessageType.EVALUATOR_RESPONSE
+            return MessageType.EVALUATE_RESPONSE
         case is LogMessage:
             return MessageType.LOG_MESSAGE
         case is ListResourcesRequest:
@@ -102,6 +106,14 @@ extension MessageType {
             return MessageType.READ_MODULE_RESPONSE
         case is ReadResourceResponse:
             return MessageType.READ_RESOURCE_RESPONSE
+        case is InitializeModuleReaderRequest:
+            return MessageType.INITIALIZE_MODULE_READER_REQUEST
+        case is InitializeModuleReaderResponse:
+            return MessageType.INITIALIZE_MODULE_READER_RESPONSE
+        case is InitializeResourceReaderRequest:
+            return MessageType.INITIALIZE_RESOURCE_READER_REQUEST
+        case is InitializeResourceReaderResponse:
+            return MessageType.INITIALIZE_RESOURCE_READER_RESPONSE
         default:
             preconditionFailure("Unreachable code")
         }
@@ -123,6 +135,8 @@ struct CreateEvaluatorRequest: ClientRequestMessage {
     var outputFormat: String?
     var project: ProjectOrDependency?
     var http: Http?
+    var externalModuleReaders: [String: ExternalReader]?
+    var externalResourceReaders: [String: ExternalReader]?
 }
 
 struct ProjectOrDependency: Codable {
@@ -230,4 +244,24 @@ struct LogMessage: ServerOneWayMessage {
     let message: String
     // NOTE: not guaranteed to conform to URL. This might have been transformed by a stack frame transformer.
     let frameUri: String
+}
+
+struct InitializeModuleReaderRequest: ServerRequestMessage {
+    var requestId: Int64
+    let scheme: String
+}
+
+struct InitializeModuleReaderResponse: ClientResponseMessage {
+    var requestId: Int64
+    var spec: ModuleReaderSpec?
+}
+
+struct InitializeResourceReaderRequest: ServerRequestMessage {
+    var requestId: Int64
+    let scheme: String
+}
+
+struct InitializeResourceReaderResponse: ClientResponseMessage {
+    var requestId: Int64
+    var spec: ResourceReaderSpec?
 }
