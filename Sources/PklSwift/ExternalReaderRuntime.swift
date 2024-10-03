@@ -17,21 +17,17 @@
 import Foundation
 import MessagePack
 
-// // Example usage:
-// // Note that the Task and dispatchMain() are required for proper signal handling upon shutdown
+// Example usage:
 // import Dispatch
 // import PklSwift
 // @main
 // struct Main {
-//     static func main() throws {
-//         Task {
-//             let runtime = ExternalReaderRuntime(
-//                 options: ExternalReaderRuntimeOptions(
-//                     resourceReaders: [EnvResourceReader()]
-//                 ))
-//             try await runtime.run()
-//         }
-//         dispatchMain()
+//     static func main() async throws {
+//         let runtime = ExternalReaderRuntime(
+//             options: ExternalReaderRuntimeOptions(
+//                 resourceReaders: [MyResourceReader()]
+//             ))
+//         try await runtime.run()
 //     }
 // }
 
@@ -75,13 +71,6 @@ public class ExternalReaderRuntime {
     }
 
     public func run() async throws {
-        signal(SIGTERM, SIG_IGN)
-        let sigtermSource = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
-        sigtermSource.setEventHandler {
-            self.close()
-        }
-        sigtermSource.resume()
-
         for try await message in try self.transport.getMessages() {
             switch message {
             case let message as InitializeModuleReaderRequest:
@@ -96,6 +85,8 @@ public class ExternalReaderRuntime {
                 try await self.handleListModulesRequest(request: message)
             case let message as ListResourcesRequest:
                 try await self.handleListResourcesRequest(request: message)
+            case _ as CloseExternalProcess:
+                self.close()
             default:
                 throw PklBugError.unknownMessage("Got request for unknown message: \(message)")
             }

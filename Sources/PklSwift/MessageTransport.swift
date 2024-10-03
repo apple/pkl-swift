@@ -212,6 +212,8 @@ public class ExternalReaderMessageTransport: BaseMessageTransport {
             return try self.decoder.decode(as: InitializeModuleReaderRequest.self)
         case MessageType.INITIALIZE_RESOURCE_READER_REQUEST:
             return try self.decoder.decode(as: InitializeResourceReaderRequest.self)
+        case MessageType.CLOSE_EXTERNAL_PROCESS:
+            return try self.decoder.decode(as: CloseExternalProcess.self)
         default:
             return try super.decodeMessage(messageType)
         }
