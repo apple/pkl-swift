@@ -1,0 +1,27 @@
+= External Readers
+
+pkl-swift provides APIs that aid in implementing xref:main:language-reference:index.adoc#external-readers[External Readers].
+In this mode of execution, the program built with pkl-swift runs as a child process of the Pkl evaluator, rather than a parent process.
+The `PklSwift.ExternalReaderRuntime` type provides a set of tools for building external readers.
+
+Much like implementing xref:ROOT:evaluation.adoc#custom-readers[Custom Readers], external readers are implemented by providing one or more instances of the `PklSwift.ResourceReader` and `pkl.ModuleReader` protocols.
+
+== Example
+
+.main.swift
+[source,swift]
+----
+@main struct Main {
+    static func main() async throws {
+        let runtime = ExternalReaderRuntime(
+            options: ExternalReaderRuntimeOptions(
+                resourceReaders: [MyResourceReader()]
+            ))
+        try await runtime.run()
+    }
+}
+
+struct MyResourceReader: ResourceReader {
+  // TODO
+}
+----
