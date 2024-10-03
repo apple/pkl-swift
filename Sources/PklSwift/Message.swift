@@ -77,6 +77,7 @@ enum MessageType: Int, Codable {
     case INITIALIZE_MODULE_READER_RESPONSE = 0x101
     case INITIALIZE_RESOURCE_READER_REQUEST = 0x102
     case INITIALIZE_RESOURCE_READER_RESPONSE = 0x103
+    case CLOSE_EXTERNAL_PROCESS = 0x104
 }
 
 extension MessageType {
@@ -114,6 +115,8 @@ extension MessageType {
             return MessageType.INITIALIZE_RESOURCE_READER_REQUEST
         case is InitializeResourceReaderResponse:
             return MessageType.INITIALIZE_RESOURCE_READER_RESPONSE
+        case is CloseExternalProcess:
+            return MessageType.CLOSE_EXTERNAL_PROCESS
         default:
             preconditionFailure("Unreachable code")
         }
@@ -265,3 +268,5 @@ struct InitializeResourceReaderResponse: ClientResponseMessage {
     var requestId: Int64
     var spec: ResourceReaderSpec?
 }
+
+struct CloseExternalProcess: ServerOneWayMessage {}
