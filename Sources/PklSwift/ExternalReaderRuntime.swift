@@ -18,7 +18,6 @@ import Foundation
 import MessagePack
 
 // Example usage:
-// import Dispatch
 // import PklSwift
 // @main
 // struct Main {
