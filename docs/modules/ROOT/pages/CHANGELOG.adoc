@@ -1,5 +1,38 @@
 = Changelog
 
+[[release-0.3.0]]
+== 0.3.0 (2024-10-10)
+
+=== Additions
+
+* Add support for Pkl 0.26 features (https://github.com/apple/pkl-swift/pull/23[#23]).
+* Add support for Windows (https://github.com/apple/pkl-swift/pull/24[#24]).
+
+=== Changes
+
+* Code generation change: `registeredIdentifier` is changed from `var` to `let` (https://github.com/apple/pkl-swift/pull/3[#3]).
+
+=== Breaking Changes
+
+* Remove support for custom `Pair`, because it is not meant to describe configuration data, and also can be better implemented as a tuple (https://github.com/apple/pkl-swift/pull/21[#21]).
+
+=== Miscellaneous
+
+* Documentation improvements (https://github.com/apple/pkl-swift/pull/10[#10], https://github.com/apple/pkl-swift/pull/12[#12], https://github.com/apple/pkl-swift/pull/16[#16]).
+* Remove iOS from supported platforms in Package.swift (this was never supported) (https://github.com/apple/pkl-swift/pull/14[#14]).
+* Code improvements (https://github.com/apple/pkl-swift/pull/25[#25]).
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bricklife[@bricklife]
+* https://github.com/krzysztofzablocki[@krzysztofzablocki]
+* https://github.com/redryerye[@redryerye]
+* https://github.com/shsw228[@shsw228]
+* https://github.com/kasugamirai[@kasugamirai]
+* https://github.com/Kila2[@Kila2]
+
 [[release-0.2.3]]
 == 0.2.3 (2024-02-04)
 
