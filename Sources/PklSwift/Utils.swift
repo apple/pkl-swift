@@ -15,11 +15,6 @@
 // ===----------------------------------------------------------------------===//
 
 import Foundation
-#if os(Linux)
-import Glibc
-#else
-import Darwin.C
-#endif
 
 let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
 
@@ -80,7 +75,7 @@ public func mapEquals<K>(map1: [K: any DynamicallyEquatable], map2: [K: any Dyna
 public func resolvePaths(_ paths: String...) -> String {
     var result = FileManager.default.currentDirectoryPath
     for path in paths {
-        if path.starts(with: "/") {
+        if path.starts(with: "/") || URL(fileURLWithPath: path).path == path {
             result = path
         } else {
             result = NSString.path(withComponents: [result, path])
