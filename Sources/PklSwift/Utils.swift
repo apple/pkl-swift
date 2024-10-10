@@ -75,7 +75,7 @@ public func mapEquals<K>(map1: [K: any DynamicallyEquatable], map2: [K: any Dyna
 public func resolvePaths(_ paths: String...) -> String {
     var result = FileManager.default.currentDirectoryPath
     for path in paths {
-        if path.starts(with: "/") || URL(fileURLWithPath: path).path  == path {
+        if path.starts(with: "/") || URL(fileURLWithPath: path).path == path {
             result = path
         } else {
             result = NSString.path(withComponents: [result, path])
