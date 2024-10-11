@@ -108,7 +108,7 @@ public actor EvaluatorManager {
 
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
-        self.init(transport: ChildProcessMessageTransport())
+        self.init(transport: ServerMessageTransport())
     }
 
     // Used for testing only.
@@ -371,8 +371,10 @@ enum PklBugError: Error {
 
 let pklVersion0_25 = SemanticVersion("0.25.0")!
 let pklVersion0_26 = SemanticVersion("0.26.0")!
+let pklVersion0_27 = SemanticVersion("0.27.0")!
 
 let supportedPklVersions = [
     pklVersion0_25,
     pklVersion0_26,
+    pklVersion0_27,
 ]
