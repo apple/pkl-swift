@@ -77,11 +77,6 @@ struct PklGenSwift: AsyncParsableCommand {
     )
     var pklInputModules: [String] = []
 
-    func tempFile() -> URL {
-        let fileName = ProcessInfo.processInfo.globallyUniqueString + ".pkl"
-        return URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    }
-
     private func generateScriptUrl() -> String {
         if let generateScript = self.generateScript {
             return URL(fileURLWithPath: generateScript).path

@@ -41,11 +41,6 @@ public struct PklSwiftGenerator {
         }
     }
 
-    private func tempFile() -> URL {
-        let fileName = ProcessInfo.processInfo.globallyUniqueString + ".pkl"
-        return URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    }
-
     private mutating func runModule(evaluator: Evaluator, pklInputModule: String) async throws {
         let out = resolvePaths(self.settings.outputPath ?? ".out")
         let moduleToEvaluate = """
@@ -55,7 +50,7 @@ public struct PklSwiftGenerator {
 
         moduleToGenerate = theModule
         """
-        let tempFile = tempFile()
+        let tempFile = try tempFile(suffix: ".pkl")
         try moduleToEvaluate.write(to: tempFile, atomically: true, encoding: .utf8)
         let files = try await evaluator.evaluateOutputFiles(source: .url(tempFile))
         for (filename, contents) in files {

@@ -22,10 +22,10 @@ import XCTest
 class ProjectTest: XCTestCase {
     func testLoadProject() async throws {
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
-        let tempDir = NSTemporaryDirectory()
-        try FileManager.default.createDirectory(atPath: tempDir + "/subdir", withIntermediateDirectories: true)
-        let otherProjectFile = URL(fileURLWithPath: tempDir, isDirectory: true)
-            .appendingPathComponent("subdir/PklProject")
+        let tempDir = try tempDir()
+        let subDir = tempDir.appendingPathComponent("subdir")
+        try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
+        let otherProjectFile = subDir.appendingPathComponent("PklProject")
 
         try #"""
         amends "pkl:Project"
@@ -38,8 +38,8 @@ class ProjectTest: XCTestCase {
         }
         """#.write(to: otherProjectFile, atomically: true, encoding: .utf8)
 
-        let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-            .appendingPathComponent("PklProject")
+        let file = (try PklSwift.tempDir()).appendingPathComponent("PklProject")
+
         let httpSetting = version < pklVersion0_26 ? "" : """
         http {
           proxy {
