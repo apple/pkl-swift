@@ -308,7 +308,7 @@ final class PklSwiftTests: XCTestCase {
 // TODO re-enable this test when packages are available
 //
 //    func testWithProject() async throws {
-//        let project1Dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("project1")
+//        let project1Dir = (try tempDir()).appendingPathComponent("project1")
 //        try FileManager.default.createDirectory(at: project1Dir, withIntermediateDirectories: true)
 //        try """
 //        amends "pkl:Project"
