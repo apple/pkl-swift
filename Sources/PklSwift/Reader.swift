@@ -35,8 +35,8 @@ public protocol BaseReader {
     /// birds:catalog/swallow.pkl
     /// ```
     ///
-    /// The first URI conveys name "fred.pkl" within parent "/persons/". The second URI
-    /// conveys the name "persons/fred.pkl" with no hierarchical meaning.
+    /// The first URI conveys name "swallow.pkl" within parent "/catalog/". The second URI
+    /// conveys the name "catalog/swallow.pkl" with no hierarchical meaning.
     var hasHierarchicalUris: Bool { get }
 
     /// Returns elements at a specified path.
@@ -107,6 +107,11 @@ public struct PathElement {
 
     /// Whether the element is a directory or not.
     public let isDirectory: Bool
+
+    public init(name: String, isDirectory: Bool) {
+        self.name = name
+        self.isDirectory = isDirectory
+    }
 }
 
 extension PathElement {
