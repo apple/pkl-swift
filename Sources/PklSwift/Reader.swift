@@ -107,6 +107,11 @@ public struct PathElement {
 
     /// Whether the element is a directory or not.
     public let isDirectory: Bool
+
+    public init(name: String, isDirectory: Bool) {
+        self.name = name
+        self.isDirectory = isDirectory
+    }
 }
 
 extension PathElement {
