@@ -35,8 +35,8 @@ public protocol BaseReader {
     /// birds:catalog/swallow.pkl
     /// ```
     ///
-    /// The first URI conveys name "fred.pkl" within parent "/persons/". The second URI
-    /// conveys the name "persons/fred.pkl" with no hierarchical meaning.
+    /// The first URI conveys name "swallow.pkl" within parent "/catalog/". The second URI
+    /// conveys the name "catalog/swallow.pkl" with no hierarchical meaning.
     var hasHierarchicalUris: Bool { get }
 
     /// Returns elements at a specified path.
