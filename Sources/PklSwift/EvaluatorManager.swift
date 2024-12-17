@@ -264,6 +264,9 @@ public actor EvaluatorManager {
         guard options.http == nil || version >= pklVersion0_26 else {
             throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }
+        guard (options.externalModuleReaders == nil && options.externalResourceReaders == nil) || version >= pklVersion0_27 else {
+            throw PklError("external reader options are not supported on Pkl versions lower than 0.27")
+        }
         let req = options.toMessage()
         guard let response = try await ask(req) as? CreateEvaluatorResponse else {
             throw PklBugError.invalidMessageCode(

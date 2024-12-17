@@ -22,15 +22,15 @@ import MessagePack
 // @main
 // struct Main {
 //     static func main() async throws {
-//         let runtime = ExternalReaderRuntime(
-//             options: ExternalReaderRuntimeOptions(
+//         let client = ExternalReaderClient(
+//             options: ExternalReaderClientOptions(
 //                 resourceReaders: [MyResourceReader()]
 //             ))
-//         try await runtime.run()
+//         try await client.run()
 //     }
 // }
 
-public struct ExternalReaderRuntimeOptions {
+public struct ExternalReaderClientOptions {
     /// Reader to receive requests.
     public var requestReader: Reader = FileHandle.standardInput
 
@@ -56,12 +56,12 @@ public struct ExternalReaderRuntimeOptions {
     }
 }
 
-public class ExternalReaderRuntime {
+public class ExternalReaderClient {
     private let moduleReaders: [ModuleReader]
     private let resourceReaders: [ResourceReader]
     private let transport: MessageTransport
 
-    public init(options: ExternalReaderRuntimeOptions) {
+    public init(options: ExternalReaderClientOptions) {
         self.moduleReaders = options.moduleReaders
         self.resourceReaders = options.resourceReaders
         self.transport = ExternalReaderMessageTransport(

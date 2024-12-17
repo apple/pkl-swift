@@ -300,6 +300,9 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
         try checkCanEncode(value: value)
         defer { self.canEncodeNewValue = false }
         switch value {
+        case let array as Array<Any> where array.count == 0:
+            // because empty Array<T> is [UInt8] this case MUST come before the [UInt8] case
+            self.storage.append(0b10010000)
         case let data as Data:
             try self.encode(data)
         case let date as Date:
