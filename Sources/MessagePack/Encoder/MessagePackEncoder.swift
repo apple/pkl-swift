@@ -44,10 +44,13 @@ public final class MessagePackEncoder {
             try Box<Data>(data).encode(to: encoder)
         case let date as Date:
             try Box<Date>(date).encode(to: encoder)
-        case let bytes as [UInt8]:
-            try Box<[UInt8]>(bytes).encode(to: encoder)
         case let url as URL:
             try Box<URL>(url).encode(to: encoder)
+        case let bytes as [UInt8]:
+            guard type(of: value) == [UInt8].self else {
+                fallthrough
+            }
+            try Box<[UInt8]>(bytes).encode(to: encoder)
         default:
             try value.encode(to: encoder)
         }
