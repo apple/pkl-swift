@@ -48,6 +48,10 @@ let package = Package(
             ],
             resources: [.embedInCode("Resources/VERSION.txt")]
         ),
+        .executableTarget(
+            name: "test-external-reader",
+            dependencies: ["PklSwift"]
+        ),
         .testTarget(
             name: "PklSwiftTests",
             dependencies: [

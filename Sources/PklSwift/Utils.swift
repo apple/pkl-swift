@@ -16,7 +16,8 @@
 
 import Foundation
 
-let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
+let pklDebug = "1"
+// let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
 
 func debug(_ message: String) {
     if pklDebug != "1" {
