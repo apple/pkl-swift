@@ -90,5 +90,5 @@ public struct Proxy: Codable, Hashable {
 
 public struct ExternalReader: Codable, Hashable {
     var executable: String
-    var arguments: [String] = []
+    var arguments: [String]? = nil
 }

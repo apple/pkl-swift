@@ -43,8 +43,7 @@ struct FibReader: ResourceReader {
 }
 
 func fibonacci(n: Int) -> Int {
-    var a = 0
-    var b = 1
+    var (a, b) = (0, 1)
     for _ in 0..<n {
         (a, b) = (b, a + b)
     }

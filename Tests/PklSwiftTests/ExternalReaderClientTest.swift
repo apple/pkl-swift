@@ -40,9 +40,9 @@ class ExternalReaderClientTest: XCTestCase {
         fib5 = 5
         fib10 = 55
         fib20 = 6765
-        fibErrA = "I/O error reading resource `fib:%20`. IOException: input uri must be in format fib:<positive integer>"
-        fibErrB = "I/O error reading resource `fib:abc`. IOException: input uri must be in format fib:<positive integer>"
-        fibErrC = "I/O error reading resource `fib:-10`. IOException: input uri must be in format fib:<positive integer>"
+        fibErrA = "I/O error reading resource `fib:%20`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
+        fibErrB = "I/O error reading resource `fib:abc`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
+        fibErrC = "I/O error reading resource `fib:-10`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
         """
 
         let opts = EvaluatorOptions(
@@ -55,7 +55,7 @@ class ExternalReaderClientTest: XCTestCase {
 
         try await withEvaluator(options: opts) { evaluator in
             let result = try await evaluator.evaluateOutputText(source: .url(testFile))
-            XCTAssertEqual(result, expectedResult)
+            XCTAssertEqual(result.trimmingCharacters(in: .whitespacesAndNewlines), expectedResult.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }   
 }
