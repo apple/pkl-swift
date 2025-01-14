@@ -14,13 +14,17 @@
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
 
+import SemanticVersion
 import XCTest
 
 @testable import PklSwift
 
 class ExternalReaderClientTest: XCTestCase {
     func testE2E() async throws {
-        // setenv("PKL_EXEC", "debugpkl", 1)
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        guard version >= pklVersion0_27 else {
+            throw XCTSkip("External readers require Pkl 0.27 or later.")
+        }
 
         let tempDir = try tempDir()
         let testFile = tempDir.appendingPathComponent("test.pkl")
