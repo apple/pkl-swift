@@ -92,7 +92,7 @@ public class BaseMessageTransport: MessageTransport {
         case MessageType.LIST_RESOURCES_REQUEST:
             return try self.decoder.decode(as: ListResourcesRequest.self)
         default:
-            fatalError("Unreachable code")
+            throw PklBugError.unknownMessage("Received unexpected message: \(messageType)")
         }
     }
 

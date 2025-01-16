@@ -11,6 +11,9 @@ Much like implementing xref:ROOT:evaluation.adoc#custom-readers[Custom Readers],
 .main.swift
 [source,swift]
 ----
+import Foundation
+import PklSwift
+
 @main struct Main {
     static func main() async throws {
         let client = ExternalReaderClient(

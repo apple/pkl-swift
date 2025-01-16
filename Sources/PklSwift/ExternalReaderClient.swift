@@ -73,9 +73,9 @@ public class ExternalReaderClient {
         for try await message in try self.transport.getMessages() {
             switch message {
             case let message as InitializeModuleReaderRequest:
-                try await self.handleInitializeModuleReaderRequest(request: message)
+                try self.handleInitializeModuleReaderRequest(request: message)
             case let message as InitializeResourceReaderRequest:
-                try await self.handleInitializeResourceReaderRequest(request: message)
+                try self.handleInitializeResourceReaderRequest(request: message)
             case let message as ReadModuleRequest:
                 try await self.handleReadModuleRequest(request: message)
             case let message as ReadResourceRequest:
@@ -96,7 +96,7 @@ public class ExternalReaderClient {
         self.transport.close()
     }
 
-    func handleInitializeModuleReaderRequest(request: InitializeModuleReaderRequest) async throws {
+    func handleInitializeModuleReaderRequest(request: InitializeModuleReaderRequest) throws {
         var response = InitializeModuleReaderResponse(requestId: request.requestId, spec: nil)
         guard let reader = moduleReaders.first(where: { $0.scheme == request.scheme }) else {
             try self.transport.send(response)
@@ -106,8 +106,7 @@ public class ExternalReaderClient {
         try self.transport.send(response)
     }
 
-    func handleInitializeResourceReaderRequest(request: InitializeResourceReaderRequest)
-        async throws {
+    func handleInitializeResourceReaderRequest(request: InitializeResourceReaderRequest) throws {
         var response = InitializeResourceReaderResponse(requestId: request.requestId, spec: nil)
         guard let reader = resourceReaders.first(where: { $0.scheme == request.scheme }) else {
             try self.transport.send(response)
