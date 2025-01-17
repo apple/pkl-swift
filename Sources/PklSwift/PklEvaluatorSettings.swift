@@ -26,8 +26,28 @@ public struct PklEvaluatorSettings: Decodable, Hashable {
     let moduleCacheDir: String?
     let rootDir: String?
     let http: Http?
+
+    /// Added in Pkl 0.27
     let externalModuleReaders: [String: ExternalReader]?
+
+    /// Added in Pkl 0.27
     let externalResourceReaders: [String: ExternalReader]?
+
+    /// Whether to format messages and test results with ANSI color colors.
+    ///
+    /// Added in Pkl 0.27
+    let color: PklEvaluatorSettingsColor?
+}
+
+public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable {
+    /// Never format.
+    case never = "never"
+
+    /// Format if the process' stdin, stdout, or stderr are connected to a console.
+    case auto = "auto"
+
+    /// Always format.
+    case always = "always"
 }
 
 /// Settings that control how Pkl talks to HTTP(S) servers.
