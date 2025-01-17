@@ -29,16 +29,16 @@ jobs:
     resource_class: xlarge
     docker:
     - image: swift:5.9-rhel-ubi9
-  test-pkl-0-26-0:
+  test-pkl-0-27-1:
     steps:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.26.0-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.26.0/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.27.1-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.27.1/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.26.0
+        name: Downloading pkl-0.27.1
     - run:
         command: |-
           mkdir -p .out/test-results/
@@ -108,11 +108,11 @@ jobs:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.26.0-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.26.0/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.27.1-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.27.1/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.26.0
+        name: Downloading pkl-0.27.1
     - run:
         command: $PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/
     - persist_to_workspace:
@@ -194,7 +194,7 @@ workflows:
         requires:
         - hold
         - pr-approval/authenticate
-    - test-pkl-0-26-0:
+    - test-pkl-0-27-1:
         requires:
         - hold
         - pr-approval/authenticate
@@ -205,7 +205,7 @@ workflows:
   main:
     jobs:
     - test-pkl-0-25-3
-    - test-pkl-0-26-0
+    - test-pkl-0-27-1
     when:
       equal:
       - main
@@ -218,7 +218,7 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
-    - test-pkl-0-26-0:
+    - test-pkl-0-27-1:
         filters:
           branches:
             ignore: /.*/
@@ -227,7 +227,7 @@ workflows:
     - pkl-package:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-26-0
+        - test-pkl-0-27-1
         filters:
           branches:
             ignore: /.*/
@@ -236,7 +236,7 @@ workflows:
     - pkl-gen-swift-macos:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-26-0
+        - test-pkl-0-27-1
         filters:
           branches:
             ignore: /.*/
@@ -245,7 +245,7 @@ workflows:
     - pkl-gen-swift-linux-amd64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-26-0
+        - test-pkl-0-27-1
         filters:
           branches:
             ignore: /.*/
@@ -254,7 +254,7 @@ workflows:
     - pkl-gen-swift-linux-aarch64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-26-0
+        - test-pkl-0-27-1
         filters:
           branches:
             ignore: /.*/

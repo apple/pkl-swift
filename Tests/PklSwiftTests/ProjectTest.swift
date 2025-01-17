@@ -28,6 +28,7 @@ class ProjectTest: XCTestCase {
         let otherProjectFile = subDir.appendingPathComponent("PklProject")
 
         try #"""
+        @ModuleInfo { minPklVersion = "0.25.0" }
         amends "pkl:Project"
 
         package {
@@ -71,6 +72,7 @@ class ProjectTest: XCTestCase {
           }
         }
         """
+        let colorSetting = version < pklVersion0_27 ? "" : #"color = "always""#
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
             caCertificates: nil,
             proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
@@ -83,6 +85,7 @@ class ProjectTest: XCTestCase {
           "scheme3": ExternalReader(executable: "reader3"),
           "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
         ]
+        let color: PklEvaluatorSettingsColor? = version < pklVersion0_27 ? nil : .always
         try #"""
         amends "pkl:Project"
 
@@ -129,6 +132,7 @@ class ProjectTest: XCTestCase {
           rootDir = "/buzzy"
           \#(externalReaderSettings)
           \#(httpSetting)
+          \#(colorSetting)
         }
 
         dependencies {
@@ -155,7 +159,8 @@ class ProjectTest: XCTestCase {
                 rootDir: "/buzzy",
                 http: httpExpectation,
                 externalModuleReaders: externalModuleReadersExpectation,
-                externalResourceReaders: externalResourceReadersExpectation
+                externalResourceReaders: externalResourceReadersExpectation,
+                color: color
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",
@@ -212,7 +217,8 @@ class ProjectTest: XCTestCase {
                         rootDir: nil,
                         http: nil,
                         externalModuleReaders: nil,
-                        externalResourceReaders: nil
+                        externalResourceReaders: nil,
+                        color: nil
                     ),
                     projectFileUri: "\(otherProjectFile)",
                     tests: [],
