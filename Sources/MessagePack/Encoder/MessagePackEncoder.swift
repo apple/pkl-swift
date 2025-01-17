@@ -1,5 +1,5 @@
 // ===----------------------------------------------------------------------===//
-// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,10 +44,13 @@ public final class MessagePackEncoder {
             try Box<Data>(data).encode(to: encoder)
         case let date as Date:
             try Box<Date>(date).encode(to: encoder)
-        case let bytes as [UInt8]:
-            try Box<[UInt8]>(bytes).encode(to: encoder)
         case let url as URL:
             try Box<URL>(url).encode(to: encoder)
+        case let bytes as [UInt8]:
+            guard type(of: value) == [UInt8].self else {
+                fallthrough
+            }
+            try Box<[UInt8]>(bytes).encode(to: encoder)
         default:
             try value.encode(to: encoder)
         }

@@ -1,5 +1,5 @@
 // ===----------------------------------------------------------------------===//
-// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -304,8 +304,6 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
             try self.encode(data)
         case let date as Date:
             try self.encode(date)
-        case let bytes as [UInt8]:
-            try self.encode(bytes)
         case let url as URL:
             try self.encode(url)
         case let bool as Bool:
@@ -334,9 +332,16 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
             try self.encode(uint64)
         case let num as any BinaryInteger & Encodable:
             try self.encode(num)
+        case let bytes as [UInt8]:
+            guard type(of: value) == [UInt8].self else {
+                fallthrough
+            }
+            try self.encode(bytes)
         default:
             let writer: Writer = BufferWriter()
             let encoder = _MessagePackEncoder()
+            encoder.userInfo = userInfo
+            encoder.codingPath = codingPath
             try value.encode(to: encoder)
             try encoder.write(into: writer)
             let data = (writer as! BufferWriter).bytes

@@ -1,5 +1,5 @@
 // ===----------------------------------------------------------------------===//
-// Copyright © 2024 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,10 +51,38 @@ class ProjectTest: XCTestCase {
           }
         }
         """
+        let externalReaderSettings = version < pklVersion0_27 ? "" : """
+        externalModuleReaders {
+          ["scheme1"] {
+            executable = "reader1"
+          }
+          ["scheme2"] {
+            executable = "reader2"
+            arguments { "with"; "args" }
+          }
+        }
+        externalResourceReaders {
+          ["scheme3"] {
+            executable = "reader3"
+          }
+          ["scheme4"] {
+            executable = "reader4"
+            arguments { "with"; "args" }
+          }
+        }
+        """
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
             caCertificates: nil,
             proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
         )
+        let externalModuleReadersExpectation = version < pklVersion0_27 ? nil : [
+          "scheme1": ExternalReader(executable: "reader1"),
+          "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"]),
+        ]
+        let externalResourceReadersExpectation = version < pklVersion0_27 ? nil : [
+          "scheme3": ExternalReader(executable: "reader3"),
+          "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
+        ]
         try #"""
         amends "pkl:Project"
 
@@ -99,6 +127,7 @@ class ProjectTest: XCTestCase {
           timeout = 5.min
           moduleCacheDir = "/bar/buzz"
           rootDir = "/buzzy"
+          \#(externalReaderSettings)
           \#(httpSetting)
         }
 
@@ -124,7 +153,9 @@ class ProjectTest: XCTestCase {
                 timeout: .minutes(5),
                 moduleCacheDir: "/bar/buzz",
                 rootDir: "/buzzy",
-                http: httpExpectation
+                http: httpExpectation,
+                externalModuleReaders: externalModuleReadersExpectation,
+                externalResourceReaders: externalResourceReadersExpectation
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",
@@ -179,7 +210,9 @@ class ProjectTest: XCTestCase {
                         timeout: nil,
                         moduleCacheDir: nil,
                         rootDir: nil,
-                        http: nil
+                        http: nil,
+                        externalModuleReaders: nil,
+                        externalResourceReaders: nil
                     ),
                     projectFileUri: "\(otherProjectFile)",
                     tests: [],
