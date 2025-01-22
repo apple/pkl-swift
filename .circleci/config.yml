@@ -193,11 +193,9 @@ workflows:
     - test-pkl-0-25-3:
         requires:
         - hold
-        - pr-approval/authenticate
     - test-pkl-0-27-2:
         requires:
         - hold
-        - pr-approval/authenticate
     when:
       matches:
         value: << pipeline.git.branch >>
