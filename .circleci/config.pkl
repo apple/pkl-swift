@@ -47,7 +47,7 @@ local class PklDistribution {
 }
 
 local pklCurrent: PklDistribution = new {
-  version = "0.27.1"
+  version = "0.27.2"
 }
 
 local pklDistributions: Listing<PklDistribution> = new {
