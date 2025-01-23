@@ -5,8 +5,8 @@
 
 === Additions
 
-* Added a new API for creating external readers, called `ExternalReaderClient`.
-* Added new fields to support new options available in Pkl 0.27:
+* Add a new API for creating external readers, called `ExternalReaderClient`.
+* Add new fields to support new options available in Pkl 0.27:
     - In struct `EvaluatorOptions`: `externalModuleReaders` and `externalResourceReaders`.
     - In struct `PklEvaluatorSettings`: `externalModuleReaders`, `externalResourceReaders`, and `color`.
 
