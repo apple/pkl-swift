@@ -1,5 +1,26 @@
 = Changelog
 
+[[release-0.4.0]]
+== 0.4.0 (2025-01-24)
+
+=== Additions
+
+* Added a new API for creating external readers, called `ExternalReaderClient`.
+* Added new fields to support new options available in Pkl 0.27:
+    - In struct `EvaluatorOptions`: `externalModuleReaders` and `externalResourceReaders`.
+    - In struct `PklEvaluatorSettings`: `externalModuleReaders`, `externalResourceReaders`, and `color`.
+
+=== Changes
+
+* Make `PathElement.init` a public method.
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/HT154[@HT154]
+* https://github.com/jcubit[@jcubit]
+
 [[release-0.3.0]]
 == 0.3.0 (2024-10-10)
 
