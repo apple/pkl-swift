@@ -5,14 +5,14 @@
 
 === Additions
 
-* Add a new API for creating external readers, called `ExternalReaderClient`.
-* Add new fields to support new options available in Pkl 0.27:
+* Add a new API for creating external readers, called `ExternalReaderClient` (https://github.com/apple/pkl-swift/pull/26[#26]).
+* Add new fields to support new options available in Pkl 0.27 (https://github.com/apple/pkl-swift/pull/26[#26], https://github.com/apple/pkl-swift/pull/32[#32]):
     - In struct `EvaluatorOptions`: `externalModuleReaders` and `externalResourceReaders`.
     - In struct `PklEvaluatorSettings`: `externalModuleReaders`, `externalResourceReaders`, and `color`.
 
 === Changes
 
-* Make `PathElement.init` a public method.
+* Make `PathElement.init` public (https://github.com/apple/pkl-swift/pull/31[#31]).
 
 === Contributors ❤️
 
