@@ -19,6 +19,8 @@ jobs:
           swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
         name: swift test
     - run:
+        command: make circleci-config
+    - run:
         command: make test-snippets
     - run:
         command: make test-pkl
@@ -44,6 +46,8 @@ jobs:
           mkdir -p .out/test-results/
           swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
         name: swift test
+    - run:
+        command: make circleci-config
     - run:
         command: make test-snippets
     - run:
