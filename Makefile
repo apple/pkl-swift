@@ -108,3 +108,8 @@ pkl-gen-swift-release: $(PKL_GEN_SWIFT_RELEASE)
 .PHONY: pkl-gen-swift-release-output
 pkl-gen-swift-release-output:
 	@echo "$(PKL_GEN_SWIFT_RELEASE)" | xargs
+
+.PHONY: circleci-config
+circleci-config:
+	$(PKL_EXEC) eval .circleci/config.pkl -o .circleci/config.yml
+	git diff --exit-code

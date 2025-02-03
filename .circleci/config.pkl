@@ -133,6 +133,7 @@ jobs {
         "checkout"
         distribution.downloadRunStep
         swiftTest
+        new RunStep { command = "make circleci-config" }
         new RunStep { command = "make test-snippets" }
         new RunStep { command = "make test-pkl" }
         new RunStep { command = "make generate-fixtures" }
