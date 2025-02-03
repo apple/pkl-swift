@@ -160,7 +160,10 @@ class FixturesTest: XCTestCase {
             animal1: .zebra(UnionTypes.Zebra(name: "Zebra")),
             animal2: .donkey(UnionTypes.Donkey(name: "Donkey")),
             animalOrString1: .animal(UnionTypes.Zebra(name: "Zebra")),
-            animalOrString2: .string("Zebra")
+            animalOrString2: .string("Zebra"),
+            intOrFloat1: .float64(5.0),
+            intOrFloat2: .float64(5.5),
+            intOrFloat3: .int(5)
         ))
     }
 }

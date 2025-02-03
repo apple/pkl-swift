@@ -15,7 +15,7 @@ extension UnionTypes {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as Banana:
                 self = Fruit.banana(decoded)
             case let decoded as Grape:
@@ -47,7 +47,7 @@ extension UnionTypes {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as Zebra:
                 self = ZebraOrDonkey.zebra(decoded)
             case let decoded as Donkey:
@@ -81,7 +81,7 @@ extension UnionTypes {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as any Animal:
                 self = AnimalOrString.animal(decoded)
             case let decoded as String:
@@ -103,6 +103,29 @@ extension UnionTypes {
                 hasher.combine(value)
             case let .string(value):
                 hasher.combine(value)
+            }
+        }
+    }
+
+    public enum IntOrFloat: Decodable, Hashable {
+        case int(Int)
+        case float64(Float64)
+
+        public init(from decoder: Decoder) throws {
+            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
+            switch decoded?.base {
+            case let decoded as Int:
+                self = IntOrFloat.int(decoded)
+            case let decoded as Float64:
+                self = IntOrFloat.float64(decoded)
+            default:
+                throw DecodingError.typeMismatch(
+                    IntOrFloat.self,
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Expected type IntOrFloat, but got \(String(describing: decoded))"
+                    )
+                )
             }
         }
     }
@@ -132,6 +155,12 @@ extension UnionTypes {
 
         public var animalOrString2: AnimalOrString
 
+        public var intOrFloat1: IntOrFloat
+
+        public var intOrFloat2: IntOrFloat
+
+        public var intOrFloat3: IntOrFloat
+
         public init(
             fruit1: Fruit,
             fruit2: Fruit,
@@ -143,7 +172,10 @@ extension UnionTypes {
             animal1: ZebraOrDonkey,
             animal2: ZebraOrDonkey,
             animalOrString1: AnimalOrString,
-            animalOrString2: AnimalOrString
+            animalOrString2: AnimalOrString,
+            intOrFloat1: IntOrFloat,
+            intOrFloat2: IntOrFloat,
+            intOrFloat3: IntOrFloat
         ) {
             self.fruit1 = fruit1
             self.fruit2 = fruit2
@@ -156,6 +188,9 @@ extension UnionTypes {
             self.animal2 = animal2
             self.animalOrString1 = animalOrString1
             self.animalOrString2 = animalOrString2
+            self.intOrFloat1 = intOrFloat1
+            self.intOrFloat2 = intOrFloat2
+            self.intOrFloat3 = intOrFloat3
         }
     }
 

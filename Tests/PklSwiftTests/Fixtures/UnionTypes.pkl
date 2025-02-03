@@ -53,3 +53,11 @@ typealias AnimalOrString = Animal|String
 animalOrString1: AnimalOrString = new Zebra {}
 
 animalOrString2: AnimalOrString = "Zebra"
+
+typealias IntOrFloat = Int | Float
+
+intOrFloat1: IntOrFloat = 5.0
+
+intOrFloat2: IntOrFloat = 5.5
+
+intOrFloat3: IntOrFloat = 5

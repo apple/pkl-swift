@@ -20,7 +20,7 @@ extension Enums {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as Horse:
                 self = Animal.horse(decoded)
             case let decoded as Zebra:
@@ -46,7 +46,7 @@ extension Enums {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as [String: String]:
                 self = DictOrArray.dictionaryStringString(decoded)
             case let decoded as [String]:
@@ -70,7 +70,7 @@ extension Enums {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as Horse:
                 self = HorseOrBug.horse(decoded)
             case let decoded as String:
@@ -95,7 +95,7 @@ extension Enums {
 
         public init(from decoder: Decoder) throws {
             let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded {
+            switch decoded?.base {
             case let decoded as Horse?:
                 self = MaybeHorseOrDefinitelyZebra.horse(decoded)
             case let decoded as Zebra:
