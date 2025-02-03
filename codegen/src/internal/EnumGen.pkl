@@ -89,7 +89,7 @@ local enumContents =
     }
     "\(module.indent)public init(from decoder: Decoder) throws {"
     "\(module.indent.repeat(2))let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value"
-    "\(module.indent.repeat(2))switch decoded {"
+    "\(module.indent.repeat(2))switch decoded?.base {"
     for (member in enumNormalMembers) {
       "\(module.indent.repeat(2))case let decoded as \(member.renderedType):"
       "\(module.indent.repeat(3))self = \(module.mapping.name).\(member.name)(decoded)"
