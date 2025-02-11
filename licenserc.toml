@@ -1,0 +1,29 @@
+additionalHeaders = ["scripts/pkl-header-style.toml"]
+
+headerPath = "scripts/license-header.txt"
+
+includes = [
+    "*.swift",
+    "*.pkl",
+    "*.h",
+    "*.cpp",
+    "*.sh",
+    "PklProject",
+]
+
+excludes = [
+    "Sources/pkl-gen-swift/Generated",
+    "Tests/PklSwiftTests/Fixtures",
+    "codegen/snippet-tests",
+    "doc",
+]
+
+[git]
+attrs = 'enable'
+ignore = 'enable'
+
+[properties]
+copyrightOwner = "Apple Inc. and the Pkl project authors"
+
+[mapping.SWIFT_STYLE]
+extensions = ["swift"]
