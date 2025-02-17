@@ -144,6 +144,20 @@ jobs {
     }
   }
 
+  ["test-license-headers"] {
+    docker {
+      new {
+        image = "ghcr.io/korandoru/hawkeye"
+      }
+    }
+    steps {
+      "checkout"
+      new RunStep {
+        command = "/bin/hawkeye check --fail-if-unknown"
+      }
+    }
+  }
+
   ["pkl-gen-swift-macos"] {
     macos {
       xcode = "15.2.0"
