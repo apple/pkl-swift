@@ -1,0 +1,37 @@
+= Development
+
+== Running the formatter
+
+This project uses https://github.com/nicklockwood/SwiftFormat[SwiftFormat] as a formatter.
+
+To install swiftformat:
+
+[source,shell]
+----
+brew install swiftformat
+----
+
+To run the formatter:
+
+[source,shell]
+----
+swiftformat .
+----
+
+== Running the license checker
+
+This project uses https://github.com/korandoru/hawkeye[hawkeye] to format license headers.
+
+To install hawkeye locally, you will need to install the https://rustup.rs[Rust toolchain], then run:
+
+[source,shell]
+----
+cargo install hawkeye
+----
+
+To run the formatter:
+
+[source,shell]
+----
+hawkeye format
+----

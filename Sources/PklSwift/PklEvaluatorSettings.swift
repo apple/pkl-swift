@@ -41,13 +41,13 @@ public struct PklEvaluatorSettings: Decodable, Hashable {
 
 public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable {
     /// Never format.
-    case never = "never"
+    case never
 
     /// Format if the process' stdin, stdout, or stderr are connected to a console.
-    case auto = "auto"
+    case auto
 
     /// Always format.
-    case always = "always"
+    case always
 }
 
 /// Settings that control how Pkl talks to HTTP(S) servers.

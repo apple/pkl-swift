@@ -50,8 +50,8 @@ class ExternalReaderClientTest: XCTestCase {
         """
 
         let opts = EvaluatorOptions(
-            allowedModules: ["file:", "repl:text"], 
-            allowedResources: ["fib:", "prop:"], 
+            allowedModules: ["file:", "repl:text"],
+            allowedResources: ["fib:", "prop:"],
             externalResourceReaders: [
                 "fib": ExternalReader(executable: "./.build/debug/test-external-reader"),
             ]
@@ -61,5 +61,5 @@ class ExternalReaderClientTest: XCTestCase {
             let result = try await evaluator.evaluateOutputText(source: .url(testFile))
             XCTAssertEqual(result.trimmingCharacters(in: .whitespacesAndNewlines), expectedResult.trimmingCharacters(in: .whitespacesAndNewlines))
         }
-    }   
+    }
 }

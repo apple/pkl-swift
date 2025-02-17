@@ -305,7 +305,7 @@ final class PklSwiftTests: XCTestCase {
         XCTAssertEqual(logger.logLines, [#"pkl: TRACE: "Hello there" = "Hello there" (repl:text)\#n"#])
     }
 
-// TODO re-enable this test when packages are available
+    // TODO: re-enable this test when packages are available
 //
 //    func testWithProject() async throws {
 //        let project1Dir = (try tempDir()).appendingPathComponent("project1")

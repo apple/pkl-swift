@@ -18,12 +18,13 @@ import Foundation
 import MessagePack
 import SemanticVersion
 #if os(Windows)
-    import WinSDK.System
-    let ENV_SEPARATOR=";"
-    let PKL_EXEC_NAME="pkl.exe"
+import WinSDK.System
+
+let ENV_SEPARATOR=";"
+let PKL_EXEC_NAME="pkl.exe"
 #else
-    let ENV_SEPARATOR=":"
-    let PKL_EXEC_NAME="pkl"
+let ENV_SEPARATOR=":"
+let PKL_EXEC_NAME="pkl"
 #endif
 /// Perfoms `action`, returns its result and then closes the manager.
 ///
@@ -46,14 +47,14 @@ public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws ->
 }
 
 func getenv(_ key: String) -> String? {
-#if os(Windows)
+    #if os(Windows)
     let key = key.lowercased()
-    return ProcessInfo.processInfo.environment.first { (envKey: String, value: String) in
-        return key == envKey.lowercased()
+    return ProcessInfo.processInfo.environment.first { (envKey: String, _: String) in
+        key == envKey.lowercased()
     }?.value
-#else
+    #else
     return ProcessInfo.processInfo.environment[key]
-#endif
+    #endif
 }
 
 /// Resolve the (CLI) command to invoke Pkl.

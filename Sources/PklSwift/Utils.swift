@@ -87,10 +87,10 @@ public func resolvePaths(_ paths: String...) -> String {
 public let absoluteUriRegex = try! Regex("\\w+:")
 
 public func tempDir() throws -> URL {
-    (try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: "/"), create: true))
+    try (FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: "/"), create: true))
 }
 
 public func tempFile(suffix: String) throws -> URL {
     let fileName = ProcessInfo.processInfo.globallyUniqueString + suffix
-    return (try tempDir()).appendingPathComponent(fileName)
+    return try (tempDir()).appendingPathComponent(fileName)
 }

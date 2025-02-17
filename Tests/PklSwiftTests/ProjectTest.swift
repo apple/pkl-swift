@@ -39,7 +39,7 @@ class ProjectTest: XCTestCase {
         }
         """#.write(to: otherProjectFile, atomically: true, encoding: .utf8)
 
-        let file = (try PklSwift.tempDir()).appendingPathComponent("PklProject")
+        let file = try (PklSwift.tempDir()).appendingPathComponent("PklProject")
 
         let httpSetting = version < pklVersion0_26 ? "" : """
         http {
@@ -78,12 +78,12 @@ class ProjectTest: XCTestCase {
             proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
         )
         let externalModuleReadersExpectation = version < pklVersion0_27 ? nil : [
-          "scheme1": ExternalReader(executable: "reader1"),
-          "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"]),
+            "scheme1": ExternalReader(executable: "reader1"),
+            "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"]),
         ]
         let externalResourceReadersExpectation = version < pklVersion0_27 ? nil : [
-          "scheme3": ExternalReader(executable: "reader3"),
-          "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
+            "scheme3": ExternalReader(executable: "reader3"),
+            "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
         ]
         let color: PklEvaluatorSettingsColor? = version < pklVersion0_27 ? nil : .always
         try #"""
