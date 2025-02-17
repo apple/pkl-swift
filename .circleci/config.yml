@@ -59,6 +59,13 @@ jobs:
     resource_class: xlarge
     docker:
     - image: swift:5.9-rhel-ubi9
+  test-license-headers:
+    steps:
+    - checkout
+    - run:
+        command: /bin/hawkeye check --fail-if-unknown
+    docker:
+    - image: ghcr.io/korandoru/hawkeye
   pkl-gen-swift-macos:
     steps:
     - checkout
@@ -200,6 +207,9 @@ workflows:
     - test-pkl-0-27-2:
         requires:
         - hold
+    - test-license-headers:
+        requires:
+        - hold
     when:
       matches:
         value: << pipeline.git.branch >>
@@ -208,6 +218,7 @@ workflows:
     jobs:
     - test-pkl-0-25-3
     - test-pkl-0-27-2
+    - test-license-headers
     when:
       equal:
       - main
@@ -226,10 +237,17 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
+    - test-license-headers:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
     - pkl-package:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
+        - test-license-headers
         filters:
           branches:
             ignore: /.*/
@@ -239,6 +257,7 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
+        - test-license-headers
         filters:
           branches:
             ignore: /.*/
@@ -248,6 +267,7 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
+        - test-license-headers
         filters:
           branches:
             ignore: /.*/
@@ -257,6 +277,7 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
+        - test-license-headers
         filters:
           branches:
             ignore: /.*/
