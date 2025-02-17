@@ -34,7 +34,7 @@ struct FibReader: ResourceReader {
     var hasHierarchicalUris: Bool { false }
     func listElements(uri: URL) async throws -> [PathElement] { throw PklError("not implemented") }
     func read(url: URL) async throws -> [UInt8] {
-        let key = url.absoluteString.dropFirst(scheme.count + 1)
+        let key = url.absoluteString.dropFirst(self.scheme.count + 1)
         guard let n = Int(key), n > 0 else {
             throw PklError("input uri must be in format fib:<positive integer>")
         }
