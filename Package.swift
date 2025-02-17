@@ -41,8 +41,10 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.3"),
         .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
-        // to enable `swift package generate-documentation --target PklSwift``
+        // to enable `swift package generate-documentation --target PklSwift`
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
+        // to enable `swift package plugin --allow-writing-to-package-directory swiftformat`
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.55.0")
     ],
     targets: [
         .target(
