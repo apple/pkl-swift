@@ -44,7 +44,7 @@ let package = Package(
         // to enable `swift package generate-documentation --target PklSwift`
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
         // to enable `swift package plugin --allow-writing-to-package-directory swiftformat`
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.55.0")
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.55.0"),
     ],
     targets: [
         .target(
