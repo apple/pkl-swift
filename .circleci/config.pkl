@@ -157,6 +157,20 @@ jobs {
       }
     }
   }
+  
+  ["test-format"] {
+    docker {
+      new {
+        image = "ghcr.io/nicklockwood/swiftformat"
+      }
+    }
+    steps {
+      "checkout"
+      new RunStep {
+        command = "swiftformat --lint ."
+      }
+    }
+  }
 
   ["pkl-gen-swift-macos"] {
     macos {

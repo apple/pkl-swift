@@ -66,6 +66,13 @@ jobs:
         command: /bin/hawkeye check --fail-if-unknown
     docker:
     - image: ghcr.io/korandoru/hawkeye
+  test-format:
+    steps:
+    - checkout
+    - run:
+        command: swiftformat --lint .
+    docker:
+    - image: ghcr.io/nicklockwood/swiftformat
   pkl-gen-swift-macos:
     steps:
     - checkout
@@ -210,6 +217,9 @@ workflows:
     - test-license-headers:
         requires:
         - hold
+    - test-format:
+        requires:
+        - hold
     when:
       matches:
         value: << pipeline.git.branch >>
@@ -219,6 +229,7 @@ workflows:
     - test-pkl-0-25-3
     - test-pkl-0-27-2
     - test-license-headers
+    - test-format
     when:
       equal:
       - main
@@ -243,11 +254,18 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
+    - test-format:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
     - pkl-package:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
         - test-license-headers
+        - test-format
         filters:
           branches:
             ignore: /.*/
@@ -258,6 +276,7 @@ workflows:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
         - test-license-headers
+        - test-format
         filters:
           branches:
             ignore: /.*/
@@ -268,6 +287,7 @@ workflows:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
         - test-license-headers
+        - test-format
         filters:
           branches:
             ignore: /.*/
@@ -278,6 +298,7 @@ workflows:
         - test-pkl-0-25-3
         - test-pkl-0-27-2
         - test-license-headers
+        - test-format
         filters:
           branches:
             ignore: /.*/
