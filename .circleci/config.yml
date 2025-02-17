@@ -70,9 +70,9 @@ jobs:
     steps:
     - checkout
     - run:
-        command: swiftformat --lint .
+        command: swift package plugin --allow-writing-to-package-directory swiftformat --lint .
     docker:
-    - image: ghcr.io/nicklockwood/swiftformat
+    - image: swift:5.9-rhel-ubi9
   pkl-gen-swift-macos:
     steps:
     - checkout

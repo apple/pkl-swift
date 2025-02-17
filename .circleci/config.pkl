@@ -161,13 +161,13 @@ jobs {
   ["test-format"] {
     docker {
       new {
-        image = "ghcr.io/nicklockwood/swiftformat"
+        image = "swift:5.9-rhel-ubi9"
       }
     }
     steps {
       "checkout"
       new RunStep {
-        command = "swiftformat --lint ."
+        command = "swift package plugin --allow-writing-to-package-directory swiftformat --lint ."
       }
     }
   }
