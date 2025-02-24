@@ -167,7 +167,7 @@ jobs {
     steps {
       "checkout"
       new RunStep {
-        command = "swift package plugin --allow-writing-to-package-directory swiftformat --lint ."
+        command = "make swiftformat-lint"
       }
     }
   }

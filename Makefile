@@ -113,3 +113,14 @@ pkl-gen-swift-release-output:
 circleci-config:
 	$(PKL_EXEC) eval .circleci/config.pkl -o .circleci/config.yml
 	git diff --exit-code
+
+swiftformat:
+	swift package plugin --allow-writing-to-package-directory swiftformat .
+
+swiftformat-lint:
+	swift package plugin --allow-writing-to-package-directory swiftformat --lint .
+
+license-format: .build/tools/hawkeye
+	.build/tools/hawkeye format
+
+format: swiftformat license-format
