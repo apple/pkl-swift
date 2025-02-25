@@ -67,7 +67,7 @@ local stringLiteralEnumContents =
     when (alias.docComment != null) {
       utils.renderDocComment(alias.docComment!!, "")
     }
-    "public enum \(module.mapping.name): String, CaseIterable, Decodable, Hashable {"
+    "public enum \(module.mapping.name): String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {"
     for (member in enumStringLiteralMembers) {
       "\(module.indent)case \(member.name) = \(utils.toSwiftString((member.pklType as reflect.StringLiteralType).value))"
     }

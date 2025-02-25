@@ -4,7 +4,7 @@ import PklSwift
 public enum ExplicitlyCoolName {}
 
 extension ExplicitlyCoolName {
-    public enum ConfigType: String, CaseIterable, Decodable, Hashable {
+    public enum ConfigType: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
         case one = "one"
         case two = "two"
     }

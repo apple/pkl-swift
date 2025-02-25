@@ -4,7 +4,7 @@ import PklSwift
 public enum UnionNameKeyword {}
 
 extension UnionNameKeyword {
-    public enum `Type`: String, CaseIterable, Decodable, Hashable {
+    public enum `Type`: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
         case one = "one"
         case two = "two"
         case three = "three"

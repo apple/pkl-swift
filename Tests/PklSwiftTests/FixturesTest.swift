@@ -163,7 +163,8 @@ class FixturesTest: XCTestCase {
             animalOrString2: .string("Zebra"),
             intOrFloat1: .float64(5.0),
             intOrFloat2: .float64(5.5),
-            intOrFloat3: .int(5)
+            intOrFloat3: .int(5),
+            config: [.dev : "Imaginary Service Company (ISC) configuration"]
         ))
     }
 }
