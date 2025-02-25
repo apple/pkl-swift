@@ -19,8 +19,9 @@ extension Enums {
         case monkey(Monkey)
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as Horse:
                 self = Animal.horse(decoded)
             case let decoded as Zebra:
@@ -32,7 +33,7 @@ extension Enums {
                     Animal.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type Animal, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type Animal, but got \(String(describing: value))"
                     )
                 )
             }
@@ -45,8 +46,9 @@ extension Enums {
         case arrayString([String])
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as [String: String]:
                 self = DictOrArray.dictionaryStringString(decoded)
             case let decoded as [String]:
@@ -56,7 +58,7 @@ extension Enums {
                     DictOrArray.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type DictOrArray, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type DictOrArray, but got \(String(describing: value))"
                     )
                 )
             }
@@ -69,8 +71,9 @@ extension Enums {
         case string(String)
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as Horse:
                 self = HorseOrBug.horse(decoded)
             case let decoded as String:
@@ -82,7 +85,7 @@ extension Enums {
                     HorseOrBug.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type HorseOrBug, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type HorseOrBug, but got \(String(describing: value))"
                     )
                 )
             }
@@ -94,8 +97,9 @@ extension Enums {
         case zebra(Zebra)
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as Horse?:
                 self = MaybeHorseOrDefinitelyZebra.horse(decoded)
             case let decoded as Zebra:
@@ -105,7 +109,7 @@ extension Enums {
                     MaybeHorseOrDefinitelyZebra.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type MaybeHorseOrDefinitelyZebra, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type MaybeHorseOrDefinitelyZebra, but got \(String(describing: value))"
                     )
                 )
             }

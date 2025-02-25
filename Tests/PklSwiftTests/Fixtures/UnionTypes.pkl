@@ -1,3 +1,5 @@
+import "pkl:math"
+
 class Banana {
   isRipe: Boolean
 }
@@ -17,6 +19,12 @@ abstract class Animal {
 typealias Fruit = Banana | Grape | Apple
 
 typealias City = "San Francisco"|"Tokyo"|"Zurich"|"London"
+
+abstract class Shape
+
+class Square extends Shape {
+  fixed corners: Int = 4
+}
 
 fruit1: Fruit = new Banana {
   isRipe = true
@@ -60,10 +68,26 @@ intOrFloat1: IntOrFloat = 5.0
 
 intOrFloat2: IntOrFloat = 5.5
 
-intOrFloat3: IntOrFloat = 5
+intOrFloat3: IntOrFloat = 128
 
 typealias Environment = "dev"|"prod"|"qa"
 
 config: Mapping<Environment, String> = new {
   ["dev"] = "Imaginary Service Company (ISC) configuration"
 }
+
+typealias AnimalOrShape = Animal|Shape
+
+animalOrShape1: AnimalOrShape = new Donkey {}
+
+animalOrShape2: AnimalOrShape = new Square {}
+
+typealias Numbers = Int8 | Int16 | Int32 | Int
+
+numbers1: Numbers = 5
+
+numbers2: Numbers = 128
+
+numbers3: Numbers = 32768
+
+numbers4: Numbers = math.maxInt

@@ -7,6 +7,9 @@ public protocol UnionTypes_Animal: PklRegisteredType, DynamicallyEquatable, Hash
     var name: String { get }
 }
 
+public protocol UnionTypes_Shape: PklRegisteredType, DynamicallyEquatable, Hashable {
+}
+
 extension UnionTypes {
     public enum Fruit: Decodable, Hashable {
         case banana(Banana)
@@ -14,8 +17,9 @@ extension UnionTypes {
         case apple(Apple)
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as Banana:
                 self = Fruit.banana(decoded)
             case let decoded as Grape:
@@ -27,7 +31,7 @@ extension UnionTypes {
                     Fruit.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type Fruit, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type Fruit, but got \(String(describing: value))"
                     )
                 )
             }
@@ -46,8 +50,9 @@ extension UnionTypes {
         case donkey(Donkey)
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as Zebra:
                 self = ZebraOrDonkey.zebra(decoded)
             case let decoded as Donkey:
@@ -57,7 +62,7 @@ extension UnionTypes {
                     ZebraOrDonkey.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type ZebraOrDonkey, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type ZebraOrDonkey, but got \(String(describing: value))"
                     )
                 )
             }
@@ -80,8 +85,9 @@ extension UnionTypes {
         }
 
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
             case let decoded as any Animal:
                 self = AnimalOrString.animal(decoded)
             case let decoded as String:
@@ -91,7 +97,7 @@ extension UnionTypes {
                     AnimalOrString.self,
                     .init(
                         codingPath: decoder.codingPath,
-                        debugDescription: "Expected type AnimalOrString, but got \(String(describing: decoded))"
+                        debugDescription: "Expected type AnimalOrString, but got \(String(describing: value))"
                     )
                 )
             }
@@ -111,22 +117,26 @@ extension UnionTypes {
         case int(Int)
         case float64(Float64)
 
+        private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> IntOrFloat? {
+            return (try? .int(container.decode(Int.self)))
+                ?? (try? .float64(container.decode(Float64.self)))
+        }
+
         public init(from decoder: Decoder) throws {
-            let decoded = try decoder.singleValueContainer().decode(PklSwift.PklAny.self).value
-            switch decoded?.base {
-            case let decoded as Int:
-                self = IntOrFloat.int(decoded)
-            case let decoded as Float64:
-                self = IntOrFloat.float64(decoded)
-            default:
-                throw DecodingError.typeMismatch(
-                    IntOrFloat.self,
-                    .init(
-                        codingPath: decoder.codingPath,
-                        debugDescription: "Expected type IntOrFloat, but got \(String(describing: decoded))"
-                    )
-                )
+            let container = try decoder.singleValueContainer()
+            let decoded = IntOrFloat.decodeNumeric(from: decoder, container)
+            if decoded != nil {
+                self = decoded!
+                return
             }
+            let value = try container.decode(PklSwift.PklAny.self).value
+            throw DecodingError.typeMismatch(
+                IntOrFloat.self,
+                .init(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Expected type IntOrFloat, but got \(String(describing: value))"
+                )
+            )
         }
     }
 
@@ -134,6 +144,81 @@ extension UnionTypes {
         case dev = "dev"
         case prod = "prod"
         case qa = "qa"
+    }
+
+    public enum AnimalOrShape: Decodable, Hashable {
+        case animal(any Animal)
+        case shape(any Shape)
+
+        public static func ==(lhs: AnimalOrShape, rhs: AnimalOrShape) -> Bool {
+            switch (lhs, rhs) {
+            case let (.animal(a), .animal(b)):
+                return a.isDynamicallyEqual(to: b)
+            case let (.shape(a), .shape(b)):
+                return a.isDynamicallyEqual(to: b)
+            default:
+                return false
+            }
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(PklSwift.PklAny.self).value
+            switch value?.base {
+            case let decoded as any Animal:
+                self = AnimalOrShape.animal(decoded)
+            case let decoded as any Shape:
+                self = AnimalOrShape.shape(decoded)
+            default:
+                throw DecodingError.typeMismatch(
+                    AnimalOrShape.self,
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Expected type AnimalOrShape, but got \(String(describing: value))"
+                    )
+                )
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case let .animal(value):
+                hasher.combine(value)
+            case let .shape(value):
+                hasher.combine(value)
+            }
+        }
+    }
+
+    public enum Numbers: Decodable, Hashable {
+        case int8(Int8)
+        case int16(Int16)
+        case int32(Int32)
+        case int(Int)
+
+        private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> Numbers? {
+            return (try? .int8(container.decode(Int8.self)))
+                ?? (try? .int16(container.decode(Int16.self)))
+                ?? (try? .int32(container.decode(Int32.self)))
+                ?? (try? .int(container.decode(Int.self)))
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let decoded = Numbers.decodeNumeric(from: decoder, container)
+            if decoded != nil {
+                self = decoded!
+                return
+            }
+            let value = try container.decode(PklSwift.PklAny.self).value
+            throw DecodingError.typeMismatch(
+                Numbers.self,
+                .init(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Expected type Numbers, but got \(String(describing: value))"
+                )
+            )
+        }
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable {
@@ -169,6 +254,18 @@ extension UnionTypes {
 
         public var config: [Environment: String]
 
+        public var animalOrShape1: AnimalOrShape
+
+        public var animalOrShape2: AnimalOrShape
+
+        public var numbers1: Numbers
+
+        public var numbers2: Numbers
+
+        public var numbers3: Numbers
+
+        public var numbers4: Numbers
+
         public init(
             fruit1: Fruit,
             fruit2: Fruit,
@@ -184,7 +281,13 @@ extension UnionTypes {
             intOrFloat1: IntOrFloat,
             intOrFloat2: IntOrFloat,
             intOrFloat3: IntOrFloat,
-            config: [Environment: String]
+            config: [Environment: String],
+            animalOrShape1: AnimalOrShape,
+            animalOrShape2: AnimalOrShape,
+            numbers1: Numbers,
+            numbers2: Numbers,
+            numbers3: Numbers,
+            numbers4: Numbers
         ) {
             self.fruit1 = fruit1
             self.fruit2 = fruit2
@@ -201,6 +304,12 @@ extension UnionTypes {
             self.intOrFloat2 = intOrFloat2
             self.intOrFloat3 = intOrFloat3
             self.config = config
+            self.animalOrShape1 = animalOrShape1
+            self.animalOrShape2 = animalOrShape2
+            self.numbers1 = numbers1
+            self.numbers2 = numbers2
+            self.numbers3 = numbers3
+            self.numbers4 = numbers4
         }
     }
 
@@ -235,6 +344,18 @@ extension UnionTypes {
     }
 
     public typealias Animal = UnionTypes_Animal
+
+    public typealias Shape = UnionTypes_Shape
+
+    public struct Square: Shape {
+        public static let registeredIdentifier: String = "UnionTypes#Square"
+
+        public var corners: Int
+
+        public init(corners: Int) {
+            self.corners = corners
+        }
+    }
 
     public struct Zebra: Animal {
         public static let registeredIdentifier: String = "UnionTypes#Zebra"
