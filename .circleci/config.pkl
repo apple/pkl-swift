@@ -157,6 +157,20 @@ jobs {
       }
     }
   }
+  
+  ["test-format"] {
+    docker {
+      new {
+        image = "swift:5.9-rhel-ubi9"
+      }
+    }
+    steps {
+      "checkout"
+      new RunStep {
+        command = "make swiftformat-lint"
+      }
+    }
+  }
 
   ["pkl-gen-swift-macos"] {
     macos {

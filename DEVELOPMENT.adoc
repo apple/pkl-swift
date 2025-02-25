@@ -1,0 +1,31 @@
+= Development
+
+== Running the formatter
+
+This project uses two formatting tools: https://github.com/korandoru/hawkeye[hawkeye] and https://github.com/nicklockwood/SwiftFormat[SwiftFormat].
+
+To install swiftformat:
+
+[source,shell]
+----
+brew install swiftformat
+----
+
+To install hawkeye locally, you will need to install the https://rustup.rs[Rust toolchain], then run:
+
+[source,shell]
+----
+cargo install hawkeye
+----
+
+To run formatters:
+
+[source,shell]
+----
+make format
+
+# Alternatively, individually:
+swiftformat .
+
+hawkeye format
+----
