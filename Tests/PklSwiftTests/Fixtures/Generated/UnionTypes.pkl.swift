@@ -34,7 +34,7 @@ extension UnionTypes {
         }
     }
 
-    public enum City: String, CaseIterable, Decodable, Hashable {
+    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
         case sanFrancisco = "San Francisco"
         case tokyo = "Tokyo"
         case zurich = "Zurich"
@@ -130,6 +130,12 @@ extension UnionTypes {
         }
     }
 
+    public enum Environment: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+        case dev = "dev"
+        case prod = "prod"
+        case qa = "qa"
+    }
+
     public struct Module: PklRegisteredType, Decodable, Hashable {
         public static let registeredIdentifier: String = "UnionTypes"
 
@@ -161,6 +167,8 @@ extension UnionTypes {
 
         public var intOrFloat3: IntOrFloat
 
+        public var config: [Environment: String]
+
         public init(
             fruit1: Fruit,
             fruit2: Fruit,
@@ -175,7 +183,8 @@ extension UnionTypes {
             animalOrString2: AnimalOrString,
             intOrFloat1: IntOrFloat,
             intOrFloat2: IntOrFloat,
-            intOrFloat3: IntOrFloat
+            intOrFloat3: IntOrFloat,
+            config: [Environment: String]
         ) {
             self.fruit1 = fruit1
             self.fruit2 = fruit2
@@ -191,6 +200,7 @@ extension UnionTypes {
             self.intOrFloat1 = intOrFloat1
             self.intOrFloat2 = intOrFloat2
             self.intOrFloat3 = intOrFloat3
+            self.config = config
         }
     }
 

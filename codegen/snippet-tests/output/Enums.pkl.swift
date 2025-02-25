@@ -5,7 +5,7 @@ public enum Enums {}
 
 extension Enums {
     /// City is one of these four fantastic cities
-    public enum City: String, CaseIterable, Decodable, Hashable {
+    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
         case sanFrancisco = "San Francisco"
         case london = "London"
         case zurich = "Zurich"

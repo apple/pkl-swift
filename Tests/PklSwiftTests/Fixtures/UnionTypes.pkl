@@ -61,3 +61,9 @@ intOrFloat1: IntOrFloat = 5.0
 intOrFloat2: IntOrFloat = 5.5
 
 intOrFloat3: IntOrFloat = 5
+
+typealias Environment = "dev"|"prod"|"qa"
+
+config: Mapping<Environment, String> = new {
+  ["dev"] = "Imaginary Service Company (ISC) configuration"
+}
