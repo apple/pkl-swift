@@ -163,8 +163,14 @@ class FixturesTest: XCTestCase {
             animalOrString2: .string("Zebra"),
             intOrFloat1: .float64(5.0),
             intOrFloat2: .float64(5.5),
-            intOrFloat3: .int(5),
-            config: [.dev : "Imaginary Service Company (ISC) configuration"]
+            intOrFloat3: .int(128),
+            config: [.dev : "Imaginary Service Company (ISC) configuration"],
+            animalOrShape1: .animal(UnionTypes.Donkey(name: "Donkey")),
+            animalOrShape2: .shape(UnionTypes.Square(corners: 4)),
+            numbers1: .int8(5),
+            numbers2: .int16(128),
+            numbers3: .int32(32768),
+            numbers4: .int(Int.max)
         ))
     }
 }

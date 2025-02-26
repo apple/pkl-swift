@@ -43,6 +43,11 @@ final class PklDecoderTests: XCTestCase {
         XCTAssertEqual(value, 42)
     }
 
+    func testDecodeInt8Overflow() throws {
+        let bytes: [UInt8] = [0xD2, 0xFF, 0x00, 0x00, 0x00]
+        XCTAssertThrowsError(try PklDecoder.decode(Int8.self, from: bytes), "Cannot fit -16777216 into Int8")
+    }
+
     func testDecodeString() throws {
         let bytes: [UInt8] = [
             0xD9, 0x27, 0x74, 0x68, 0x65, 0x20, 0x71, 0x75, 0x69, 0x63, 0x6B, 0x20, 0x66, 0x6F, 0x78,

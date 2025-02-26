@@ -29,6 +29,9 @@ isPolymorphic: Boolean = false
 /// True if this type represents a Pkl Any
 isAny: Boolean = false
 
+/// Tells if this type represents a number (int or float) or not
+isNumeric: Boolean = false
+
 /// Renders this type into source code.
 ///
 /// [swiftModuleName] is the full path of the package that this type appears in.

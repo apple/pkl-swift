@@ -37,11 +37,13 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
         switch self.value {
         case .bool(let value): return value
         default:
-            throw DecodingError.dataCorrupted(
+            throw DecodingError.typeMismatch(
+                Bool.self,
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected a boolean, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 
@@ -49,11 +51,13 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
         switch self.value {
         case .string(let value): return value
         default:
-            throw DecodingError.dataCorrupted(
+            throw DecodingError.typeMismatch(
+                String.self,
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected a string, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 
@@ -61,11 +65,13 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
         switch self.value {
         case .float(let value): return Double(value)
         default:
-            throw DecodingError.dataCorrupted(
+            throw DecodingError.typeMismatch(
+                Double.self,
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected a float, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 
@@ -73,11 +79,13 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
         switch self.value {
         case .float(let value): return Float(value)
         default:
-            throw DecodingError.dataCorrupted(
+            throw DecodingError.typeMismatch(
+                Float.self,
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected a float, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 
@@ -124,7 +132,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
     func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
         if type == PklAny.self {
             guard let result = try _PklDecoder.decodePolymorphic(value, codingPath: codingPath) else {
-                throw DecodingError.dataCorrupted(.init(codingPath: self.codingPath, debugDescription: "Tried to decode but got nil"))
+                throw DecodingError.typeMismatch(T.self, .init(codingPath: self.codingPath, debugDescription: "Tried to decode but got nil"))
             }
             return result as! T
         }
@@ -135,13 +143,25 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
 
     private func decodeBinaryInteger<T>() throws -> T where T: BinaryInteger {
         switch self.value {
-        case .int(let value): return T(value)
+        case .int(let value):
+            guard let result = T(exactly: value) else {
+                throw DecodingError.typeMismatch(
+                    T.self,
+                    .init(
+                        codingPath: self.codingPath,
+                        debugDescription: "Cannot fit \(value) into \(String(describing: T.self))"
+                    )
+                )
+            }
+            return result
         default:
-            throw DecodingError.dataCorrupted(
+            throw DecodingError.typeMismatch(
+                T.self,
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected an int, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 }
