@@ -29,12 +29,16 @@ let PKL_EXEC_NAME="pkl"
 /// Perfoms `action`, returns its result and then closes the manager.
 ///
 /// - Parameter action: The action to perform
+/// - Parameter isolation: Run under the given actor isolation.  Defaults to surrounding actor
 /// - Returns: The result of `action`
-public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws -> T) async rethrows -> T {
-    let manager: EvaluatorManager = .init()
+public func withEvaluatorManager<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    _ action: (inout sending EvaluatorManager) async throws -> T
+) async rethrows -> T {
+    var manager: EvaluatorManager = .init()
     var closed = false
     do {
-        let result = try await action(manager)
+        let result = try await action(&manager)
         await manager.close()
         closed = true
         return result
