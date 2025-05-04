@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 /// The Swift representation of standard library module `pkl.EvaluatorSettings`.
-public struct PklEvaluatorSettings: Decodable, Hashable {
+public struct PklEvaluatorSettings: Decodable, Hashable, Sendable {
     let externalProperties: [String: String]?
     let env: [String: String]?
     let allowedModules: [String]?
@@ -51,7 +51,7 @@ public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable
 }
 
 /// Settings that control how Pkl talks to HTTP(S) servers.
-public struct Http: Codable, Hashable {
+public struct Http: Codable, Hashable, Sendable {
     /// PEM format certificates to trust when making HTTP requests.
     ///
     /// If empty, Pkl will trust its own built-in certificates.
@@ -65,7 +65,7 @@ public struct Http: Codable, Hashable {
 }
 
 /// Settings that control how Pkl talks to HTTP proxies.
-public struct Proxy: Codable, Hashable {
+public struct Proxy: Codable, Hashable, Sendable {
     /// The proxy to use for HTTP(S) connections.
     ///
     /// Only HTTP proxies are supported.
