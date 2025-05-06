@@ -124,7 +124,7 @@ contents = new Listing {
   """
   @preconcurrency import PklSwift
 
-  public enum \(namespaceName) {}
+  public enum \(namespaceName): Sendable {}
 
   """
   when (topLevelContents.length > 0) {
