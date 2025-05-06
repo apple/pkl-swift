@@ -39,7 +39,7 @@ public struct PklEvaluatorSettings: Decodable, Hashable, Sendable {
     let color: PklEvaluatorSettingsColor?
 }
 
-public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable {
+public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable, Sendable {
     /// Never format.
     case never
 
@@ -108,7 +108,7 @@ public struct Proxy: Codable, Hashable, Sendable {
     var noProxy: [String]?
 }
 
-public struct ExternalReader: Codable, Hashable {
+public struct ExternalReader: Codable, Hashable, Sendable {
     var executable: String
     var arguments: [String]? = nil
 }
