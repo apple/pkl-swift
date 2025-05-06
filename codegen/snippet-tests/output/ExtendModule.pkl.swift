@@ -1,7 +1,7 @@
 // Code generated from Pkl module `ExtendModule`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum ExtendModule {}
+public enum ExtendModule: Sendable {}
 
 extension ExtendModule {
     public struct Module: MyModule.Module {

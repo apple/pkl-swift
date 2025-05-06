@@ -1,10 +1,10 @@
 // Code generated from Pkl module `HiddenProperties`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum HiddenProperties {}
+public enum HiddenProperties: Sendable {}
 
 extension HiddenProperties {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "HiddenProperties"
 
         public var propC: String

@@ -1,14 +1,14 @@
 // Code generated from Pkl module `ExtendingOpenClass`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum ExtendingOpenClass {}
+public enum ExtendingOpenClass: Sendable {}
 
-public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var myStr: String { get }
 }
 
 extension ExtendingOpenClass {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExtendingOpenClass"
 
         public var res1: MyClass

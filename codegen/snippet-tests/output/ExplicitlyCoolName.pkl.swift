@@ -1,15 +1,15 @@
 // Code generated from Pkl module `ExplicitName`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum ExplicitlyCoolName {}
+public enum ExplicitlyCoolName: Sendable {}
 
 extension ExplicitlyCoolName {
-    public enum ConfigType: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum ConfigType: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case one = "one"
         case two = "two"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExplicitName"
 
         public var MyCoolProp: SomethingVeryFunny
@@ -23,7 +23,7 @@ extension ExplicitlyCoolName {
         }
     }
 
-    public struct SomethingVeryFunny: PklRegisteredType, Decodable, Hashable {
+    public struct SomethingVeryFunny: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExplicitName#SomethingFunny"
 
         public init() {}

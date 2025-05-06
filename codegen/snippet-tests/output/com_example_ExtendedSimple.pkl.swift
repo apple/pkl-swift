@@ -1,10 +1,10 @@
 // Code generated from Pkl module `com.example.ExtendedSimple`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum com_example_ExtendedSimple {}
+public enum com_example_ExtendedSimple: Sendable {}
 
 extension com_example_ExtendedSimple {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "com.example.ExtendedSimple"
 
         public init() {}

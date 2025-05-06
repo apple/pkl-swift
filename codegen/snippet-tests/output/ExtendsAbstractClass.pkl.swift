@@ -1,14 +1,14 @@
 // Code generated from Pkl module `ExtendsAbstractClass`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum ExtendsAbstractClass {}
+public enum ExtendsAbstractClass: Sendable {}
 
-public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var b: String { get }
 }
 
 extension ExtendsAbstractClass {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExtendsAbstractClass"
 
         public var a: any A

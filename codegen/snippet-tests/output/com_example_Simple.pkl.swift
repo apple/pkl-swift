@@ -1,20 +1,20 @@
 // Code generated from Pkl module `com.example.Simple`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum com_example_Simple {}
+public enum com_example_Simple: Sendable {}
 
-public protocol com_example_Simple_Person: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol com_example_Simple_Person: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var theName: String { get }
 
     var `enum`: String { get }
 }
 
-public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var someOtherProp: Bool? { get }
 }
 
 extension com_example_Simple {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "com.example.Simple"
 
         /// This is truly a person.
@@ -98,7 +98,7 @@ extension com_example_Simple {
         }
     }
 
-    public struct ClassWithReallyLongConstructor: PklRegisteredType, Decodable, Hashable {
+    public struct ClassWithReallyLongConstructor: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "com.example.Simple#ClassWithReallyLongConstructor"
 
         public var theProperty1: String

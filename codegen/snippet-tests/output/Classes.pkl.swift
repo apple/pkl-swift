@@ -1,14 +1,14 @@
 // Code generated from Pkl module `Classes`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum Classes {}
+public enum Classes: Sendable {}
 
-public protocol Classes_Animal: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Classes_Animal: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var name: String { get }
 }
 
 extension Classes {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Classes"
 
         public var animals: [any Animal]
