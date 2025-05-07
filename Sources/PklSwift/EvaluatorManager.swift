@@ -26,11 +26,16 @@ let PKL_EXEC_NAME="pkl.exe"
 let ENV_SEPARATOR=":"
 let PKL_EXEC_NAME="pkl"
 #endif
+
+#if compiler(>=6.0)
 /// Perfoms `action`, returns its result and then closes the manager.
+/// Executing on the global concurrent or task preferred executor
 ///
 /// - Parameter action: The action to perform
-/// - Parameter isolation: Run under the given actor isolation.  Defaults to surrounding actor
+/// - Parameter isolation: Run under the given actor isolation. Defaults to surrounding actor
 /// - Returns: The result of `action`
+///
+/// - Throws: Rethrows the closure error
 public func withEvaluatorManager<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
     _ action: (inout sending EvaluatorManager) async throws -> T
@@ -49,6 +54,27 @@ public func withEvaluatorManager<T: Sendable>(
         throw error
     }
 }
+#else
+/// Perfoms `action`, returns its result and then closes the manager.
+///
+/// - Parameter action: The action to perform
+/// - Returns: The result of `action`
+public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws -> T) async rethrows -> T {
+    let manager: EvaluatorManager = .init()
+    var closed = false
+    do {
+        let result = try await action(manager)
+        await manager.close()
+        closed = true
+        return result
+    } catch {
+        if !closed {
+            await manager.close()
+        }
+        throw error
+    }
+}
+#endif
 
 func getenv(_ key: String) -> String? {
     #if os(Windows)
