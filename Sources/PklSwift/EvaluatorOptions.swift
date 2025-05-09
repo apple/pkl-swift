@@ -191,7 +191,7 @@ extension EvaluatorOptions {
         return .init(
             packageUri: nil,
             type: "project",
-            projectFileUri: "file://\(projectBaseURI)/PklProject",
+            projectFileUri: "\(projectBaseURI.appending(component: "PklProject"))",
             checksums: nil,
             dependencies: self.declaredProjectDependenciesToMessage(self.declaredProjectDependencies)
         )
