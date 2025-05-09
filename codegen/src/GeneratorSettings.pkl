@@ -41,6 +41,14 @@ dryRun: Boolean?
 /// This is an internal setting that's meant for development purposes.
 generateScript: String?
 
+/// The project directory to control dependency and evaluator settings during codegen.
+///
+/// This corresponds to the `--project-dir` flag in the Pkl CLI.
+/// Relative paths are resolved against the enclosing directory.
+///
+/// Paths must use `/` as the path separator.
+projectDir: String?
+
 output {
   local myModuleDirectory =
     let (myModuleUri = reflect.Module(module).uri)
@@ -60,6 +68,9 @@ output {
     }
     when (module.outputPath != null) {
       outputPath = resolvePath(module.outputPath!!)
+    }
+    when (module.projectDir != null) {
+      projectDir = resolvePath(module.projectDir!!)
     }
   }
 }

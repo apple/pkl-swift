@@ -17,3 +17,7 @@
 amends "codegen/src/GeneratorSettings.pkl"
 
 generateScript = "codegen/src/Generator.pkl"
+
+projectDir = "codegen/src"
+
+outputPath = "Sources/pkl-gen-swift/Generated"

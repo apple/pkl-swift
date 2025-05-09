@@ -17,6 +17,7 @@
 import ArgumentParser
 import Foundation
 import PklSwift
+import System
 
 let VERSION = String(decoding: Data(PackageResources.VERSION_txt), as: UTF8.self)
 
@@ -39,7 +40,8 @@ extension GeneratorSettings {
         inputs: [],
         outputPath: nil,
         dryRun: nil,
-        generateScript: nil
+        generateScript: nil,
+        projectDir: nil
     )
 }
 
@@ -70,12 +72,38 @@ struct PklGenSwift: AsyncParsableCommand {
     )
     var generatorSettings: String?
 
+    @Option(name: .long, help: "The project directory to use", completion: .directory)
+    var projectDir: String?
+
     @Argument(
         help: "The Pkl modules to generate as Swift",
         completion: .file(extensions: [".pkl"]),
         transform: normalizeModule
     )
     var pklInputModules: [String] = []
+
+    // mimick logic for finding project dir in the pkl CLI.
+    private func findProjectDir(projectDirFlag: String?) -> FilePath? {
+        if projectDirFlag != nil {
+            return FilePath(projectDirFlag!)
+        }
+        let cwd = FileManager.default.currentDirectoryPath
+        return self.doFindProjectDir(dir: cwd)
+    }
+
+    private func doFindProjectDir(dir: String) -> FilePath? {
+        var filepath: FilePath = .init(dir)
+        while true {
+            if FileManager.default.fileExists(atPath: "\(filepath.appending("PklProject"))") {
+                return filepath
+            }
+            let parent = filepath.removingLastComponent()
+            if parent == filepath {
+                return nil
+            }
+            filepath = parent
+        }
+    }
 
     private func generateScriptUrl() -> String {
         if let generateScript = self.generateScript {
@@ -101,11 +129,17 @@ struct PklGenSwift: AsyncParsableCommand {
         }
         var options = EvaluatorOptions.preconfigured
         options.logger = Loggers.standardError
-        return try await withEvaluator(options: options) { evaluator in
+        let projectDir = self.findProjectDir(projectDirFlag: self.projectDir)
+        let doEval: (Evaluator) async throws -> GeneratorSettings.Module = { evaluator in
             try await evaluator.evaluateOutputValue(
                 source: .path(settingsFile),
                 asType: GeneratorSettings.Module.self
             )
+        }
+        if let projectDir {
+            return try await withProjectEvaluator(projectBaseURI: .init(filePath: projectDir)!, options: options, doEval)
+        } else {
+            return try await withEvaluator(options: options, doEval)
         }
     }
 
@@ -121,6 +155,9 @@ struct PklGenSwift: AsyncParsableCommand {
             generatorSettings.outputPath = outputPath
         }
         generatorSettings.generateScript = self.generateScriptUrl()
+        if let projectDir = self.projectDir {
+            generatorSettings.projectDir = projectDir
+        }
         return generatorSettings
     }
 

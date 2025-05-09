@@ -31,13 +31,18 @@ public struct PklSwiftGenerator {
     public mutating func run() async throws {
         var options = EvaluatorOptions.preconfigured
         options.logger = Loggers.standardError
-        try await withEvaluator(options: options) { evaluator in
+        let doEval: (Evaluator) async throws -> Void = { evaluator in
             for pklInputModule in self.settings.inputs ?? [] {
                 try await self.runModule(
                     evaluator: evaluator,
                     pklInputModule: pklInputModule
                 )
             }
+        }
+        if let projectDir = settings.projectDir {
+            return try await withProjectEvaluator(projectBaseURI: URL(fileURLWithPath: projectDir), options: options, doEval)
+        } else {
+            return try await withEvaluator(options: options, doEval)
         }
     }
 
