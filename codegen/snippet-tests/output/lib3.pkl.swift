@@ -1,9 +1,9 @@
 // Code generated from Pkl module `lib3`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum lib3 {}
+public enum lib3: Sendable {}
 
-public protocol lib3_GoGoGo: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol lib3_GoGoGo: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var duck: String { get }
 }
 
@@ -20,7 +20,7 @@ extension lib3 {
         }
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "lib3"
 
         public init() {}
