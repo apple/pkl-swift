@@ -129,14 +129,13 @@ struct PklGenSwift: AsyncParsableCommand {
         }
         var options = EvaluatorOptions.preconfigured
         options.logger = Loggers.standardError
-        let projectDir = self.findProjectDir(projectDirFlag: self.projectDir)
         let doEval: (Evaluator) async throws -> GeneratorSettings.Module = { evaluator in
             try await evaluator.evaluateOutputValue(
                 source: .path(settingsFile),
                 asType: GeneratorSettings.Module.self
             )
         }
-        if let projectDir {
+        if let projectDir = self.findProjectDir(projectDirFlag: self.projectDir) {
             return try await withProjectEvaluator(projectBaseURI: .init(filePath: projectDir)!, options: options, doEval)
         } else {
             return try await withEvaluator(options: options, doEval)
