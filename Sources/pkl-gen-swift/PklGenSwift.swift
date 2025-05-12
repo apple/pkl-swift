@@ -17,7 +17,7 @@
 import ArgumentParser
 import Foundation
 import PklSwift
-import System
+import SystemPackage
 
 let VERSION = String(decoding: Data(PackageResources.VERSION_txt), as: UTF8.self)
 
@@ -136,7 +136,8 @@ struct PklGenSwift: AsyncParsableCommand {
             )
         }
         if let projectDir = self.findProjectDir(projectDirFlag: self.projectDir) {
-            return try await withProjectEvaluator(projectBaseURI: .init(filePath: projectDir)!, options: options, doEval)
+            let path = "\(projectDir)"
+            return try await withProjectEvaluator(projectBaseURI: .init(fileURLWithPath: path, isDirectory: true), options: options, doEval)
         } else {
             return try await withEvaluator(options: options, doEval)
         }
@@ -155,7 +156,11 @@ struct PklGenSwift: AsyncParsableCommand {
         }
         generatorSettings.generateScript = self.generateScriptUrl()
         if let projectDir = self.projectDir {
+            // if explicitly set as a CLI flag, use it directly
             generatorSettings.projectDir = projectDir
+        } else if generatorSettings.projectDir == nil, let projectDir = self.findProjectDir(projectDirFlag: nil) {
+            // otherwise if not set in generator-settings file, detect it from CWD.
+            generatorSettings.projectDir = "\(projectDir)"
         }
         return generatorSettings
     }

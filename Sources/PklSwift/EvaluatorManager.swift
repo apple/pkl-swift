@@ -302,7 +302,7 @@ public actor EvaluatorManager {
         }
         return try await self.withEvaluator(options: .preconfigured) { projectEvaluator in
             let project = try await projectEvaluator.evaluateOutputValue(
-                source: .url(projectBaseURI.appending(component: "PklProject")),
+                source: .url(projectBaseURI.appendingPathComponent("PklProject")),
                 asType: Project.self
             )
             return try await self.newEvaluator(options: options.withProject(project))
