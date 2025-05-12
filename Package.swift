@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 //===----------------------------------------------------------------------===//
 // Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
 //
