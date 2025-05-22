@@ -1,39 +1,39 @@
 // Code generated from Pkl module `union`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum union {}
+public enum union: Sendable {}
 
 extension union {
     /// City; e.g. where people live
-    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case sanFrancisco = "San Francisco"
         case london = "London"
         case 上海 = "上海"
     }
 
     /// Locale that contains cities and towns
-    public enum County: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum County: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case sanFrancisco = "San Francisco"
         case sanMateo = "San Mateo"
         case yolo = "Yolo"
     }
 
     /// Noodles
-    public enum Noodles: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum Noodles: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case 拉面 = "拉面"
         case 刀切面 = "刀切面"
         case 面线 = "面线"
         case 意大利面 = "意大利面"
     }
 
-    public enum AccountDisposition: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum AccountDisposition: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case empty = ""
         case icloud3 = "icloud3"
         case prod = "prod"
         case shared = "shared"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "union"
 
         /// A city

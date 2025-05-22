@@ -1,9 +1,9 @@
 // Code generated from Pkl module `EmptyOpenModule`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum EmptyOpenModule {}
+public enum EmptyOpenModule: Sendable {}
 
-public protocol EmptyOpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol EmptyOpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
 }
 
 extension EmptyOpenModule {
