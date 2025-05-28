@@ -293,7 +293,7 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
     }
 
     func encode(_ value: URL) throws {
-        try self.encode("\(value)")
+        try self.encode(value.absoluteString)
     }
 
     func encode(_ value: some Encodable) throws {
