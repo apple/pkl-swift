@@ -17,7 +17,7 @@
 import Foundation
 
 /// Duration is the Swift representation of Pkl's `pkl.Duration`.
-public struct Duration: Hashable {
+public struct Duration: Hashable, Sendable {
     /// The value of this ``Duration`` in the unit set in ``unit``.
     public let value: Float64
 
@@ -137,7 +137,7 @@ extension Duration {
 }
 
 /// A unit (magnitude) of duration.
-public enum DurationUnit: String, CaseIterable, Decodable {
+public enum DurationUnit: String, CaseIterable, Decodable, Sendable {
     /// Nanosecond
     case ns
 
