@@ -127,7 +127,7 @@ final class PklSwiftTests: XCTestCase {
         )
         XCTAssertEqual(output, [
             "foo.bin": [1, 2, 3, 255],
-            "bar.bin": []
+            "bar.bin": [],
         ])
         try await evaluator.close()
     }
