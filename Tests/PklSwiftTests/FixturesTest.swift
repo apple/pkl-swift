@@ -14,7 +14,8 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import PklSwift
+@testable import PklSwift
+import SemanticVersion
 import XCTest
 
 class FixturesTest: XCTestCase {
@@ -64,8 +65,24 @@ class FixturesTest: XCTestCase {
                 res7: [1: true, 2: false],
                 res8: [1: [1: true], 2: [2: false]],
                 res9: ["one", "two", "three"],
-                res10: [1, 2, 3],
-                res11: [1, 2, 3, 255]
+                res10: [1, 2, 3]
+            )
+        )
+    }
+
+    func testEvaluateCollections2() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_29 {
+            throw XCTSkip("Bytes() is not available")
+        }
+        let result = try await Collections2.loadFrom(
+            evaluator: self.evaluator,
+            source: .path("\(#filePath)/../Fixtures/Collections2.pkl")
+        )
+        XCTAssertEqual(
+            result,
+            Collections2.Module(
+                res: [1, 2, 3, 255],
             )
         )
     }
