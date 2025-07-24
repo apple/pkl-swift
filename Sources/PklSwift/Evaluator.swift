@@ -112,6 +112,16 @@ public struct Evaluator {
         try await self.evaluateExpression(source: source, expression: "output.text", as: String.self)
     }
 
+    /// Evaluates the provided module's `output.bytes` property, and returns the result as `[UInt8]`.
+    ///
+    /// - Parameters:
+    ///   - source: The module source to be evaluated.
+    /// - Returns: A [UInt8] representing the byte array of the module.
+    /// - Throws: ``PklError`` if an error occurs during evaluation.
+    public func evaluateOutputBytes(source: ModuleSource) async throws -> [UInt8] {
+        try await self.evaluateExpression(source: source, expression: "output.bytes", as: [UInt8].self)
+    }
+
     /// Evaluates the provided module's `output.value` property, and decodes the result as type `type`.
     ///
     /// - Parameters:
@@ -124,15 +134,30 @@ public struct Evaluator {
         try await self.evaluateExpression(source: source, expression: "output.value", as: type)
     }
 
-    /// Evaluates the `output.files` property of the given module.
+    /// Evaluates the `output.files` property of the given module, returning each file's contents as a string.
     ///
-    /// - Parameter source: The module to be evaluated.
-    /// - Returns: A dictionary whose keys are the filenames, and values are the file contents.
+    /// - Parameters:
+    ///   - source: The module to be evaluated.
+    /// - Returns: A dictionary whose keys are the filenames, and values are the file contents as a string.
     /// - Throws: ``PklError`` if an error occurs during evaluation.
     public func evaluateOutputFiles(source: ModuleSource) async throws -> [String: String] {
         try await self.evaluateExpression(
-            source: source, expression: "output.files.toMap().mapValues((_, it) -> it.text)",
+            source: source, expression: "output.files?.toMap()?.mapValues((_, it) -> it.text) ?? Map()",
             as: [String: String].self
+        )
+    }
+
+    /// Evaluates the `output.files` property of the given module, returning each file's contents as a byte array.
+    ///
+    /// - Parameters:
+    ///   - source: The module to be evaluated.
+    /// - Returns: A dictionary whose keys are the filenames, and values are the file contents as bytes.
+    /// - Throws: ``PklError`` if an error occurs during evaluation.
+    public func evaluateOutputFilesBytes(source: ModuleSource) async throws -> [String: [UInt8]] {
+        try await self.evaluateExpression(
+            source: source,
+            expression: "output.files?.toMap()?.mapValues((_, it) -> it.bytes) ?? Map()",
+            as: [String: [UInt8]].self
         )
     }
 
