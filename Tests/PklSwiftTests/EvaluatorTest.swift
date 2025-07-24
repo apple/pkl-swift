@@ -14,6 +14,7 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
+import Foundation
 @testable import MessagePack
 @testable import PklSwift
 import SemanticVersion
@@ -84,11 +85,87 @@ final class PklSwiftTests: XCTestCase {
         await self.manager.close()
     }
 
-    func testBasicEvaluation() async throws {
+    func testEvaluateOutputText() async throws {
         let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
-        let output = try await evaluator.evaluateOutputText(
-            source: ModuleSource(uri: URL(string: "repl:text")!, text: "foo = 1"))
+        let output = try await evaluator.evaluateOutputText(source: .text("foo = 1"))
         XCTAssertEqual(output, "foo = 1\n")
+        try await evaluator.close()
+    }
+
+    func testEvaluateOutputBytes() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_29 {
+            throw XCTSkip("Bytes() is not available")
+        }
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let output = try await evaluator.evaluateOutputBytes(source: .text("output { bytes = Bytes(1, 2, 3, 255) }"))
+        XCTAssertEqual(output, [1, 2, 3, 255])
+        try await evaluator.close()
+    }
+
+    func testEvaluateOutputFilesBytes() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_29 {
+            throw XCTSkip("Bytes() is not available")
+        }
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let output = try await evaluator.evaluateOutputFilesBytes(
+            source: .text(
+                """
+                output {
+                    files {
+                        ["foo.bin"] {
+                            bytes = Bytes(1, 2, 3, 255)
+                        }
+                        ["bar.bin"] {
+                            bytes = Bytes()
+                        }
+                    }
+                }
+                """
+            )
+        )
+        XCTAssertEqual(output, [
+            "foo.bin": [1, 2, 3, 255],
+            "bar.bin": [],
+        ])
+        try await evaluator.close()
+    }
+
+    func testEvaluateOutputFiles() async throws {
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let output = try await evaluator.evaluateOutputFiles(
+            source: .text(
+                """
+                output {
+                    files {
+                        ["foo"] { text = "foo" }
+                        ["bar"] { text = "bar" }
+                    }
+                }
+                """
+            )
+        )
+        XCTAssertEqual(output, [
+            "foo": "foo",
+            "bar": "bar",
+        ])
+        try await evaluator.close()
+    }
+
+    func testEvaluateOutputFilesNull() async throws {
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let output = try await evaluator.evaluateOutputFiles(
+            source: .text(
+                """
+                output {
+                    files = null
+                }
+                """
+            )
+        )
+        XCTAssertEqual(output, [:])
+        try await evaluator.close()
     }
 
     func testVersionCoverage() async throws {
@@ -285,6 +362,29 @@ final class PklSwiftTests: XCTestCase {
         }
     }
 
+    func testHttpRewrites() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version.major == 0, version.minor < 29 {
+            throw XCTSkip("External readers require Pkl 0.29 or later.")
+        }
+
+        var options = EvaluatorOptions.preconfigured
+        options.http = .init(
+            rewrites: [
+                "https://example.com/": "https://example.example/",
+            ]
+        )
+        let evaluator = try await manager.newEvaluator(options: options)
+        do {
+            _ = try await evaluator.evaluateOutputText(source: .text(#"res = import("https://example.com/foo.pkl")"#))
+            XCTFail("Should not reach here")
+        } catch {
+            XCTAssertTrue(error is PklError)
+            let error = error as! PklError
+            self.assertContains(error.message, "request was rewritten: https://example.com/foo.pkl -> https://example.example/foo.pkl")
+        }
+    }
+
     private func assertStartsWith(
         _ message: String,
         _ prefix: String,
@@ -293,6 +393,17 @@ final class PklSwiftTests: XCTestCase {
     ) {
         if !message.starts(with: prefix) {
             XCTFail("Expected \(message) to start with \(prefix)", file: file, line: line)
+        }
+    }
+
+    private func assertContains(
+        _ message: String,
+        _ value: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        if !message.contains(value) {
+            XCTFail("Expected \(message) to contain \(value)", file: file, line: line)
         }
     }
 

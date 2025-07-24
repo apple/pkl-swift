@@ -20,27 +20,21 @@ jobs:
         name: swift test
     - run:
         command: make circleci-config
-    - run:
-        command: make test-snippets
-    - run:
-        command: make test-pkl
-    - run:
-        command: make generate-fixtures
     - store_test_results:
         path: .out/test-results/
     resource_class: xlarge
     docker:
     - image: swift:5.10-rhel-ubi9
-  test-pkl-0-27-2:
+  test-pkl-0-29-0:
     steps:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.27.2-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.27.2/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.29.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.29.0/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.27.2
+        name: Downloading pkl-0.29.0
     - run:
         command: |-
           mkdir -p .out/test-results/
@@ -126,11 +120,11 @@ jobs:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.27.2-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.27.2/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.29.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.29.0/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.27.2
+        name: Downloading pkl-0.29.0
     - run:
         command: $PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/
     - persist_to_workspace:
@@ -211,7 +205,7 @@ workflows:
     - test-pkl-0-25-3:
         requires:
         - hold
-    - test-pkl-0-27-2:
+    - test-pkl-0-29-0:
         requires:
         - hold
     - test-license-headers:
@@ -227,7 +221,7 @@ workflows:
   main:
     jobs:
     - test-pkl-0-25-3
-    - test-pkl-0-27-2
+    - test-pkl-0-29-0
     - test-license-headers
     - test-format
     when:
@@ -242,7 +236,7 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
-    - test-pkl-0-27-2:
+    - test-pkl-0-29-0:
         filters:
           branches:
             ignore: /.*/
@@ -263,7 +257,7 @@ workflows:
     - pkl-package:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-27-2
+        - test-pkl-0-29-0
         - test-license-headers
         - test-format
         filters:
@@ -274,7 +268,7 @@ workflows:
     - pkl-gen-swift-macos:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-27-2
+        - test-pkl-0-29-0
         - test-license-headers
         - test-format
         filters:
@@ -285,7 +279,7 @@ workflows:
     - pkl-gen-swift-linux-amd64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-27-2
+        - test-pkl-0-29-0
         - test-license-headers
         - test-format
         filters:
@@ -296,7 +290,7 @@ workflows:
     - pkl-gen-swift-linux-aarch64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-27-2
+        - test-pkl-0-29-0
         - test-license-headers
         - test-format
         filters:

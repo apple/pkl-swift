@@ -31,6 +31,8 @@ public enum PklValueType: UInt8, Decodable {
     case regex = 0xB
     case `class` = 0xC
     case `typealias` = 0xD
+    case function = 0xE
+    case bytes = 0xF
     case objectMemberProperty = 0x10
     case objectMemberEntry = 0x11
     case objectMemberElement = 0x12
@@ -235,6 +237,15 @@ extension _PklDecoder {
             case .dataSize:
                 let decoder = try _PklDecoder(value: propertyValue)
                 return try PklAny(value: DataSize(from: decoder))
+            case .bytes:
+                guard case .bin(let bytes) = value[1] else {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: codingPath,
+                            debugDescription: "Expected binary type but got \(value[1].debugDescription)"
+                        ))
+                }
+                return PklAny(value: bytes)
             default:
                 throw DecodingError.dataCorrupted(
                     .init(

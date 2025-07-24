@@ -97,6 +97,7 @@ facts {
     generateType(reflectedSlices.properties["res2"].type) == "[[String: String]]"
     generateType(reflectedSlices.properties["res3"].type) == "[String]"
     generateType(reflectedSlices.properties["res4"].type) == "[[String: String]]"
+    generateType(reflect.DeclaredType(reflect.Class(Bytes))) == "[UInt8]"
   }
   ["nullables"] {
     generateType(reflectedNullables.properties["res1"].type) == "String?"

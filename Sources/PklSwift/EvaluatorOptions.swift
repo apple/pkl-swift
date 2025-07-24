@@ -262,7 +262,15 @@ extension EvaluatorOptions {
         options.allowedResources = evaluatorSettings.allowedResources ?? self.allowedResources
         options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? self.cacheDir)
         options.rootDir = evaluatorSettings.rootDir ?? self.rootDir
-        options.http = evaluatorSettings.http ?? self.http
+        if let http = evaluatorSettings.http {
+            options.http = .init()
+            if let proxy = http.proxy {
+                options.http!.proxy = .init()
+                options.http!.proxy!.noProxy = proxy.noProxy ?? self.http?.proxy?.noProxy
+                options.http!.proxy!.address = proxy.address ?? self.http?.proxy?.address
+            }
+            options.http!.rewrites = http.rewrites ?? self.http?.rewrites
+        }
         options.externalModuleReaders = evaluatorSettings.externalModuleReaders ?? options.externalModuleReaders
         options.externalResourceReaders = evaluatorSettings.externalResourceReaders ?? options.externalResourceReaders
         return options

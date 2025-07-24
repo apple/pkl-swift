@@ -47,7 +47,7 @@ local class PklDistribution {
 }
 
 local pklCurrent: PklDistribution = new {
-  version = "0.27.2"
+  version = "0.29.0"
 }
 
 local pklDistributions: Listing<PklDistribution> = new {
@@ -134,9 +134,11 @@ jobs {
         distribution.downloadRunStep
         swiftTest
         new RunStep { command = "make circleci-config" }
-        new RunStep { command = "make test-snippets" }
-        new RunStep { command = "make test-pkl" }
-        new RunStep { command = "make generate-fixtures" }
+        when (distribution == pklCurrent) {
+          new RunStep { command = "make test-snippets" }
+          new RunStep { command = "make test-pkl" }
+          new RunStep { command = "make generate-fixtures" }
+        }
         new StoreTestResults {
           path = ".out/test-results/"
         }

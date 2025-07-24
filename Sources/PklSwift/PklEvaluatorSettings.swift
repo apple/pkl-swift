@@ -62,6 +62,23 @@ public struct Http: Codable, Hashable {
     /// If `nil`, uses the operating system's proxy configuration.
     /// Configuration of the HTTP proxy to use.
     var proxy: Proxy?
+
+    /// HTTP URL rewrite rules.
+    ///
+    /// Added in Pkl 0.29.
+    /// This field is ignored if targeting Pkl 0.28 and older.
+    ///
+    /// Each key-value pair designates a source prefix to a target prefix.
+    /// Each rewrite rule must start with `http://` or `https://`, and end with `/`.
+    ///
+    /// This option is often used for setting up package mirroring.
+    ///
+    /// The following example will rewrite a request https://example.com/foo/bar to https://my.other.website/foo/bar:
+    ///
+    ///		Rewrites: [
+    ///			"https://example.com/": "https://my.other.website/"
+    ///		]
+    var rewrites: [String: String]?
 }
 
 /// Settings that control how Pkl talks to HTTP proxies.

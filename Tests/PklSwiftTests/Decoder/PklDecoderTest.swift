@@ -103,4 +103,12 @@ final class PklDecoderTests: XCTestCase {
         let value = try PklDecoder.decode([Int: Int].self, from: bytes)
         XCTAssertEqual(value, [1: 1])
     }
+
+    func testDecodeBytes() throws {
+        let bytes: [UInt8] = [
+            0x92, 0x0F, 0xC4, 0x4, 0x1, 0x2, 0x3, 0xFF,
+        ]
+        let value = try PklDecoder.decode([UInt8].self, from: bytes)
+        XCTAssertEqual(value, [1, 2, 3, 255])
+    }
 }
