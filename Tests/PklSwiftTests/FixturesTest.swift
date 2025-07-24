@@ -64,7 +64,8 @@ class FixturesTest: XCTestCase {
                 res7: [1: true, 2: false],
                 res8: [1: [1: true], 2: [2: false]],
                 res9: ["one", "two", "three"],
-                res10: [1, 2, 3]
+                res10: [1, 2, 3],
+                res11: [1, 2, 3, 255]
             )
         )
     }

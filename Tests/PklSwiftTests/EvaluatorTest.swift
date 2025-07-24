@@ -14,6 +14,7 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
+import Foundation
 @testable import MessagePack
 @testable import PklSwift
 import SemanticVersion
@@ -285,6 +286,29 @@ final class PklSwiftTests: XCTestCase {
         }
     }
 
+    func testHttpRewrites() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version.major == 0, version.minor < 29 {
+            throw XCTSkip("External readers require Pkl 0.29 or later.")
+        }
+
+        var options = EvaluatorOptions.preconfigured
+        options.http = .init(
+            rewrites: [
+                "https://example.com/": "https://example.example/",
+            ]
+        )
+        let evaluator = try await manager.newEvaluator(options: options)
+        do {
+            _ = try await evaluator.evaluateOutputText(source: .text(#"res = import("https://example.com/foo.pkl")"#))
+            XCTFail("Should not reach here")
+        } catch {
+            XCTAssertTrue(error is PklError)
+            let error = error as! PklError
+            self.assertContains(error.message, "request was rewritten: https://example.com/foo.pkl -> https://example.example/foo.pkl")
+        }
+    }
+
     private func assertStartsWith(
         _ message: String,
         _ prefix: String,
@@ -293,6 +317,17 @@ final class PklSwiftTests: XCTestCase {
     ) {
         if !message.starts(with: prefix) {
             XCTFail("Expected \(message) to start with \(prefix)", file: file, line: line)
+        }
+    }
+
+    private func assertContains(
+        _ message: String,
+        _ value: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        if !message.contains(value) {
+            XCTFail("Expected \(message) to contain \(value)", file: file, line: line)
         }
     }
 

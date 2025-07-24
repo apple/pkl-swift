@@ -112,6 +112,11 @@ mappedTypes: Mapping<Class|TypeAlias, Type> = new {
     swiftModuleName = "PklSwift"
     typeName = "DataSizeUnit"
   }
+  [Bytes] = new Type.Array {
+    elem = new Type.Declared {
+      typeName = "UInt8"
+    }
+  }
 }
 
 mappedHigherOrderTypes: Mapping<Class|TypeAlias, (reflect.DeclaredType, reflect.TypeDeclaration, List<SwiftMapping>) -> Type> = new {

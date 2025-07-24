@@ -27,6 +27,8 @@ extension Collections {
 
         public var res10: Set<Int8>
 
+        public var res11: [UInt8]
+
         public init(
             res1: [Int],
             res2: [Int],
@@ -37,7 +39,8 @@ extension Collections {
             res7: [Int: Bool],
             res8: [Int: [Int: Bool]],
             res9: Set<String>,
-            res10: Set<Int8>
+            res10: Set<Int8>,
+            res11: [UInt8]
         ) {
             self.res1 = res1
             self.res2 = res2
@@ -49,6 +52,7 @@ extension Collections {
             self.res8 = res8
             self.res9 = res9
             self.res10 = res10
+            self.res11 = res11
         }
     }
 

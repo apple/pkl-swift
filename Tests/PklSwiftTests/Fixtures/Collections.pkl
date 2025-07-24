@@ -28,3 +28,5 @@ res8: Map<Int, Map<Int, Boolean>> = Map(1, Map(1, true), 2, Map(2, false))
 res9: Set<String> = Set("one", "two", "three")
 
 res10: Set<Int8> = Set(1, 2, 3)
+
+res11: Bytes = Bytes(1, 2, 3, 255)

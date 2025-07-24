@@ -24,16 +24,21 @@ extension _PklDecoder {
 
         var currentIndex: Int
 
-        var members: [MessagePackValue]
+        // either [members] or [bytes] are set
+        var members: [MessagePackValue]?
+
+        var bytes: [UInt8]?
 
         var isAtEnd: Bool {
-            self.currentIndex >= self.members.count
+            let length = self.members?.count ?? self.bytes!.count
+            return self.currentIndex >= length
         }
 
         init(value: [MessagePackValue], codingPath: [CodingKey]) throws {
             func error(_ debugDescription: String) -> DecodingError {
                 .dataCorrupted(.init(codingPath: codingPath, debugDescription: debugDescription))
             }
+
             guard value.count > 0 else {
                 throw error("Expected at least a type marker, but got 0 values")
             }
@@ -41,7 +46,12 @@ extension _PklDecoder {
                 throw error("Failed to decode type marker from '\(value[0])'")
             }
 
-            if value.count == 2 {
+            if pklType == .bytes {
+                guard case .bin(let bytes) = value[1] else {
+                    throw error("Expected binary but got \(value[1].debugDataTypeDescription)")
+                }
+                self.bytes = bytes
+            } else if value.count == 2 {
                 guard [.list, .listing, .set].contains(pklType) else {
                     throw error("Expected either list, listing, or set, but got \(pklType)")
                 }
@@ -58,16 +68,29 @@ extension _PklDecoder {
         }
 
         func decodeNil() throws -> Bool {
+            if self.bytes != nil {
+                return false
+            }
+            let members = self.members!
             defer { currentIndex += 1 }
-            switch self.members[self.currentIndex] {
+            switch members[self.currentIndex] {
             case .nil: return true
             default: return false
             }
         }
 
+        private func decodeBytes<T>(_: T.Type, _ bytes: [UInt8]) throws -> T where T: Decodable {
+            let value = bytes[self.currentIndex]
+            return value as! T
+        }
+
         func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
             defer { currentIndex += 1 }
-            let value = self.members[self.currentIndex]
+            if let bytes = self.bytes {
+                return try self.decodeBytes(type, bytes)
+            }
+
+            let value = self.members![self.currentIndex]
 
             // special case for polymorphic types
             if type == PklAny.self,
@@ -80,8 +103,11 @@ extension _PklDecoder {
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<
             NestedKey
         > where NestedKey: CodingKey {
+            if self.bytes != nil {
+                throw self.error("Cannot decode byte into \(type) because the decoded value is a byte array.")
+            }
             defer { currentIndex += 1 }
-            let value = self.members[self.currentIndex]
+            let value = self.members![self.currentIndex]
             var nestedCodingPath = self.codingPath
             if let key = NestedKey(intValue: currentIndex) {
                 nestedCodingPath.append(key)
@@ -92,8 +118,11 @@ extension _PklDecoder {
         }
 
         func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
+            if self.bytes != nil {
+                throw self.error("Cannot create nested UnkeyedDecodingContainer; the decoded value is a byte array.")
+            }
             defer { currentIndex += 1 }
-            let value = self.members[self.currentIndex]
+            let value = self.members![self.currentIndex]
             var nestedCodingPath = self.codingPath
             if let key = _PklKey(intValue: currentIndex) {
                 nestedCodingPath.append(key)
@@ -107,6 +136,10 @@ extension _PklDecoder {
 
         func superDecoder() throws -> Decoder {
             fatalError("TODO")
+        }
+
+        private func error(_ debugDescription: String) -> DecodingError {
+            .dataCorrupted(.init(codingPath: self.codingPath, debugDescription: debugDescription))
         }
     }
 }
