@@ -81,9 +81,7 @@ class FixturesTest: XCTestCase {
         )
         XCTAssertEqual(
             result,
-            Collections2.Module(
-                res: [1, 2, 3, 255],
-            )
+            Collections2.Module(res: [1, 2, 3, 255])
         )
     }
 
