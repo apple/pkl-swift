@@ -14,8 +14,6 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import Foundation
-
 /// The Swift representation of standard library module `pkl.EvaluatorSettings`.
 public struct PklEvaluatorSettings: Decodable, Hashable {
     let externalProperties: [String: String]?
