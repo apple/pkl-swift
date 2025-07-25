@@ -45,6 +45,12 @@ Thank you to all our contributors!
 * Auto-generate DocC documentation in the Swift Package Index (https://github.com/apple/pkl-swift/pull/41[#41]).
 * Update license headers (https://github.com/apple/pkl-swift/pull/43[#43]).
 
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.4.1]]
 == 0.4.1 (2025-02-04)
 
@@ -72,6 +78,7 @@ Thank you to all our contributors!
 
 * https://github.com/HT154[@HT154]
 * https://github.com/jcubit[@jcubit]
+* https://github.com/bioball[@bioball]
 
 [[release-0.3.0]]
 == 0.3.0 (2024-10-10)
@@ -113,6 +120,12 @@ Thank you to all our contributors!
 
 * Fixes one more Pkl module whose name was incorrect
 
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.2.2]]
 == 0.2.2 (2024-02-04)
 
@@ -121,10 +134,22 @@ Thank you to all our contributors!
 * Fixes an issue where module names in Pkl module pkl.swift do not match the package name
 * Fix some documentation issues on the website
 
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.2.1]]
 == 0.2.1 (2024-02-02)
 
 Fix bug in pkl package url.
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/stackoverflow[@stackoverflow]
 
 [[release-0.2.0]]
 == 0.2.0 (2024-02-02)
