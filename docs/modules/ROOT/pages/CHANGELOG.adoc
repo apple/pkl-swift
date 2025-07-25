@@ -1,5 +1,37 @@
 = Changelog
 
+[[release-0.5.0]]
+== 0.5.0 (2025-07-2)
+
+=== Fixes
+
+* Fixes an issue where URLs are incorrectly serialized (https://github.com/apple/pkl-swift/pull/55[#55]).
+
+=== Additions
+
+* Adds support for using PklProject with pkl-gen-swift (https://github.com/apple/pkl-swift/pull/52[#52]).
+* Adds support for Pkl 0.29 features (https://github.com/apple/pkl-swift/pull/56[#56]).
+** Add support for consuming `Bytes`, represented as type `[UInt8]` in Swift.
+** Add support for HTTP rewrites.
+** Add methods `Evaluator.evaluateOutputBytes()` and `Evaluator.evaluateOutputFilesBytes()`.
+
+=== Changes
+
+* Bump minimum Swift version to 5.10 (https://github.com/apple/pkl-swift/pull/53[#53]).
+
+=== Breaking Changes
+
+* `pkl-gen-swift` requires Pkl 0.29.0.
+* In `EvaluatorOptions.withProjectEvaluatorSettings`: The `http.proxy.address` and `http.proxy.noProxy` options are applied separately (https://github.com/apple/pkl-swift/pull/56[#56]). +
++
+This means that if a PklProject's evaluator settings only sets `http.proxy.address`, the current `noProxy` options are preserved.
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.4.2]]
 == 0.4.2 (2025-04-14)
 
@@ -12,6 +44,12 @@
 
 * Auto-generate DocC documentation in the Swift Package Index (https://github.com/apple/pkl-swift/pull/41[#41]).
 * Update license headers (https://github.com/apple/pkl-swift/pull/43[#43]).
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
 
 [[release-0.4.1]]
 == 0.4.1 (2025-02-04)
@@ -40,6 +78,7 @@ Thank you to all our contributors!
 
 * https://github.com/HT154[@HT154]
 * https://github.com/jcubit[@jcubit]
+* https://github.com/bioball[@bioball]
 
 [[release-0.3.0]]
 == 0.3.0 (2024-10-10)
@@ -81,6 +120,12 @@ Thank you to all our contributors!
 
 * Fixes one more Pkl module whose name was incorrect
 
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.2.2]]
 == 0.2.2 (2024-02-04)
 
@@ -89,10 +134,22 @@ Thank you to all our contributors!
 * Fixes an issue where module names in Pkl module pkl.swift do not match the package name
 * Fix some documentation issues on the website
 
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+
 [[release-0.2.1]]
 == 0.2.1 (2024-02-02)
 
 Fix bug in pkl package url.
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/stackoverflow[@stackoverflow]
 
 [[release-0.2.0]]
 == 0.2.0 (2024-02-02)
