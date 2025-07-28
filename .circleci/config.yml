@@ -214,9 +214,6 @@ workflows:
     - test-format:
         requires:
         - hold
-    - pkl-gen-swift-macos:
-        requires:
-        - hold
     when:
       matches:
         value: << pipeline.git.branch >>
