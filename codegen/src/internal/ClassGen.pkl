@@ -139,7 +139,7 @@ local structSuperclasses: String =
     else
       "\(superClass.namespaceName).\(superClass.name)"
   else
-    "PklRegisteredType, Decodable, Hashable"
+    "PklRegisteredType, Decodable, Hashable, Sendable"
 
 local struct: String = new Listing {
   when (clazz.docComment != null) {
@@ -338,7 +338,7 @@ local protocol: String? =
         when (superClass != null) {
           "\(superClass.protocol.fullName) {\n"
         } else {
-          "PklRegisteredType, DynamicallyEquatable, Hashable {\n"
+          "PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {\n"
         }
         for (key, field in methodsToGenerate) {
           when (key != methodsToGenerate.keys.first) {

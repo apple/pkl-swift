@@ -1,9 +1,9 @@
 // Code generated from Pkl module `Override2`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum Override2 {}
+public enum Override2: Sendable {}
 
-public protocol Override2_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Override2_Module: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var foo: String { get }
 }
 

@@ -1,10 +1,10 @@
 // Code generated from Pkl module `Imports`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum Imports {}
+public enum Imports: Sendable {}
 
 extension Imports {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Imports"
 
         public var foo: Foo.Module
