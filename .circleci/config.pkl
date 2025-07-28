@@ -66,6 +66,7 @@ main {
 prb {
   jobs {
     ...testJobs
+    "pkl-gen-swift-macos"
   }
 }
 
@@ -176,7 +177,7 @@ jobs {
 
   ["pkl-gen-swift-macos"] {
     macos {
-      xcode = "15.2.0"
+      xcode = "16.4.0"
     }
     resource_class = "macos.m1.large.gen1"
     steps {
