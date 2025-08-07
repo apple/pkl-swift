@@ -16,13 +16,13 @@
 
 import Foundation
 
-let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"]
+let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"] == "1"
 
-func debug(_ message: String) {
-    if pklDebug != "1" {
+func debug(_ message: @autoclosure () -> String) {
+    if !pklDebug {
         return
     }
-    FileHandle.standardError.write("[pkl-swift] \(message)\n".data(using: .utf8)!)
+    FileHandle.standardError.write("[pkl-swift] \(message())\n".data(using: .utf8)!)
     fflush(stderr)
 }
 
