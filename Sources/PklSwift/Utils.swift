@@ -23,7 +23,7 @@ func debug(_ message: @autoclosure @Sendable () -> String) {
         return
     }
     FileHandle.standardError.write("[pkl-swift] \(message())\n".data(using: .utf8)!)
-    fflush(stderr)
+    try? FileHandle.standardError.synchronize()
 }
 
 let longNumberFormatter: NumberFormatter = {
