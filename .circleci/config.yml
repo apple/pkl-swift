@@ -24,7 +24,7 @@ jobs:
         path: .out/test-results/
     resource_class: xlarge
     docker:
-    - image: swift:5.10-rhel-ubi9
+    - image: swift:6.1-rhel-ubi9
   test-pkl-0-29-0:
     steps:
     - checkout
@@ -52,7 +52,7 @@ jobs:
         path: .out/test-results/
     resource_class: xlarge
     docker:
-    - image: swift:5.10-rhel-ubi9
+    - image: swift:6.1-rhel-ubi9
   test-license-headers:
     steps:
     - checkout

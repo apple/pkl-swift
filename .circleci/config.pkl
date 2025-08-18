@@ -125,7 +125,7 @@ jobs {
     ["test-pkl-\(distribution.normalizedVersion)"] {
       docker {
         new {
-          image = "swift:5.10-rhel-ubi9"
+          image = "swift:6.1-rhel-ubi9"
         }
       }
       resource_class = "xlarge"
