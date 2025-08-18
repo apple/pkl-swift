@@ -16,7 +16,7 @@
 
 import Foundation
 
-public struct PklCodingKey: CodingKey, Equatable {
+public struct PklCodingKey: CodingKey, Equatable, Sendable {
     public let stringValue: String
     public let intValue: Int?
 

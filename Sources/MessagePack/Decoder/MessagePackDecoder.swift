@@ -417,7 +417,7 @@ public final class MessagePackDecoder {
 }
 
 /// A generic representation of MessagePack values.
-public enum MessagePackValue {
+public enum MessagePackValue: @unchecked Sendable {
     case `nil`
     case bool(Bool)
     case int(any BinaryInteger)

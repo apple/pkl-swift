@@ -8,7 +8,7 @@ public protocol pkl_swift_example_Poly_Animal: pkl_swift_lib1_Being {
 }
 
 extension pkl_swift_example_Poly {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "pkl.swift.example.Poly"
 
         public var beings: [any pkl_swift_lib1.Being]

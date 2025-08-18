@@ -17,7 +17,7 @@
 import Foundation
 import MessagePack
 
-public enum PklValueType: UInt8, Decodable {
+public enum PklValueType: UInt8, Decodable, Sendable {
     case object = 0x1
     case map = 0x2
     case mapping = 0x3
