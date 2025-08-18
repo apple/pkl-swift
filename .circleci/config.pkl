@@ -163,7 +163,7 @@ jobs {
   ["test-format"] {
     docker {
       new {
-        image = "swift:5.10-rhel-ubi9"
+        image = "swift:6.1-rhel-ubi9"
       }
     }
     steps {
@@ -197,7 +197,7 @@ jobs {
     ["pkl-gen-swift-linux-\(arch)"] {
       docker {
         new {
-          image = "swift:5.10-rhel-ubi9"
+          image = "swift:6.1-rhel-ubi9"
         }
       }
       resource_class = if (arch == "amd64") "xlarge" else "arm.xlarge"
