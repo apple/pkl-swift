@@ -19,7 +19,7 @@ import XCTest
 
 @testable import PklSwift
 
-class FakeMessageTransport: MessageTransport {
+class FakeMessageTransport: MessageTransport, @unchecked Sendable {
     var outboundStream: AsyncThrowingStream<PklSwift.ServerMessage, Error>!
 
     var outboundContinuation: AsyncThrowingStream<PklSwift.ServerMessage, Error>.Continuation!

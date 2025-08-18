@@ -92,7 +92,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode(_: Date.Type) throws -> Date {
+    private func decode(_: Date.Type) throws -> Date {
         switch value {
         case .timestamp(let value):
             return value
@@ -101,7 +101,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode(_: Data.Type) throws -> Data {
+    private func decode(_: Data.Type) throws -> Data {
         switch value {
         case .bin(let value):
             return Data(value)
@@ -110,7 +110,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode(_: [UInt8].Type) throws -> [UInt8] {
+    private func decode(_: [UInt8].Type) throws -> [UInt8] {
         // accept either msgpack binary or array
         switch value {
         case .bin(let value):
@@ -130,7 +130,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode(_: URL.Type) throws -> URL {
+    private func decode(_: URL.Type) throws -> URL {
         switch value {
         case .string(let value):
             if let url = URL(string: value) {

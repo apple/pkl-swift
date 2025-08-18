@@ -44,7 +44,7 @@ public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectF
     }
 }
 
-public protocol DependencyDeclaredInProjectFile: Hashable, Decodable, Equatable {}
+public protocol DependencyDeclaredInProjectFile: Hashable, Decodable, Equatable, Sendable {}
 
 extension Project: Decodable {
     public init(from decoder: Decoder) throws {

@@ -30,7 +30,7 @@ let PKL_EXEC_NAME="pkl"
 ///
 /// - Parameter action: The action to perform
 /// - Returns: The result of `action`
-public func withEvaluatorManager<T>(_ action: (EvaluatorManager) async throws -> T) async rethrows -> T {
+public func withEvaluatorManager<T: Sendable>(_ action: (EvaluatorManager) async throws -> T) async rethrows -> T {
     let manager: EvaluatorManager = .init()
     var closed = false
     do {
@@ -192,7 +192,7 @@ public actor EvaluatorManager {
     }
 
     /// Convenience method for calling ``withEvaluator(_:)`` with preconfigured evaluator options.
-    public func withEvaluator<T>(_ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withEvaluator<T: Sendable>(_ action: (Evaluator) async throws -> T) async throws -> T {
         try await self.withEvaluator(options: .preconfigured, action)
     }
 
@@ -203,7 +203,7 @@ public actor EvaluatorManager {
     /// - Parameters:
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withEvaluator<T>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withEvaluator<T: Sendable>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
         let evaluator = try await newEvaluator(options: options)
         var closed = false
         do {
@@ -220,7 +220,7 @@ public actor EvaluatorManager {
     }
 
     /// Convenience method for constructing a project evaluator with preconfigured base options.
-    public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withProjectEvaluator<T: Sendable>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
         try await self.withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
     }
 
@@ -235,7 +235,7 @@ public actor EvaluatorManager {
     ///   - projectBaseURI: The project base path that contains the PklProject file.
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withProjectEvaluator<T>(projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withProjectEvaluator<T: Sendable>(projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
         let evaluator = try await newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)
         var closed = false
         do {

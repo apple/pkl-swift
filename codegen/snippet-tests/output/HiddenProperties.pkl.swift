@@ -4,7 +4,7 @@ import PklSwift
 public enum HiddenProperties {}
 
 extension HiddenProperties {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "HiddenProperties"
 
         public var propC: String

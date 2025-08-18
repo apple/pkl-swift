@@ -29,3 +29,5 @@ swiftformat .
 
 hawkeye format
 ----
+
+To regenerate all the test fixtures after changes to the codegen run `make generate-fixtures`.

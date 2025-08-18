@@ -5,7 +5,7 @@ public enum Enums {}
 
 extension Enums {
     /// City is one of these four fantastic cities
-    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case sanFrancisco = "San Francisco"
         case london = "London"
         case zurich = "Zurich"
@@ -13,7 +13,7 @@ extension Enums {
     }
 
     /// Animal is either a horse, monkey, or zebra
-    public enum Animal: Decodable, Hashable {
+    public enum Animal: Decodable, Hashable, Sendable {
         case horse(Horse)
         case zebra(Zebra)
         case monkey(Monkey)
@@ -41,7 +41,7 @@ extension Enums {
     }
 
     /// Either a dictionary or an array.
-    public enum DictOrArray: Decodable, Hashable {
+    public enum DictOrArray: Decodable, Hashable, Sendable {
         case dictionaryStringString([String: String])
         case arrayString([String])
 
@@ -65,7 +65,7 @@ extension Enums {
         }
     }
 
-    public enum HorseOrBug: Decodable, Hashable {
+    public enum HorseOrBug: Decodable, Hashable, Sendable {
         case horse(Horse)
         case string(String)
         case string(String)
@@ -92,7 +92,7 @@ extension Enums {
         }
     }
 
-    public enum MaybeHorseOrDefinitelyZebra: Decodable, Hashable {
+    public enum MaybeHorseOrDefinitelyZebra: Decodable, Hashable, Sendable {
         case horse(Horse?)
         case zebra(Zebra)
 
@@ -116,7 +116,7 @@ extension Enums {
         }
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Enums"
 
         /// City of tomorrow!
@@ -148,7 +148,7 @@ extension Enums {
         }
     }
 
-    public struct Horse: PklRegisteredType, Decodable, Hashable {
+    public struct Horse: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Enums#Horse"
 
         public var neigh: Bool
@@ -158,7 +158,7 @@ extension Enums {
         }
     }
 
-    public struct Zebra: PklRegisteredType, Decodable, Hashable {
+    public struct Zebra: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Enums#Zebra"
 
         public var stripes: String
@@ -168,7 +168,7 @@ extension Enums {
         }
     }
 
-    public struct Monkey: PklRegisteredType, Decodable, Hashable {
+    public struct Monkey: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Enums#Monkey"
 
         public var tail: String

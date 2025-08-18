@@ -4,7 +4,7 @@ import PklSwift
 public enum Imports {}
 
 extension Imports {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Imports"
 
         public var foo: Foo.Module

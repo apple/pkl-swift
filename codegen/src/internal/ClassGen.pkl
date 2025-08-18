@@ -139,7 +139,7 @@ local structSuperclasses: String =
     else
       "\(superClass.namespaceName).\(superClass.name)"
   else
-    "PklRegisteredType, Decodable, Hashable"
+    "PklRegisteredType, Decodable, Hashable, @unchecked Sendable"
 
 local struct: String = new Listing {
   when (clazz.docComment != null) {

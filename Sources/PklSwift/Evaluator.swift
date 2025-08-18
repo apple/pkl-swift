@@ -22,7 +22,7 @@ import Foundation
 /// - Parameters:
 ///   - options: The options used to configure the evaluator.
 ///   - action: The action to perform.
-public func withEvaluator<T>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+public func withEvaluator<T: Sendable>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
     try await withEvaluatorManager { manager in
         let evaluator: Evaluator = try await manager.newEvaluator(options: options)
         return try await action(evaluator)
@@ -32,7 +32,7 @@ public func withEvaluator<T>(options: EvaluatorOptions, _ action: (Evaluator) as
 /// Like ``withEvaluator(options:_:)``, but with preconfigured evaluator options.
 ///
 /// - Parameter action: The action to perform
-public func withEvaluator<T>(_ action: (Evaluator) async throws -> T) async throws -> T {
+public func withEvaluator<T: Sendable>(_ action: (Evaluator) async throws -> T) async throws -> T {
     try await withEvaluator(options: .preconfigured, action)
 }
 
@@ -42,7 +42,7 @@ public func withEvaluator<T>(_ action: (Evaluator) async throws -> T) async thro
 ///   - projectBaseURI: The base path containing the PklProject file.
 ///   - action: The action to perform.
 /// - Returns: The result of the action.
-public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
+public func withProjectEvaluator<T: Sendable>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
     try await withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
 }
 
@@ -57,7 +57,7 @@ public func withProjectEvaluator<T>(projectBaseURI: URL, _ action: (Evaluator) a
 ///   - options: The base options used to configure the evaluator.
 ///   - action: The action to perform.
 /// - Returns: The result of the action.
-public func withProjectEvaluator<T>(
+public func withProjectEvaluator<T: Sendable>(
     projectBaseURI: URL,
     options: EvaluatorOptions,
     _ action: (Evaluator) async throws -> T
@@ -69,7 +69,7 @@ public func withProjectEvaluator<T>(
 }
 
 /// The core API for evaluating Pkl modules.
-public struct Evaluator {
+public struct Evaluator: Sendable {
     private var manager: EvaluatorManager
     private let evaluatorID: Int64
     private let resourceReaders: [ResourceReader]

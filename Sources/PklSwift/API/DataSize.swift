@@ -18,7 +18,7 @@ import Foundation
 import MessagePack
 
 /// DataSize is the Swift representation of Pkl's `pkl.DataSize`.
-public struct DataSize: Hashable {
+public struct DataSize: Hashable, Sendable {
     /// The value of this ``DataSize`` in the unit set in ``unit``.
     let value: Float64
 
@@ -150,7 +150,7 @@ extension DataSize {
 }
 
 /// The unit of a ``DataSize``.
-public enum DataSizeUnit: String, CaseIterable, Decodable {
+public enum DataSizeUnit: String, CaseIterable, Decodable, Sendable {
     /// byte
     case b
 

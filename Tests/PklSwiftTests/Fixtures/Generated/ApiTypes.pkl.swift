@@ -4,7 +4,7 @@ import PklSwift
 public enum ApiTypes {}
 
 extension ApiTypes {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "ApiTypes"
 
         public var res1: Duration
