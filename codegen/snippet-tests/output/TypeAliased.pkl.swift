@@ -1,10 +1,10 @@
 // Code generated from Pkl module `TypeAliased`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum TypeAliased {}
+public enum TypeAliased: Sendable {}
 
 extension TypeAliased {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "TypeAliased"
 
         public var myMap: StringyMap

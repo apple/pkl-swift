@@ -17,7 +17,7 @@
 import Foundation
 
 /// A representation of a source for a Pkl module to be evaluated.
-public struct ModuleSource: Hashable {
+public struct ModuleSource: Hashable, Sendable {
     /// The URI of the module.
     let uri: URL
 

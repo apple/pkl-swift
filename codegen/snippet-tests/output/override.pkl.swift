@@ -1,14 +1,14 @@
 // Code generated from Pkl module `override`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum override {}
+public enum override: Sendable {}
 
-public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var myProp: String { get }
 }
 
 extension override {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "override"
 
         public var foo: any Foo

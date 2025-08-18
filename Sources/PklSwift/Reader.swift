@@ -101,7 +101,7 @@ extension ResourceReader {
 ///
 /// For example, a ``PathElement`` with name `bar.txt` and is not a directory at base URI `file:////foo/`
 /// implies URI resource `file:///foo/bar.txt`.
-public struct PathElement {
+public struct PathElement: Sendable {
     /// The name of the path element
     public let name: String
 

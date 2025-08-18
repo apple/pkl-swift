@@ -1,9 +1,9 @@
 // Code generated from Pkl module `MyModule`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum MyModule {}
+public enum MyModule: Sendable {}
 
-public protocol MyModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol MyModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var foo: String { get }
 }
 

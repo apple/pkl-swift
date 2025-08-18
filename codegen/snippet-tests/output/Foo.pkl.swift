@@ -1,18 +1,18 @@
 // Code generated from Pkl module `Foo`. DO NOT EDIT.
-import PklSwift
+@preconcurrency import PklSwift
 
-public enum Foo {}
+public enum Foo: Sendable {}
 
 public protocol Foo_Animal: Foo_Being {
     var name: String { get }
 }
 
-public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var exists: Bool { get }
 }
 
 extension Foo {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Foo"
 
         public var animals: [any Animal]
