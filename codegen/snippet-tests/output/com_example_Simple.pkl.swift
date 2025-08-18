@@ -14,7 +14,7 @@ public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredTyp
 }
 
 extension com_example_Simple {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "com.example.Simple"
 
         /// This is truly a person.
@@ -98,7 +98,7 @@ extension com_example_Simple {
         }
     }
 
-    public struct ClassWithReallyLongConstructor: PklRegisteredType, Decodable, Hashable {
+    public struct ClassWithReallyLongConstructor: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "com.example.Simple#ClassWithReallyLongConstructor"
 
         public var theProperty1: String

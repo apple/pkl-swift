@@ -4,13 +4,13 @@ import PklSwift
 public enum UnionNameKeyword {}
 
 extension UnionNameKeyword {
-    public enum `Type`: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum `Type`: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case one = "one"
         case two = "two"
         case three = "three"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "UnionNameKeyword"
 
         public var type: `Type`
