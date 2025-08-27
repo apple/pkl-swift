@@ -76,7 +76,6 @@ extension Decodable where Self: PklSerializableType {
                     debugDescription: "Expected array but got \(decoder.value.debugDataTypeDescription)"
                 ))
         }
-        let code = try arr[0].decode(PklValueType.self)
         guard arr.count > 0 else {
             throw DecodingError.dataCorrupted(
                 .init(
@@ -84,6 +83,7 @@ extension Decodable where Self: PklSerializableType {
                     debugDescription: "Expected non-empty array"
                 ))
         }
+        let code = try arr[0].decode(PklValueType.self)
         guard Self.messageTag == code else {
             throw DecodingError.dataCorrupted(
                 .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)"))
@@ -112,6 +112,14 @@ extension PklSerializableValueUnitType {
                     codingPath: codingPath,
                     debugDescription: "Expected array but got \(value.debugDataTypeDescription)"
                 ))
+        }
+        guard arr.count > 0 else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected non-empty array"
+                )
+            )
         }
         let code = try arr[0].decode(PklValueType.self)
         guard Self.messageTag == code else {
