@@ -4,7 +4,7 @@ import PklSwift
 public enum Collections2 {}
 
 extension Collections2 {
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Collections2"
 
         public var res: [UInt8]

@@ -221,7 +221,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes"
 
         public var fruit1: Fruit
@@ -313,7 +313,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Banana: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Banana: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Banana"
 
         public var isRipe: Bool
@@ -323,7 +323,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Grape: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Grape: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Grape"
 
         public var isUsedForWine: Bool
@@ -333,7 +333,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Apple: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Apple: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Apple"
 
         public var isRed: Bool

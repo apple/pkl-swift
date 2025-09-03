@@ -51,6 +51,9 @@ local superClass: SwiftMapping.Class? = mappings.findOrNull((c) -> c is SwiftMap
 
 local properties: Map<String, Property> = getProperties(clazz, mappings)
 
+local hasAnyHashable: Boolean =
+  properties.any((_, prop) -> prop.type.isAny)
+
 local imports: List<String> =
   properties.values
     .flatMap((f) -> f.type.imports)
@@ -139,7 +142,8 @@ local structSuperclasses: String =
     else
       "\(superClass.namespaceName).\(superClass.name)"
   else
-    "PklRegisteredType, Decodable, Hashable, @unchecked Sendable"
+    let (sendable = if (hasAnyHashable) "@unchecked Sendable" else "Sendable")
+      "PklRegisteredType, Decodable, Hashable, \(sendable)"
 
 local struct: String = new Listing {
   when (clazz.docComment != null) {

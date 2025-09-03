@@ -10,7 +10,7 @@ public protocol pkl_swift_lib1_Being: PklRegisteredType, DynamicallyEquatable, H
 extension pkl_swift_lib1 {
     public typealias Being = pkl_swift_lib1_Being
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "pkl.swift.lib1"
 
         public init() {}

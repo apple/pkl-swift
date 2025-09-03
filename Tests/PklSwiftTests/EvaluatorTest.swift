@@ -32,7 +32,7 @@ class TestLogger: Logger, @unchecked Sendable {
     }
 }
 
-struct VirtualModuleReader: ModuleReader, @unchecked Sendable {
+struct VirtualModuleReader: ModuleReader {
     func read(url: URL) async throws -> String {
         try await self.read(url)
     }
@@ -54,7 +54,7 @@ struct VirtualModuleReader: ModuleReader, @unchecked Sendable {
     var isLocal: Bool
 }
 
-struct VirtualResourceReader: ResourceReader, @unchecked Sendable {
+struct VirtualResourceReader: ResourceReader {
     var scheme: String
 
     var isGlobbable: Bool

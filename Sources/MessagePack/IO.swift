@@ -14,7 +14,7 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-public protocol Writer: Sendable {
+public protocol Writer {
     /// Write the given bytes into an output somewhere.
     func write(_ buffer: UnsafeRawBufferPointer) throws
 
@@ -32,7 +32,7 @@ extension Writer {
     }
 }
 
-public protocol Reader: Sendable {
+public protocol Reader {
     /// Reads bytes from somewhere, writing them into the given bytearray.
     func read(into: UnsafeMutableRawBufferPointer) throws -> Int
 

@@ -62,7 +62,7 @@ extension AnyType {
         }
     }
 
-    public struct Bird: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Bird: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "AnyType#Bird"
 
         public var species: String
