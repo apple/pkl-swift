@@ -1,0 +1,5 @@
+module NoCollectThroughHidden
+
+import "support/DoNotCollect.pkl"
+
+hidden doNotCollect: DoNotCollect

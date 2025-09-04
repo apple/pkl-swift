@@ -1,0 +1,4 @@
+/// This module should not be discovered during codegen
+module DoNotCollect
+
+foo: String
