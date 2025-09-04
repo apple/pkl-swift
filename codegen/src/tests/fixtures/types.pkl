@@ -50,6 +50,10 @@ class Bug {
   size: DataSize
 
   kind: BugKind
+
+  bugClass: Class
+
+  bugTypeAlias: TypeAlias
 }
 
 class Cyclic {
