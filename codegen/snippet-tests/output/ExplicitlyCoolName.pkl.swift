@@ -9,7 +9,7 @@ extension ExplicitlyCoolName {
         case two = "two"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExplicitName"
 
         public var MyCoolProp: SomethingVeryFunny
@@ -23,7 +23,7 @@ extension ExplicitlyCoolName {
         }
     }
 
-    public struct SomethingVeryFunny: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct SomethingVeryFunny: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExplicitName#SomethingFunny"
 
         public init() {}

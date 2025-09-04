@@ -8,7 +8,7 @@ public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable 
 }
 
 extension override {
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "override"
 
         public var foo: any Foo

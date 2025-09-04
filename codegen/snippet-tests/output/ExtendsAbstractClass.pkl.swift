@@ -8,7 +8,7 @@ public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable,
 }
 
 extension ExtendsAbstractClass {
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExtendsAbstractClass"
 
         public var a: any A

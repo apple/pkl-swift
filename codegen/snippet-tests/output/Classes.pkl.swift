@@ -8,7 +8,7 @@ public protocol Classes_Animal: PklRegisteredType, DynamicallyEquatable, Hashabl
 }
 
 extension Classes {
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Classes"
 
         public var animals: [any Animal]

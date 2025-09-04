@@ -8,7 +8,7 @@ public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEq
 }
 
 extension ExtendingOpenClass {
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ExtendingOpenClass"
 
         public var res1: MyClass

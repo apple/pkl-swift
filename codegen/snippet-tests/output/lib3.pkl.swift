@@ -20,7 +20,7 @@ extension lib3 {
         }
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "lib3"
 
         public init() {}

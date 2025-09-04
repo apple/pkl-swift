@@ -10,7 +10,7 @@ extension UnionNameKeyword {
         case three = "three"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionNameKeyword"
 
         public var type: `Type`

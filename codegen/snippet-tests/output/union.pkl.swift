@@ -33,7 +33,7 @@ extension union {
         case shared = "shared"
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "union"
 
         /// A city
