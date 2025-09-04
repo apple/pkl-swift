@@ -25,6 +25,12 @@ extension AnyType {
 
         public var dataSize: AnyHashable?
 
+        public var pair: AnyHashable?
+
+        public var regex: AnyHashable?
+
+        public var seq: AnyHashable?
+
         public init(
             bird: AnyHashable?,
             primitive: AnyHashable?,
@@ -34,7 +40,10 @@ extension AnyType {
             mapping: AnyHashable?,
             nullable: AnyHashable?,
             duration: AnyHashable?,
-            dataSize: AnyHashable?
+            dataSize: AnyHashable?,
+            pair: AnyHashable?,
+            regex: AnyHashable?,
+            seq: AnyHashable?
         ) {
             self.bird = bird
             self.primitive = primitive
@@ -45,6 +54,9 @@ extension AnyType {
             self.nullable = nullable
             self.duration = duration
             self.dataSize = dataSize
+            self.pair = pair
+            self.regex = regex
+            self.seq = seq
         }
 
         public init(from decoder: Decoder) throws {
@@ -58,7 +70,10 @@ extension AnyType {
             let nullable = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "nullable")).value
             let duration = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "duration")).value
             let dataSize = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "dataSize")).value
-            self = Module(bird: bird, primitive: primitive, primitive2: primitive2, array: array, set: set, mapping: mapping, nullable: nullable, duration: duration, dataSize: dataSize)
+            let pair = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "pair")).value
+            let regex = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "regex")).value
+            let seq = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "seq")).value
+            self = Module(bird: bird, primitive: primitive, primitive2: primitive2, array: array, set: set, mapping: mapping, nullable: nullable, duration: duration, dataSize: dataSize, pair: pair, regex: regex, seq: seq)
         }
     }
 
