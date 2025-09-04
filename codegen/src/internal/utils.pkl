@@ -128,6 +128,9 @@ function renderDocComment(docComment: String, indent: String) =
 function renderHeaderComment(`module`: reflect.Module) =
   "// Code generated from Pkl module `\(`module`.name)`. DO NOT EDIT."
 
+function canBeNormalizedToEnumCaseName(name: String) =
+  name == "" || !name.split(Regex(#"(?u)[^\p{L}\d]"#)).isEmpty
+
 function normalizeEnumName(name: String) =
   if (name == "") "empty"
   else

@@ -15,12 +15,105 @@
 // ===----------------------------------------------------------------------===//
 module Classes
 
-animals: Listing<Animal> = new {
-  new { name = "Uni" }
-  new { name = "Wally" }
-  new { name = "Mouse" }
+bug: Bug
+
+蚊子: Bug
+
+thisPerson: ThisPerson
+
+d: D
+
+hidden myHiddenProp: String
+
+class Wheel {
+  hasSpokes: Boolean
 }
 
-open class Animal {
-  name: String
+class Bike {
+  isFixie: Boolean
+
+  /// Wheels are the front and back wheels.
+  ///
+  /// There are typically two of them.
+  wheels: List<Wheel>
+}
+
+abstract class Being {
+  isAlive: Boolean
+}
+
+/// A Person!
+open class Person extends Being {
+  isAlive = true
+
+  bike: Bike
+
+  /// The person's first name
+  firstName: UInt16?
+
+  /// The person's last name
+  lastName: Mapping<String, UInt32?>
+
+  things: Set<Int>
+}
+
+class ThisPerson extends Person {
+  myself: ThisPerson
+  someoneElse: Person
+}
+
+typealias BugKind = "butterfly"|"beetle\""|"beetle one"
+
+// `nothing` is allowed as a string literal
+typealias BugKindTwo = nothing|"butterfly"|"beetle\""|"beetle one"
+
+// should turn into just a string type because of a conflict; "bettle one" and "bettle_one" would
+// turn into the same Swift identifier.
+typealias BugKindThree = "butterfly"|"beetle\""|"beetle one"|"beetle_one"
+
+// should also turn into just a string type because there no way to generate valid swift symols; "*" and "!!" would
+// turn into invalid Swift symbols.
+typealias BugKindFour = "*"|"!!"
+
+class Bug {
+  /// The owner of this bug.
+  owner: Person?
+
+  /// The age of this bug
+  age: Int?
+
+  /// How long the bug holds its breath for
+  holdsBreathFor: Duration
+
+  size: DataSize
+
+  kind: BugKind
+
+  kind2: BugKindTwo
+
+  kind3: BugKindThree
+
+  kind4: BugKindFour
+
+  bagOfStuff: Dynamic
+
+  bugClass: Class
+
+  bugTypeAlias: TypeAlias
+}
+
+abstract class A {
+  a: "a"
+}
+
+open class B extends A {
+  b: "b"
+}
+
+open class C extends B {
+  c: "c"
+}
+
+class D extends C {
+  d: "d"
 }
