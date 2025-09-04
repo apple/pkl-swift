@@ -182,7 +182,8 @@ struct PklGenSwift: AsyncParsableCommand {
             )
             try await cmd.run()
         } catch let error as PklError {
-            Self.exit(withError: error)
+            FileHandle.standardError.write(Data(error.message.utf8))
+            Self.exit()
         }
     }
 }

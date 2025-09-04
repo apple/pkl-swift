@@ -1,2 +1,8 @@
 res1: Duration = 10.h
 res2: DataSize = 1.2345.gib
+
+stringClass: Class = String
+moduleClass: Class = module.getClass()
+typeAlias: TypeAlias = Foo
+
+typealias Foo = String
