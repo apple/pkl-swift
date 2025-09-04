@@ -92,6 +92,7 @@ let package = Package(
                 "Fixtures/Collections.pkl",
                 "Fixtures/Poly.pkl",
                 "Fixtures/ApiTypes.pkl",
+                "Fixtures/Collections2.pkl",
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),

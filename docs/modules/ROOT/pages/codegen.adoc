@@ -76,7 +76,7 @@ The below table describes how Pkl types are mapped into Swift types.
 |`Set<T>`
 
 |`Pair<A, B>`
-|Not supported
+|`PklSwift.Pair<A, B>`
 
 |`Dynamic`
 |Not supported
@@ -88,7 +88,10 @@ The below table describes how Pkl types are mapped into Swift types.
 |`PklSwift.Duration`
 
 |`IntSeq`
-|Not supported
+|`PklSwift.IntSeq`
+
+|`Regex`
+|`PklSwift.PklRegex`
 
 |`Class`
 |Not supported

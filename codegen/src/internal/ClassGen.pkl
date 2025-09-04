@@ -164,7 +164,7 @@ local struct: String = new Listing {
     "\n"
   }
   synthesisedInit
-  when (properties.values.any((p) -> p.isPolymorphic)) {
+  when (properties.values.any((p) -> p.isPolymorphic || p is Type.Tuple)) {
     // need to implement ==, hash and both inits
     "\n\n"
     synthesisedEqualsEquals

@@ -1,0 +1,13 @@
+module Pairs
+
+untyped: Pair
+
+typed: Pair<String, Int>
+
+aliased: MyPair
+
+typeArgAliased: OurPair
+
+typealias MyPair = Pair<String, Any>
+typealias OurPair = Pair<String, Foo>
+typealias Foo = Int

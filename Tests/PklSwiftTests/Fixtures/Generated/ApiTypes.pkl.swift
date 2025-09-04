@@ -7,13 +7,48 @@ extension ApiTypes {
     public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ApiTypes"
 
-        public var res1: Duration
+        public var dur: Duration
 
-        public var res2: DataSize
+        public var data: DataSize
 
-        public init(res1: Duration, res2: DataSize) {
-            self.res1 = res1
-            self.res2 = res2
+        public var pair1: Pair<AnyHashable?, AnyHashable?>
+
+        public var pair2: Pair<String, Int>
+
+        public var pair3: Pair<String, Int?>
+
+        public var pair4: Pair<String, Int?>
+
+        public var pairListing1: [Pair<AnyHashable?, AnyHashable?>]
+
+        public var pairListing2: [Pair<String, Int?>]
+
+        public var regex: PklRegex
+
+        public var seq: IntSeq
+
+        public init(
+            dur: Duration,
+            data: DataSize,
+            pair1: Pair<AnyHashable?, AnyHashable?>,
+            pair2: Pair<String, Int>,
+            pair3: Pair<String, Int?>,
+            pair4: Pair<String, Int?>,
+            pairListing1: [Pair<AnyHashable?, AnyHashable?>],
+            pairListing2: [Pair<String, Int?>],
+            regex: PklRegex,
+            seq: IntSeq
+        ) {
+            self.dur = dur
+            self.data = data
+            self.pair1 = pair1
+            self.pair2 = pair2
+            self.pair3 = pair3
+            self.pair4 = pair4
+            self.pairListing1 = pairListing1
+            self.pairListing2 = pairListing2
+            self.regex = regex
+            self.seq = seq
         }
     }
 

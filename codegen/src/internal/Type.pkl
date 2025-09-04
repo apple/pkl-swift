@@ -100,17 +100,17 @@ class Nullable extends Type {
 }
 
 class Tuple extends Type {
-  members: Listing<Type>
+  members: List<Type>
 
-  isPolymorphic = members.toList().any((t) -> t.isPolymorphic)
+  isPolymorphic = members.any((t) -> t.isPolymorphic)
 
-  isAny = members.toList().any((t) -> t.isAny)
+  isAny = members.any((t) -> t.isAny)
 
   function render(withinNamespace: String?) =
-    "(" + members.toList().map((it) -> it.render(withinNamespace)).join(", ") + ")"
+    "(" + members.map((it) -> it.render(withinNamespace)).join(", ") + ")"
 
   function renderGeneric(withinNamespace: String?) =
-    "(" + members.toList().map((it) -> it.renderGeneric(withinNamespace)).join(", ") + ")"
+    "(" + members.map((it) -> it.renderGeneric(withinNamespace)).join(", ") + ")"
 }
 
 class Declared extends Type {

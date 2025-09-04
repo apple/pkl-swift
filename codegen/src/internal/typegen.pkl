@@ -68,7 +68,20 @@ function generateDeclaredType(
         mappedHigherOrderTypes.getOrNull(reflectee)?.apply(type, enclosing, seenMappings) ??
           if (referent is reflect.TypeAlias)
             generateType(referent.referent, enclosing, seenMappings)
+          else if (reflectee == Pair)
+            generatePair(type, enclosing, seenMappings)
           else throw("Cannot generate type \(type.referent.name) as Swift.")
+
+function generatePair(
+  type: reflect.DeclaredType,
+  enclosing: reflect.TypeDeclaration,
+  seenMappings: List<SwiftMapping>
+): Type =
+  new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "Pair"
+    typeArguments = type.typeArguments.map((t) -> generateType(t, enclosing, seenMappings))
+  }
 
 local function builtInType(typ: String): Type.Declared = new { typeName = typ }
 
@@ -111,6 +124,14 @@ mappedTypes: Mapping<Class|TypeAlias, Type> = new {
   [DataSizeUnit] = new Type.Declared {
     swiftModuleName = "PklSwift"
     typeName = "DataSizeUnit"
+  }
+  [Regex] = new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "PklRegex"
+  }
+  [IntSeq] = new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "IntSeq"
   }
   [Bytes] = new Type.Array {
     elem = new Type.Declared {

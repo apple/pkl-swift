@@ -40,6 +40,20 @@ public enum PklValueType: UInt8, Decodable, Sendable {
 
 public protocol PklSerializableType: Decodable {
     static var messageTag: PklValueType { get }
+
+    static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Self
+}
+
+extension PklSerializableType {
+    static func checkFieldCount(_ fields: [MessagePackValue], codingPath: [any CodingKey], min: Int) throws {
+        guard fields.count >= min else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected at least \(min) fields but got \(fields.count)"
+                ))
+        }
+    }
 }
 
 public protocol PklSerializableValueUnitType: PklSerializableType {
@@ -49,35 +63,41 @@ public protocol PklSerializableValueUnitType: PklSerializableType {
     init(_: ValueType, unit: UnitType)
 }
 
-extension Decodable where Self: PklSerializableValueUnitType {
+extension Decodable where Self: PklSerializableType {
     public init(from decoder: Decoder) throws {
         guard let decoder = decoder as? _PklDecoder else {
             fatalError("\(Self.self) can only be decoded using \(_PklDecoder.self), but was: \(decoder)")
         }
-        self = try Self.decodeValueUnitType(from: decoder.value, at: decoder.codingPath)
-    }
-}
-
-extension PklSerializableValueUnitType {
-    static func decodeValueUnitType(
-        from value: MessagePackValue,
-        at codingPath: [CodingKey]
-    ) throws -> Self {
-        guard case .array(let arr) = value else {
+        let codingPath = decoder.codingPath
+        guard case .array(let arr) = decoder.value else {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: codingPath,
-                    debugDescription: "Expected array but got \(value.debugDataTypeDescription)"
+                    debugDescription: "Expected array but got \(decoder.value.debugDataTypeDescription)"
                 ))
         }
         let code = try arr[0].decode(PklValueType.self)
+        guard arr.count > 0 else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected non-empty array"
+                ))
+        }
         guard Self.messageTag == code else {
             throw DecodingError.dataCorrupted(
                 .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)"))
         }
 
-        let value = try arr[1].decode(Self.ValueType.self)
-        let unit = try arr[2].decode(Self.UnitType.self)
+        self = try Self.decode(arr, codingPath: codingPath)
+    }
+}
+
+extension Decodable where Self: PklSerializableValueUnitType {
+    public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Self {
+        try checkFieldCount(fields, codingPath: codingPath, min: 3)
+        let value = try fields[1].decode(Self.ValueType.self)
+        let unit = try fields[2].decode(Self.UnitType.self)
         return Self(value, unit: unit)
     }
 }
@@ -237,6 +257,15 @@ extension _PklDecoder {
             case .dataSize:
                 let decoder = try _PklDecoder(value: propertyValue)
                 return try PklAny(value: DataSize(from: decoder))
+            case .pair:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: Pair<AnyHashable?, AnyHashable?>(from: decoder))
+            case .regex:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: PklRegex(from: decoder))
+            case .intSeq:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: IntSeq(from: decoder))
             case .bytes:
                 guard case .bin(let bytes) = value[1] else {
                     throw DecodingError.dataCorrupted(

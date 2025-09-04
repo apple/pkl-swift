@@ -92,9 +92,25 @@ class FixturesTest: XCTestCase {
         )
         XCTAssertEqual(
             result,
-            ApiTypes.Module(
-                res1: .hours(10),
-                res2: .gibibytes(1.2345)
+            try ApiTypes.Module(
+                dur: .hours(20),
+                data: .gibibytes(2.4680),
+                pair1: Pair(AnyHashable?("a"), AnyHashable?("b")),
+                pair2: Pair("a", 1),
+                pair3: Pair("a", 1),
+                pair4: Pair("a", nil),
+                pairListing1: [
+                    Pair("a", 1),
+                    Pair("a", 1),
+                    Pair("a", nil),
+                ],
+                pairListing2: [
+                    Pair("a", 1),
+                    Pair("a", 1),
+                    Pair("a", nil),
+                ],
+                regex: PklRegex("def"),
+                seq: IntSeq(start: 0, end: 20, step: 3)
             )
         )
     }
@@ -146,7 +162,7 @@ class FixturesTest: XCTestCase {
         )
         XCTAssertEqual(
             result,
-            AnyType.Module(
+            try AnyType.Module(
                 bird: AnyType.Bird(species: "Owl"),
                 primitive: "foo",
                 primitive2: 12,
@@ -155,7 +171,10 @@ class FixturesTest: XCTestCase {
                 mapping: ["1": 12, 12: "1"] as [AnyHashable: AnyHashable],
                 nullable: nil,
                 duration: Duration(5, unit: DurationUnit.min),
-                dataSize: DataSize(10, unit: DataSizeUnit.mb)
+                dataSize: DataSize(10, unit: DataSizeUnit.mb),
+                pair: Pair(AnyHashable?(1), AnyHashable?(2)),
+                regex: PklRegex("abc"),
+                seq: IntSeq(start: 0, end: 10, step: 2)
             )
         )
     }
