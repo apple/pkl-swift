@@ -17,13 +17,29 @@
 import MessagePack
 
 /// TypeAlias is the Swift representation of Pkl's `pkl.base#TypeAlias`.
-public struct TypeAlias: Hashable {}
+public struct TypeAlias: Hashable {
+    /// The URI of the module containing this typealias.
+    /// Will be an empty string for values encoded by Pkl versions older than 0.30.
+    public let moduleUri: String
+
+    /// The qualified name of this typealias.
+    /// Will be an empty string for values encoded by Pkl versions older than 0.30.
+    public let qualifiedName: String
+}
 
 extension TypeAlias: PklSerializableType, Sendable {
     public static let messageTag: PklValueType = .typealias
 
     public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> TypeAlias {
+        if fields.count > 1 { // pkl 0.30+ includes the qualified name and module uri
+            try checkFieldCount(fields, codingPath: codingPath, min: 3)
+            return try TypeAlias(
+                moduleUri: fields[1].decode(String.self),
+                qualifiedName: fields[2].decode(String.self)
+            )
+        }
+
         try checkFieldCount(fields, codingPath: codingPath, min: 1)
-        return TypeAlias()
+        return TypeAlias(moduleUri: "", qualifiedName: "")
     }
 }
