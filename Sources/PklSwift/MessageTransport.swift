@@ -18,7 +18,7 @@ import Foundation
 import MessagePack
 import SemanticVersion
 
-protocol MessageTransport {
+protocol MessageTransport: Sendable {
     /// Send a message to the Pkl server.
     func send(_ message: ClientMessage) throws
 
@@ -64,7 +64,7 @@ extension FileHandle: Writer {
 }
 
 /// A ``MessageTransport`` base class that implements core message handling logic
-public class BaseMessageTransport: MessageTransport {
+public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
     var reader: Reader!
     var writer: Writer!
     var encoder: MessagePackEncoder!
@@ -122,7 +122,7 @@ public class BaseMessageTransport: MessageTransport {
 }
 
 /// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
-public class ServerMessageTransport: BaseMessageTransport {
+public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     var process: Process?
     let pklCommand: [String]?
 
@@ -150,7 +150,8 @@ public class ServerMessageTransport: BaseMessageTransport {
         self.decoder = .init(reader: self.reader)
         self.process!.standardOutput = self.reader
         self.process!.standardInput = self.writer
-        debug("Spawning command \(pklCommand[0]) with arguments \(arguments)")
+        let debugArguments = arguments
+        debug("Spawning command \(pklCommand[0]) with arguments \(debugArguments)")
         try self.process!.run()
     }
 
@@ -194,7 +195,7 @@ public class ServerMessageTransport: BaseMessageTransport {
     }
 }
 
-public class ExternalReaderMessageTransport: BaseMessageTransport {
+public class ExternalReaderMessageTransport: BaseMessageTransport, @unchecked Sendable {
     override var running: Bool { self._running }
     private var _running = true
 

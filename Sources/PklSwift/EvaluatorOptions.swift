@@ -16,7 +16,7 @@
 
 import Foundation
 
-public struct EvaluatorOptions {
+public struct EvaluatorOptions: Sendable {
     public init(
         allowedModules: [String]? = nil,
         allowedResources: [String]? = nil,
@@ -314,7 +314,7 @@ extension EvaluatorOptions {
     }
 }
 
-public enum ProjectDependency {
+public enum ProjectDependency: Sendable {
     case local(ProjectLocalDependency)
     case remote(ProjectRemoteDependency)
 }
@@ -338,13 +338,13 @@ extension ProjectDependency: Codable {
     }
 }
 
-public struct ProjectRemoteDependency: Codable, Hashable {
+public struct ProjectRemoteDependency: Codable, Hashable, Sendable {
     let uri: String
 
     let checksums: Checksums?
 }
 
-public struct ProjectLocalDependency: Codable {
+public struct ProjectLocalDependency: Codable, Sendable {
     let uri: String
 
     let projectFileUri: String

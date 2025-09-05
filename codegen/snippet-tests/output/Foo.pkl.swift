@@ -12,7 +12,7 @@ public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
 }
 
 extension Foo {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Foo"
 
         public var animals: [any Animal]

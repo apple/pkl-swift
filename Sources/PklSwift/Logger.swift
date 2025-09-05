@@ -20,7 +20,7 @@ import MessagePack
 /// Handler to control logging messages emitted by the Pkl evaluator.
 ///
 /// To set a logger, register it on EvaluatorOptions.Logger when building an Evaluator.
-public protocol Logger {
+public protocol Logger: Sendable {
     /// Log the message using level TRACE.
     ///
     /// - Parameters:
@@ -36,7 +36,7 @@ public protocol Logger {
     func warn(message: String, frameUri: String)
 }
 
-public struct NoopLogger: Logger {
+public struct NoopLogger: Logger, Sendable {
     public func trace(message: String, frameUri: String) {
         // no-op
     }
@@ -54,7 +54,7 @@ extension Logger {
 }
 
 /// A logger that writes messages to the provided ``FileHandle``.
-public struct FileHandleLogger: Logger {
+public struct FileHandleLogger: Logger, Sendable {
     var fileHandle: FileHandle
 
     public init(_ fileHandle: FileHandle) {

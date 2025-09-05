@@ -11,7 +11,7 @@ public protocol UnionTypes_Shape: PklRegisteredType, DynamicallyEquatable, Hasha
 }
 
 extension UnionTypes {
-    public enum Fruit: Decodable, Hashable {
+    public enum Fruit: Decodable, Hashable, Sendable {
         case banana(Banana)
         case grape(Grape)
         case apple(Apple)
@@ -38,14 +38,14 @@ extension UnionTypes {
         }
     }
 
-    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum City: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case sanFrancisco = "San Francisco"
         case tokyo = "Tokyo"
         case zurich = "Zurich"
         case london = "London"
     }
 
-    public enum ZebraOrDonkey: Decodable, Hashable {
+    public enum ZebraOrDonkey: Decodable, Hashable, Sendable {
         case zebra(Zebra)
         case donkey(Donkey)
 
@@ -69,7 +69,7 @@ extension UnionTypes {
         }
     }
 
-    public enum AnimalOrString: Decodable, Hashable {
+    public enum AnimalOrString: Decodable, Hashable, Sendable {
         case animal(any Animal)
         case string(String)
 
@@ -113,7 +113,7 @@ extension UnionTypes {
         }
     }
 
-    public enum IntOrFloat: Decodable, Hashable {
+    public enum IntOrFloat: Decodable, Hashable, Sendable {
         case int(Int)
         case float64(Float64)
 
@@ -140,13 +140,13 @@ extension UnionTypes {
         }
     }
 
-    public enum Environment: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable {
+    public enum Environment: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case dev = "dev"
         case prod = "prod"
         case qa = "qa"
     }
 
-    public enum AnimalOrShape: Decodable, Hashable {
+    public enum AnimalOrShape: Decodable, Hashable, Sendable {
         case animal(any Animal)
         case shape(any Shape)
 
@@ -190,7 +190,7 @@ extension UnionTypes {
         }
     }
 
-    public enum Numbers: Decodable, Hashable {
+    public enum Numbers: Decodable, Hashable, Sendable {
         case int8(Int8)
         case int16(Int16)
         case int32(Int32)
@@ -221,7 +221,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes"
 
         public var fruit1: Fruit
@@ -313,7 +313,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Banana: PklRegisteredType, Decodable, Hashable {
+    public struct Banana: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Banana"
 
         public var isRipe: Bool
@@ -323,7 +323,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Grape: PklRegisteredType, Decodable, Hashable {
+    public struct Grape: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Grape"
 
         public var isUsedForWine: Bool
@@ -333,7 +333,7 @@ extension UnionTypes {
         }
     }
 
-    public struct Apple: PklRegisteredType, Decodable, Hashable {
+    public struct Apple: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "UnionTypes#Apple"
 
         public var isRed: Bool

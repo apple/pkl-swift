@@ -219,7 +219,7 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
         self.storage.append(contentsOf: value.bytes)
     }
 
-    func encode(_ value: Date) throws {
+    private func encode(_ value: Date) throws {
         try checkCanEncode(value: value)
         defer { self.canEncodeNewValue = false }
 
@@ -246,7 +246,7 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
         }
     }
 
-    func encode(_ value: Data) throws {
+    private func encode(_ value: Data) throws {
         let length = value.count
         if let uint8 = UInt8(exactly: length) {
             self.storage.append(0xC4)
@@ -269,7 +269,7 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
         }
     }
 
-    func encode(_ value: [UInt8]) throws {
+    private func encode(_ value: [UInt8]) throws {
         let length = value.count
         if let uint8 = UInt8(exactly: length) {
             self.storage.append(0xC4)
@@ -292,7 +292,7 @@ extension _MessagePackEncoder.SingleValueContainer: SingleValueEncodingContainer
         }
     }
 
-    func encode(_ value: URL) throws {
+    private func encode(_ value: URL) throws {
         try self.encode(value.absoluteString)
     }
 

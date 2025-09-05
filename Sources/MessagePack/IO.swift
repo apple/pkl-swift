@@ -41,7 +41,7 @@ public protocol Reader {
 }
 
 /// Writes bytes into an internal buffer.
-public class BufferWriter: Writer {
+public class BufferWriter: Writer, @unchecked Sendable {
     var bytes: [UInt8] = []
 
     public func write(_ buffer: UnsafeRawBufferPointer) throws {
@@ -54,7 +54,7 @@ public class BufferWriter: Writer {
 }
 
 /// Reads bytes from the provided buffer.
-public class BufferReader: Reader {
+public class BufferReader: Reader, @unchecked Sendable {
     let bytes: [UInt8]
     var index: Int
 
@@ -81,7 +81,7 @@ public class BufferReader: Reader {
 }
 
 /// Like [Reader], but also supports a way to peek bytes.
-class PeekableReader: Reader {
+class PeekableReader: Reader, @unchecked Sendable {
     var peekedByte: UInt8?
 
     let reader: Reader
