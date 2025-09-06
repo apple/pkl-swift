@@ -42,17 +42,17 @@ extension Enums {
 
     /// Either a dictionary or an array.
     public enum DictOrArray: Decodable, Hashable, Sendable {
-        case dictionaryStringString([String: String])
-        case arrayString([String])
+        case mappingStringString([String: String])
+        case listingString([String])
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
             case let decoded as [String: String]:
-                self = DictOrArray.dictionaryStringString(decoded)
+                self = DictOrArray.mappingStringString(decoded)
             case let decoded as [String]:
-                self = DictOrArray.arrayString(decoded)
+                self = DictOrArray.listingString(decoded)
             default:
                 throw DecodingError.typeMismatch(
                     DictOrArray.self,
@@ -93,7 +93,7 @@ extension Enums {
     }
 
     public enum MaybeHorseOrDefinitelyZebra: Decodable, Hashable, Sendable {
-        case horse(Horse?)
+        case optionalHorse(Horse?)
         case zebra(Zebra)
 
         public init(from decoder: Decoder) throws {
@@ -101,7 +101,7 @@ extension Enums {
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
             case let decoded as Horse?:
-                self = MaybeHorseOrDefinitelyZebra.horse(decoded)
+                self = MaybeHorseOrDefinitelyZebra.optionalHorse(decoded)
             case let decoded as Zebra:
                 self = MaybeHorseOrDefinitelyZebra.zebra(decoded)
             default:

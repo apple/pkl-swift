@@ -45,28 +45,30 @@ public protocol DynamicallyEquatable: Equatable {
 /// The implementation of `isDynamicallyEqual` varies only with the meaning of `Self`, so can be implemented once and for all.
 extension DynamicallyEquatable {
     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
-        if let value = other as? Self {
-            return self == value
-        } else {
-            return false
-        }
+        guard let value = other as? Self else { return false }
+        return self == value
     }
 }
 
-/// Compares two arrays for equality based on the predicate
-public func arrayEquals(arr1: [any DynamicallyEquatable], arr2: [any DynamicallyEquatable]) -> Bool {
-    if arr1.count != arr2.count { return false }
-    return zip(arr1, arr2).allSatisfy { x, y in x.isDynamicallyEqual(to: y) }
+public func arrayEquals(arr1: [(any DynamicallyEquatable)?]?, arr2: [(any DynamicallyEquatable)?]?) -> Bool {
+    if arr1 == nil, arr2 == nil { return true }
+    guard let arr1,
+          let arr2,
+          arr1.count == arr2.count else { return false }
+    return zip(arr1, arr2).allSatisfy { $0?.isDynamicallyEqual(to: $1) ?? false }
 }
 
-/// Compares two maps for equality based on the predicate
-public func mapEquals<K>(map1: [K: any DynamicallyEquatable], map2: [K: any DynamicallyEquatable]) -> Bool {
-    if map1.count != map2.count { return false }
+public func mapEquals<K>(map1: [K: (any DynamicallyEquatable)?]?, map2: [K: (any DynamicallyEquatable)?]?) -> Bool {
+    if map1 == nil, map2 == nil { return true }
+    guard let map1,
+          let map2,
+          map1.count == map2.count else { return false }
+
     return map1.allSatisfy { k, v in
         guard let v2 = map2[k] else {
             return false
         }
-        return v.isDynamicallyEqual(to: v2)
+        return v?.isDynamicallyEqual(to: v2) ?? false
     }
 }
 

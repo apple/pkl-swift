@@ -53,7 +53,7 @@ port: UInt16
 
 With a schema defined, generate Swift source code for it.
 
-Code generation is done via the `pkl-gen-swift` CLI. To install, download it from Artifactory.
+Code generation is done via the `pkl-gen-swift` CLI. To install, download it from GitHub.
 
 On macOS:
 

@@ -4,7 +4,7 @@ import PklSwift
 public enum NoCollectThroughHidden {}
 
 extension NoCollectThroughHidden {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "NoCollectThroughHidden"
 
         public init() {}
