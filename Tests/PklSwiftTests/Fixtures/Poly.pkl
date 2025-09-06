@@ -17,6 +17,12 @@ beings: Listing<lib1.Being> = new {
   }
 }
 
+beings2: Listing<lib1.Being>? = beings
+beings3: Listing<lib1.Being?> = beings
+beings4: Listing<lib1.Being?>? = beings
+
+dogs: Listing<Dog>?
+
 rex: Dog = new {
   name = "Rex"
   barks = false
@@ -34,6 +40,10 @@ moreBeings: Mapping<String, lib1.Being> = new {
   }
 }
 
+moreBeings2: Mapping<String, lib1.Being>? = moreBeings
+moreBeings3: Mapping<String, lib1.Being?>? = moreBeings
+moreBeings4: Mapping<String, lib1.Being?> = moreBeings
+
 open class Animal extends lib1.Being {
   name: String
 }
@@ -47,3 +57,73 @@ class Dog extends Animal {
   barks: Boolean
   hates: Animal?
 }
+
+nestListing1: Listing<Listing>
+nestListing2: Listing<Listing>?
+nestListing3: Listing<Listing?>
+nestListing4: Listing<Listing?>?
+// these don't work right now for swift typesystem reasons
+// nestListing5: Listing<Listing<lib1.Being>>
+// nestListing6: Listing<Listing<lib1.Being>>?
+// nestListing7: Listing<Listing<lib1.Being>?>
+// nestListing8: Listing<Listing<lib1.Being>?>?
+// nestListing9: Listing<Listing<lib1.Being?>>
+// nestListingA: Listing<Listing<lib1.Being?>>?
+// nestListingB: Listing<Listing<lib1.Being?>?>
+// nestListingC: Listing<Listing<lib1.Being?>?>?
+
+nestListings: NestListings
+
+nestMapping1: Mapping<String?, Mapping>
+nestMapping2: Mapping<String?, Mapping>?
+nestMapping3: Mapping<String?, Mapping?>
+nestMapping4: Mapping<String?, Mapping?>?
+// these don't work right now for swift typesystem reasons
+// nestMapping5: Mapping<String?, Mapping<String?, lib1.Being>>
+// nestMapping6: Mapping<String?, Mapping<String?, lib1.Being>>?
+// nestMapping7: Mapping<String?, Mapping<String?, lib1.Being>?>
+// nestMapping8: Mapping<String?, Mapping<String?, lib1.Being>?>?
+// nestMapping9: Mapping<String?, Mapping<String?, lib1.Being?>>
+// nestMappingA: Mapping<String?, Mapping<String?, lib1.Being?>>?
+// nestMappingB: Mapping<String?, Mapping<String?, lib1.Being?>?>
+// nestMappingC: Mapping<String?, Mapping<String?, lib1.Being?>?>?
+
+nestMappings: NestMappings
+
+typealias NestListings =
+  * Listing<lib1.Being>
+  | Listing<lib1.Being>?
+  | Listing<lib1.Being?>
+  | Listing<lib1.Being?>?
+  | Listing<Listing>
+  | Listing<Listing>?
+  | Listing<Listing?>
+  | Listing<Listing?>?
+  // these don't work right now for swift typesystem reasons
+  // | Listing<Listing<lib1.Being>>
+  // | Listing<Listing<lib1.Being>>?
+  // | Listing<Listing<lib1.Being>?>
+  // | Listing<Listing<lib1.Being>?>?
+  // | Listing<Listing<lib1.Being?>>
+  // | Listing<Listing<lib1.Being?>>?
+  // | Listing<Listing<lib1.Being?>?>
+  // | Listing<Listing<lib1.Being?>?>?
+
+typealias NestMappings =
+  * Mapping<String?, lib1.Being>
+  | Mapping<String?, lib1.Being>?
+  | Mapping<String?, lib1.Being?>
+  | Mapping<String?, lib1.Being?>?
+  | Mapping<String?, Mapping>
+  | Mapping<String?, Mapping>?
+  | Mapping<String?, Mapping?>
+  | Mapping<String?, Mapping?>?
+  // these don't work right now for swift typesystem reasons
+  // | Mapping<String?, Mapping<String?, lib1.Being>>
+  // | Mapping<String?, Mapping<String?, lib1.Being>>?
+  // | Mapping<String?, Mapping<String?, lib1.Being>?>
+  // | Mapping<String?, Mapping<String?, lib1.Being>?>?
+  // | Mapping<String?, Mapping<String?, lib1.Being?>>
+  // | Mapping<String?, Mapping<String?, lib1.Being?>>?
+  // | Mapping<String?, Mapping<String?, lib1.Being?>?>
+  // | Mapping<String?, Mapping<String?, lib1.Being?>?>?

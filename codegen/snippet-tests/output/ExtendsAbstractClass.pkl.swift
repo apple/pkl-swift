@@ -28,7 +28,7 @@ extension ExtendsAbstractClass {
         public init(from decoder: Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let a = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "a"))
-                    .value as! any A
+                .value as! any A
             self = Module(a: a)
         }
     }

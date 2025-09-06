@@ -106,24 +106,43 @@ class FixturesTest: XCTestCase {
             evaluator: self.evaluator,
             source: .path("\(#filePath)/../Fixtures/Poly.pkl")
         )
+        let being: [any pkl_swift_lib1.Being] = [
+            Poly.AnimalImpl(name: "Lion", exists: true),
+            Poly.Dog(barks: true, hates: nil, name: "Ruuf", exists: true),
+            Poly.Bird(name: "Duck", flies: false, exists: false),
+        ]
+        let moreBeings: [String: any pkl_swift_lib1.Being] = [
+            "duck": Poly.Bird(name: "Ducky", flies: true, exists: true),
+            "dog": Poly.Dog(
+                barks: false,
+                hates: Poly.Dog(barks: false, hates: nil, name: "Rex", exists: true),
+                name: "TRex",
+                exists: true
+            ),
+        ]
         XCTAssertEqual(
             result,
             Poly.Module(
-                beings: [
-                    Poly.AnimalImpl(name: "Lion", exists: true),
-                    Poly.Dog(barks: true, hates: nil, name: "Ruuf", exists: true),
-                    Poly.Bird(name: "Duck", flies: false, exists: false),
-                ],
+                beings: being,
+                beings2: being,
+                beings3: being,
+                beings4: being,
+                dogs: nil,
                 rex: Poly.Dog(barks: false, hates: nil, name: "Rex", exists: true),
-                moreBeings: [
-                    "duck": Poly.Bird(name: "Ducky", flies: true, exists: true),
-                    "dog": Poly.Dog(
-                        barks: false,
-                        hates: Poly.Dog(barks: false, hates: nil, name: "Rex", exists: true),
-                        name: "TRex",
-                        exists: true
-                    ),
-                ]
+                moreBeings: moreBeings,
+                moreBeings2: moreBeings,
+                moreBeings3: moreBeings,
+                moreBeings4: moreBeings,
+                nestListing1: [],
+                nestListing2: nil,
+                nestListing3: [],
+                nestListing4: nil,
+                nestListings: .arraypkl_swift_lib1Being([]),
+                nestMapping1: [:],
+                nestMapping2: nil,
+                nestMapping3: [:],
+                nestMapping4: nil,
+                nestMappings: .dictionaryOptional_StringOptional_pkl_swift_lib1Being([:])
             )
         )
     }

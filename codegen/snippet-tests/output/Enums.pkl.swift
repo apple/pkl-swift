@@ -93,7 +93,7 @@ extension Enums {
     }
 
     public enum MaybeHorseOrDefinitelyZebra: Decodable, Hashable {
-        case horse(Horse?)
+        case optionalHorse(Horse?)
         case zebra(Zebra)
 
         public init(from decoder: Decoder) throws {
@@ -101,7 +101,7 @@ extension Enums {
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
             case let decoded as Horse?:
-                self = MaybeHorseOrDefinitelyZebra.horse(decoded)
+                self = MaybeHorseOrDefinitelyZebra.optionalHorse(decoded)
             case let decoded as Zebra:
                 self = MaybeHorseOrDefinitelyZebra.zebra(decoded)
             default:
