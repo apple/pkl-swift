@@ -45,30 +45,95 @@ public protocol DynamicallyEquatable: Equatable {
 /// The implementation of `isDynamicallyEqual` varies only with the meaning of `Self`, so can be implemented once and for all.
 extension DynamicallyEquatable {
     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
-        if let value = other as? Self {
-            return self == value
-        } else {
-            return false
-        }
+        guard let value = other as? Self else { return false }
+        return self == value
     }
 }
 
 /// Compares two arrays for equality based on the predicate
-public func arrayEquals(arr1: [any DynamicallyEquatable], arr2: [any DynamicallyEquatable]) -> Bool {
-    if arr1.count != arr2.count { return false }
-    return zip(arr1, arr2).allSatisfy { x, y in x.isDynamicallyEqual(to: y) }
+// public func arrayEquals(arr1: [any DynamicallyEquatable]?, arr2: [any DynamicallyEquatable]?) -> Bool {
+//     if arr1 == nil && arr2 == nil { return true }
+//     guard let arr1 = arr1,
+//         let arr2 = arr2,
+//         arr1.count == arr2.count
+//         else { return false }
+//     return zip(arr1, arr2).allSatisfy { $0.isDynamicallyEqual(to: $1) }
+// }
+
+public func arrayEquals(arr1: [(any DynamicallyEquatable)?]?, arr2: [(any DynamicallyEquatable)?]?) -> Bool {
+    if arr1 == nil, arr2 == nil { return true }
+    guard let arr1,
+          let arr2,
+          arr1.count == arr2.count else { return false }
+    return zip(arr1, arr2).allSatisfy { $0?.isDynamicallyEqual(to: $1) ?? false }
 }
 
+// extension Array: DynamicallyEquatable where Element: DynamicallyEquatable {
+//     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
+//         guard let other = other as? [any DynamicallyEquatable],
+//             self.count == other.count
+//             else { return false }
+//         return zip(self, other).allSatisfy { $0.isDynamicallyEqual(to: $1) }
+//     }
+// }
+
+// extension AnyHashable: DynamicallyEquatable {
+//     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
+//         return false
+//     }
+// }
+
+// extension Optional: DynamicallyEquatable where Wrapped: DynamicallyEquatable {
+//     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
+//         switch (self, other) {
+//             case (.none, .none): return true
+//             case (.some(let a), .some(let b)): return a.isDynamicallyEqual(to: b)
+//             default: return false
+//         }
+//     }
+// }
+
 /// Compares two maps for equality based on the predicate
-public func mapEquals<K>(map1: [K: any DynamicallyEquatable], map2: [K: any DynamicallyEquatable]) -> Bool {
-    if map1.count != map2.count { return false }
+// public func mapEquals<K>(map1: [K: any DynamicallyEquatable]?, map2: [K: any DynamicallyEquatable]?) -> Bool {
+//     if map1 == nil && map2 == nil { return true }
+//     guard let map1 = map1,
+//         let map2 = map2,
+//         map1.count == map2.count
+//         else { return false }
+
+//     return map1.allSatisfy { k, v in
+//         guard let v2 = map2[k] else {
+//             return false
+//         }
+//         return v.isDynamicallyEqual(to: v2)
+//     }
+// }
+
+public func mapEquals<K>(map1: [K: (any DynamicallyEquatable)?]?, map2: [K: (any DynamicallyEquatable)?]?) -> Bool {
+    if map1 == nil, map2 == nil { return true }
+    guard let map1,
+          let map2,
+          map1.count == map2.count else { return false }
+
     return map1.allSatisfy { k, v in
         guard let v2 = map2[k] else {
             return false
         }
-        return v.isDynamicallyEqual(to: v2)
+        return v?.isDynamicallyEqual(to: v2) ?? false
     }
 }
+
+// extension Dictionary: DynamicallyEquatable where Value: DynamicallyEquatable {
+//     public func isDynamicallyEqual(to other: (any DynamicallyEquatable)?) -> Bool {
+//         guard let other = other as? [Self.Key: any DynamicallyEquatable],
+//         self.count == other.count
+//         else { return false }
+//         return allSatisfy { k, v in
+//             guard let v2 = other[k] else { return false }
+//             return v.isDynamicallyEqual(to: v2)
+//         }
+//     }
+// }
 
 /// Resolves a sequence of paths into an absolute path.
 /// If the first path is relative, the result is relative to the current working directory.

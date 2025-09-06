@@ -22,7 +22,7 @@ extension Classes {
         }
 
         public func hash(into hasher: inout Hasher) {
-            for x in self.animals {
+            for x in animals {
                 hasher.combine(x)
             }
         }
@@ -30,7 +30,9 @@ extension Classes {
         public init(from decoder: Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let animals = try dec.decode([PklSwift.PklAny].self, forKey: PklCodingKey(string: "animals"))
-                    .map { $0.value as! any Animal }
+                .map {
+                    $0.value as! any Animal
+                }
             self = Module(animals: animals)
         }
     }

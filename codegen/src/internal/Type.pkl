@@ -19,6 +19,7 @@
 abstract module pkl.swift.internal.Type
 
 import "Type.pkl"
+import "utils.pkl"
 
 /// The imports required by this type.
 imports: List<String>
@@ -43,6 +44,13 @@ abstract function render(swiftModuleName: String?): String
 /// [swiftModuleName] is the full path of the package that this type appears in.
 abstract function renderGeneric(swiftModuleName: String?): String
 
+/// Renders this type as an enum case name.
+///
+/// Must use an incrementing separator to avoid ambiguities.
+///
+/// [swiftModuleName] is the full path of the package that this type appears in.
+abstract function renderEnumCaseName(swiftModuleName: String?, sep: String): String
+
 class Dictionary extends Type {
   key: Type
 
@@ -62,6 +70,9 @@ class Dictionary extends Type {
 
   function renderGeneric(withinNamespace: String?) =
     "[\(key.renderGeneric(withinNamespace)): \(elem.renderGeneric(withinNamespace))]"
+
+  function renderEnumCaseName(withinNamespace: String?, sep: String) =
+    "Dictionary\(sep)\(key.renderEnumCaseName(withinNamespace, sep+"_"))\(sep)\(elem.renderEnumCaseName(withinNamespace, sep+"_"))"
 }
 
 class Array extends Type {
@@ -76,9 +87,12 @@ class Array extends Type {
   function render(withinNamespace: String?) = "[\(elem.render(withinNamespace))]"
 
   function renderGeneric(withinNamespace: String?) = "[\(elem.renderGeneric(withinNamespace))]"
+
+  function renderEnumCaseName(withinNamespace: String?, sep: String) =
+    "Array\(sep)\(elem.renderEnumCaseName(withinNamespace, sep+"_"))"
 }
 
-class Nullable extends Type {
+class Optional extends Type {
   elem: Type
 
   isPolymorphic = elem.isPolymorphic
@@ -86,7 +100,7 @@ class Nullable extends Type {
   isAny = elem.isAny
 
   function render(withinNamespace: String?) =
-    if (elem.isPolymorphic)
+    if (elem.isPolymorphic && elem is Declared)
       "(\(elem.render(withinNamespace)))?"
     else
       "\(elem.render(withinNamespace))?"
@@ -97,6 +111,9 @@ class Nullable extends Type {
       rendered
     else
       "\(rendered)?"
+  
+  function renderEnumCaseName(withinNamespace: String?, sep: String) =
+    "Optional\(sep)\(elem.renderEnumCaseName(withinNamespace, sep+"_"))"
 }
 
 class Tuple extends Type {
@@ -111,6 +128,9 @@ class Tuple extends Type {
 
   function renderGeneric(withinNamespace: String?) =
     "(" + members.toList().map((it) -> it.renderGeneric(withinNamespace)).join(", ") + ")"
+
+  function renderEnumCaseName(withinNamespace: String?, sep: String) =
+    "Tuple\(sep)\(elem.renderEnumCaseName(withinNamespace, sep+"_"))"
 }
 
 class Declared extends Type {
@@ -148,7 +168,7 @@ class Declared extends Type {
 
   function renderBaseGeneric(withinNamespace: String?) =
     // Always qualify imported type names so we avoid conflicts.
-    let (name = if (this.isPolymorphic || typeName == "AnyHashable") "PklSwift.PklAny" else typeName)
+    let (name = if (this.isPolymorphic || isAny) "PklSwift.PklAny" else typeName)
     if (!this.isPolymorphic && namespaceName != null && withinNamespace != this.namespaceName)
       "\(namespaceName).\(name)"
     else name
@@ -159,4 +179,7 @@ class Declared extends Type {
 
   function renderGeneric(withinNamespace: String?) =
     renderBaseGeneric(withinNamespace) + renderTypeArgumentsGeneric(withinNamespace)
+  
+  function renderEnumCaseName(withinNamespace: String?, sep: String) =
+    utils.normalizeName(render(withinNamespace).replaceFirst(Regex("^any "), ""))
 }
