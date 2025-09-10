@@ -28,3 +28,9 @@ nullable: Any = null
 duration: Any = 5.min
 
 dataSize: Any = 10.mb
+
+pair: Any = Pair(1, 2)
+
+regex: Any = Regex("abc")
+
+seq: Any = IntSeq(0, 10).step(2)

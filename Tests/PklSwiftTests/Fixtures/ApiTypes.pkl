@@ -1,2 +1,22 @@
-res1: Duration = 10.h
-res2: DataSize = 1.2345.gib
+dur: Duration = 20.h
+
+data: DataSize = 2.4680.gib
+ 
+pair1: Pair = Pair("a", "b")
+pair2: Pair<String, Int> = Pair("a", 1)
+pair3: Pair<String, Int?> = Pair("a", 1)
+pair4: Pair<String, Int?> = Pair("a", null)
+
+// pairMapping1: Mapping<Pair, Any>
+// pairMapping2: Mapping<Pair<String, Int>, Any>
+
+pairListing1: Listing<Pair> = new {
+  pair2
+  pair3
+  pair4
+}
+pairListing2: Listing<Pair<String, Int?>> = pairListing1
+
+regex: Regex = Regex("def")
+
+seq: IntSeq = IntSeq(0, 20).step(3)
