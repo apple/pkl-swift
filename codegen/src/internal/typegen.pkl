@@ -112,6 +112,14 @@ mappedTypes: Mapping<Class|TypeAlias, Type> = new {
     swiftModuleName = "PklSwift"
     typeName = "DataSizeUnit"
   }
+  [Class] = new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "PklClass"
+  }
+  [TypeAlias] = new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "PklTypeAlias"
+  }
   [Bytes] = new Type.Array {
     elem = new Type.Declared {
       typeName = "UInt8"

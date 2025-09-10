@@ -47,7 +47,8 @@ function isEnumLike(decl: reflect.TypeDeclaration) =
       && referent.members.every((t) -> t is EnumMember)
       &&
         if (referent.members is List<reflect.StringLiteralType>)
-          hasDistinctEnumNames(referent.members)
+          referent.members.every((it) -> utils.canBeNormalizedToEnumCaseName(it.value))
+          && hasDistinctEnumNames(referent.members)
         else true
 
 // noinspection UnresolvedElement
