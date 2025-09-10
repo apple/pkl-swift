@@ -49,15 +49,24 @@ extension AnyType {
 
         public init(from decoder: Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
-            let bird = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "bird")).value
-            let primitive = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "primitive")).value
-            let primitive2 = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "primitive2")).value
-            let array = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "array")).value
-            let set = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "set")).value
-            let mapping = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "mapping")).value
-            let nullable = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "nullable")).value
-            let duration = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "duration")).value
-            let dataSize = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "dataSize")).value
+            let bird = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "bird"))
+                .value
+            let primitive = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "primitive"))
+                .value
+            let primitive2 = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "primitive2"))
+                .value
+            let array = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "array"))
+                .value
+            let set = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "set"))
+                .value
+            let mapping = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "mapping"))
+                .value
+            let nullable = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "nullable"))
+                .value
+            let duration = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "duration"))
+                .value
+            let dataSize = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "dataSize"))
+                .value
             self = Module(bird: bird, primitive: primitive, primitive2: primitive2, array: array, set: set, mapping: mapping, nullable: nullable, duration: duration, dataSize: dataSize)
         }
     }

@@ -20,8 +20,18 @@ import PklSwiftInternals
 /// Marker protocol that all generated Pkl types should conform to.
 ///
 /// It is used by the TypeRegistry to find the types at runtime, and dynamically form a registry of all known pkl types.
-public protocol PklRegisteredType: Decodable, Sendable {
+public protocol PklRegisteredType: Decodable, Sendable, CodingKeyRepresentable {
     static var registeredIdentifier: String { get }
+}
+
+extension PklRegisteredType {
+    public var codingKey: any CodingKey {
+        PklCodingKey(string: "<obj:\(Self.self)>")
+    }
+
+    public init?(codingKey: some CodingKey) {
+        fatalError("cannot initialize \(Self.self) from CodingKey")
+    }
 }
 
 /// This type registry

@@ -51,14 +51,14 @@ local enumStringLiteralMembers = enumBaseMembers.map((it) -> (it) {
 })
 
 local enumNormalMembers = enumBaseMembers.map((it) -> (it) {
-  name =
-    let (baseName = utils.normalizeEnumName(renderedType.replaceFirst(Regex("^any "), "")))
-      if (type is Type.Dictionary) "dictionary" + baseName.capitalize()
-      else if (type is Type.Array) "array" + baseName.capitalize()
-      else baseName
+  name = let (baseName = type.renderEnumCaseName(module.namespaceName).first)
+    baseName[0].toLowerCase() + baseName.drop(1)
 })
 
 local enumNonNumericMembers = enumNormalMembers.filter((it) -> !it.type.isNumeric)
+local hasAnyHashable: Boolean =
+  enumNormalMembers.any((it) -> it.type.isAny)
+
 
 local enumNumericMembers = enumNormalMembers.filter((it) -> it.type.isNumeric)
 
@@ -83,7 +83,8 @@ local enumContents =
     when (alias.docComment != null) {
       utils.renderDocComment(alias.docComment!!, "")
     }
-    "public enum \(module.mapping.name): Decodable, Hashable, Sendable {"
+    let (sendable = if (hasAnyHashable) "@unchecked Sendable" else "Sendable")
+      "public enum \(module.mapping.name): Decodable, Hashable, \(sendable) {"
     for (member: EnumMember in enumNormalMembers) {
       "\(module.indent)case \(member.name)(\(member.renderedType))"
     }
@@ -145,12 +146,18 @@ local initMethod = new Listing {
 local synthesizedEquals = new Listing {
   "\(module.indent)public static func ==(lhs: \(module.mapping.name), rhs: \(module.mapping.name)) -> Bool {"
   "\(module.indent.repeat(2))switch (lhs, rhs) {"
+  local renderEqualityCheck = (type: Type) ->
+    if (type.isAny) "a == b"
+    else if (type is Type.Array) "arrayEquals(arr1: a, arr2: b)"
+    else if (type is Type.Dictionary) "mapEquals(map1: a, map2: b)"
+    else if (type.isPolymorphic) "a.isDynamicallyEqual(to: b)"
+    else "a == b"
   for (member in enumNormalMembers) {
     "\(module.indent.repeat(2))case let (.\(member.name)(a), .\(member.name)(b)):"
-    when (member.type.isPolymorphic) {
-      "\(module.indent.repeat(3))return a.isDynamicallyEqual(to: b)"
+    when (member.type is Type.Optional) {
+      "\(module.indent.repeat(3))return a == nil && b == nil || \(renderEqualityCheck.apply(member.type.elem))"
     } else {
-      "\(module.indent.repeat(3))return a == b"
+      "\(module.indent.repeat(3))return \(renderEqualityCheck.apply(member.type))"
     }
   }
   "\(module.indent.repeat(2))default:"
@@ -164,7 +171,8 @@ local synthesizedHash = new Listing {
   "\(module.indent.repeat(2))switch self {"
   for (member in enumNormalMembers) {
     "\(module.indent.repeat(2))case let .\(member.name)(value):"
-    "\(module.indent.repeat(3))hasher.combine(value)"
+    "\(module.indent.repeat(3))hasher.combine(\"\(member.name)\")"
+    module.renderInnerHash(member.type, 3, "value", false)
   }
   "\(module.indent.repeat(2))}"
   "\(module.indent)}"

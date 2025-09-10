@@ -90,6 +90,7 @@ let package = Package(
                 "Fixtures/ExtendedModule.pkl",
                 "Fixtures/OpenModule.pkl",
                 "Fixtures/Collections.pkl",
+                "Fixtures/Collections2.pkl",
                 "Fixtures/Poly.pkl",
                 "Fixtures/ApiTypes.pkl",
             ],

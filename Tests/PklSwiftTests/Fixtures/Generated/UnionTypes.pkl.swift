@@ -106,8 +106,10 @@ extension UnionTypes {
         public func hash(into hasher: inout Hasher) {
             switch self {
             case let .animal(value):
+                hasher.combine("animal")
                 hasher.combine(value)
             case let .string(value):
+                hasher.combine("string")
                 hasher.combine(value)
             }
         }
@@ -183,8 +185,10 @@ extension UnionTypes {
         public func hash(into hasher: inout Hasher) {
             switch self {
             case let .animal(value):
+                hasher.combine("animal")
                 hasher.combine(value)
             case let .shape(value):
+                hasher.combine("shape")
                 hasher.combine(value)
             }
         }

@@ -18,6 +18,7 @@
 abstract module pkl.swift.internal.Gen
 
 import "SwiftMapping.pkl"
+import "Type.pkl"
 
 /// The generated contents for this particular mapping.
 mapping: SwiftMapping
@@ -36,3 +37,28 @@ namespaceName: String
 
 /// The indentation applied to generated Swift code.
 indent: String
+
+function renderInnerHash(type: Type, rpt: Int, name: String, isDictKey: Boolean): String =
+  if (type is Type.Array)
+    """
+    \(module.indent.repeat(rpt))for x in \(name) {
+    \(renderInnerHash(type.elem, rpt+1, "x", false))
+    \(module.indent.repeat(rpt))}
+    """
+  else if (type is Type.Dictionary)
+    """
+    \(module.indent.repeat(rpt))for (k, v) in \(name) {
+    \(renderInnerHash(type.key, rpt+1, "k", type.key is Type.Optional))
+    \(renderInnerHash(type.elem, rpt+1, "v", false))
+    \(module.indent.repeat(rpt))}
+    """
+  else if (type is Type.Optional && !isDictKey)
+    """
+    \(module.indent.repeat(rpt))if let \(name)\(if (isDictKey) " = \(name).key" else "") {
+    \(renderInnerHash(type.elem, rpt+1, name, false))
+    \(module.indent.repeat(rpt))}
+    """
+  else
+    """
+    \(module.indent.repeat(rpt))hasher.combine(\(name))
+    """

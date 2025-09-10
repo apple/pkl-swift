@@ -36,8 +36,8 @@ function generateType(
   else if (type is reflect.NullableType)
     let (_elem = generateType(type.member, enclosing, seenMappings))
       // No doubly-nullable type
-      if (_elem is Type.Nullable) _elem
-      else new Type.Nullable { elem = _elem }
+      if (_elem is Type.Optional) _elem
+      else new Type.Optional { elem = _elem }
   else if (type is reflect.UnknownType) anyType
   else if (type is reflect.NothingType) neverType
   else if (type is reflect.StringLiteralType) new Type.Declared { typeName = "String" }
@@ -72,7 +72,7 @@ function generateDeclaredType(
 
 local function builtInType(typ: String): Type.Declared = new { typeName = typ }
 
-anyType: Type.Nullable = new { elem = builtInType("AnyHashable") }
+anyType: Type.Optional = new { elem = builtInType("AnyHashable") }
 
 local neverType: Type.Declared = builtInType("Never")
 
@@ -127,6 +127,7 @@ mappedHigherOrderTypes: Mapping<Class|TypeAlias, (reflect.DeclaredType, reflect.
           elem =
             if (typeArg == null) anyType
             else generateType(typeArg, enclosing, seenMappings)
+          pklTypeName = type.referent.name
         }
   [Map] = this[Mapping]
   [Mapping] = (type, enclosing, seenMappings) -> new Type.Dictionary {
@@ -139,6 +140,7 @@ mappedHigherOrderTypes: Mapping<Class|TypeAlias, (reflect.DeclaredType, reflect.
     elem =
       if (typeArgValue == null) anyType
       else generateType(typeArgValue, enclosing, seenMappings)
+    pklTypeName = type.referent.name
   }
   [Set] = (type, enclosing, seenMappings) -> new Type.Declared {
         local typeArg = type.typeArguments.getOrNull(0)
