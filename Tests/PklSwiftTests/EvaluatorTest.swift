@@ -20,7 +20,7 @@ import Foundation
 import SemanticVersion
 import XCTest
 
-class TestLogger: Logger {
+class TestLogger: Logger, @unchecked Sendable {
     var logLines: [String] = []
 
     func trace(message: String, frameUri: String) {
@@ -41,9 +41,9 @@ struct VirtualModuleReader: ModuleReader {
         try await self.listElements(uri)
     }
 
-    var read: (URL) async throws -> String
+    var read: @Sendable (URL) async throws -> String
 
-    var listElements: (URL) async throws -> [PathElement]
+    var listElements: @Sendable (URL) async throws -> [PathElement]
 
     var scheme: String
 
@@ -61,9 +61,9 @@ struct VirtualResourceReader: ResourceReader {
 
     var hasHierarchicalUris: Bool
 
-    var read: (URL) async throws -> [UInt8]
+    var read: @Sendable (URL) async throws -> [UInt8]
 
-    var listElements: (URL) async throws -> [PathElement]
+    var listElements: @Sendable (URL) async throws -> [PathElement]
 
     func read(url: URL) async throws -> [UInt8] {
         try await self.read(url)
@@ -307,18 +307,20 @@ final class PklSwiftTests: XCTestCase {
     }
 
     func testConcurrenctEvaluations() async throws {
+        // not safe to capture `self` in a task, so making a copy
+        let manager = self.manager!
         async let evalResult1 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+            let evaluator = try await manager.newEvaluator(options: .preconfigured)
             return try await evaluator.evaluateOutputText(source: .text("foo = 1"))
         }.result.get()
 
         async let evalResult2 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+            let evaluator = try await manager.newEvaluator(options: .preconfigured)
             return try await evaluator.evaluateOutputText(source: .text("foo = 2"))
         }.result.get()
 
         async let evalResult3 = try Task {
-            let evaluator = try await self.manager.newEvaluator(options: .preconfigured)
+            let evaluator = try await manager.newEvaluator(options: .preconfigured)
             return try await evaluator.evaluateOutputText(source: .text("foo = 3"))
         }.result.get()
 

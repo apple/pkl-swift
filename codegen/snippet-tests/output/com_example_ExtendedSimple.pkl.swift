@@ -4,7 +4,7 @@ import PklSwift
 public enum com_example_ExtendedSimple {}
 
 extension com_example_ExtendedSimple {
-    public struct Module: PklRegisteredType, Decodable, Hashable {
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "com.example.ExtendedSimple"
 
         public init() {}

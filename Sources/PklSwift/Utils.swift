@@ -18,12 +18,12 @@ import Foundation
 
 let pklDebug = ProcessInfo.processInfo.environment["PKL_DEBUG"] == "1"
 
-func debug(_ message: @autoclosure () -> String) {
+func debug(_ message: @autoclosure @Sendable () -> String) {
     if !pklDebug {
         return
     }
     FileHandle.standardError.write("[pkl-swift] \(message())\n".data(using: .utf8)!)
-    fflush(stderr)
+    try? FileHandle.standardError.synchronize()
 }
 
 let longNumberFormatter: NumberFormatter = {
@@ -33,7 +33,7 @@ let longNumberFormatter: NumberFormatter = {
     return ret
 }()
 
-func format(fractional: some BinaryFloatingPoint) -> String? {
+@Sendable func format(fractional: some BinaryFloatingPoint) -> String? {
     longNumberFormatter.string(from: NSNumber(value: Float64(fractional)))
 }
 
@@ -84,7 +84,7 @@ public func resolvePaths(_ paths: String...) -> String {
     return result
 }
 
-public let absoluteUriRegex = try! Regex("\\w+:")
+public nonisolated(unsafe) let absoluteUriRegex = try! Regex("\\w+:")
 
 public func tempDir() throws -> URL {
     try (FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: "/"), create: true))

@@ -197,8 +197,6 @@ final class LockStorage<Value>: ManagedBuffer<Value, LockPrimitive> {
     }
 }
 
-extension LockStorage: @unchecked Sendable {}
-
 /// A threading lock based on `libpthread` instead of `libdispatch`.
 ///
 /// - note: ``PklLock`` has reference semantics.
@@ -207,7 +205,7 @@ extension LockStorage: @unchecked Sendable {}
 /// of lock is safe to use with `libpthread`-based threading models, such as the
 /// one used by Pkl. On Windows, the lock is based on the substantially similar
 /// `SRWLOCK` type.
-public struct PklLock {
+public struct PklLock: @unchecked Sendable {
     @usableFromInline
     let _storage: LockStorage<Void>
 
@@ -265,8 +263,6 @@ extension PklLock {
     }
 }
 
-extension PklLock: Sendable {}
-
 extension UnsafeMutablePointer {
     @inlinable
     func assertValidAlignment() {
@@ -274,7 +270,7 @@ extension UnsafeMutablePointer {
     }
 }
 
-public struct PklLockedValueBox<Value> {
+public struct PklLockedValueBox<Value>: @unchecked Sendable {
     @usableFromInline
     let _storage: LockStorage<Value>
 
@@ -290,5 +286,3 @@ public struct PklLockedValueBox<Value> {
         try self._storage.withLockedValue(mutate)
     }
 }
-
-extension PklLockedValueBox: Sendable where Value: Sendable {}

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 //===----------------------------------------------------------------------===//
 // Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
 //
@@ -49,16 +49,19 @@ let package = Package(
     targets: [
         .target(
             name: "PklSwift",
-            dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"]
+            dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .target(
-            name: "PklSwiftInternals"
+            name: "PklSwiftInternals",
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .target(
             name: "MessagePack",
             dependencies: [
                 .product(name: "SystemPackage", package: "swift-system"),
-            ]
+            ],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .executableTarget(
             name: "pkl-gen-swift",
@@ -66,11 +69,13 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 "PklSwift",
             ],
-            resources: [.embedInCode("Resources/VERSION.txt")]
+            resources: [.embedInCode("Resources/VERSION.txt")],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .executableTarget(
             name: "test-external-reader",
-            dependencies: ["PklSwift"]
+            dependencies: ["PklSwift"],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .testTarget(
             name: "PklSwiftTests",
@@ -87,14 +92,17 @@ let package = Package(
                 "Fixtures/Collections.pkl",
                 "Fixtures/Poly.pkl",
                 "Fixtures/ApiTypes.pkl",
-            ]
+            ],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .testTarget(
             name: "MessagePackTests",
             dependencies: [
                 "MessagePack",
-            ]
+            ],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
     ],
+    swiftLanguageModes: [.v5, .v6],
     cxxLanguageStandard: .cxx20
 )

@@ -20,7 +20,7 @@ import PklSwiftInternals
 /// Marker protocol that all generated Pkl types should conform to.
 ///
 /// It is used by the TypeRegistry to find the types at runtime, and dynamically form a registry of all known pkl types.
-public protocol PklRegisteredType: Decodable {
+public protocol PklRegisteredType: Decodable, Sendable {
     static var registeredIdentifier: String { get }
 }
 
@@ -107,7 +107,7 @@ extension TypeRegistry {
 
 extension TypeRegistry {
     static let _sharedLock: PklLock = .init()
-    static var _shared: TypeRegistry?
+    nonisolated(unsafe) static var _shared: TypeRegistry?
 
     public static func get() -> TypeRegistry {
         self._sharedLock.withLock {

@@ -56,7 +56,7 @@ public struct ExternalReaderClientOptions {
     }
 }
 
-public class ExternalReaderClient {
+public actor ExternalReaderClient {
     private let moduleReaders: [ModuleReader]
     private let resourceReaders: [ResourceReader]
     private let transport: MessageTransport
