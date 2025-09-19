@@ -959,6 +959,10 @@ extension pkl_swift_example_Poly {
 
         public var sameResultType: SameResultType
 
+        public var foosListing: [Foo]
+
+        public var foosMapping: [String: Foo]
+
         public init(
             beings: [any pkl_swift_lib1.Being],
             beings2: [any pkl_swift_lib1.Being]?,
@@ -998,7 +1002,9 @@ extension pkl_swift_example_Poly {
             nestMapObj3: [PklSwift.OptionalDictionaryKey<ObjectKey>: [AnyHashable?: AnyHashable?]?],
             nestMapObj4: [PklSwift.OptionalDictionaryKey<ObjectKey>: [AnyHashable?: AnyHashable?]?]?,
             nestMaps: NestMaps,
-            sameResultType: SameResultType
+            sameResultType: SameResultType,
+            foosListing: [Foo],
+            foosMapping: [String: Foo]
         ) {
             self.beings = beings
             self.beings2 = beings2
@@ -1039,6 +1045,8 @@ extension pkl_swift_example_Poly {
             self.nestMapObj4 = nestMapObj4
             self.nestMaps = nestMaps
             self.sameResultType = sameResultType
+            self.foosListing = foosListing
+            self.foosMapping = foosMapping
         }
 
         public static func ==(lhs: Module, rhs: Module) -> Bool {
@@ -1046,7 +1054,7 @@ extension pkl_swift_example_Poly {
             && lhs.beings2 == nil && rhs.beings2 == nil || arrayEquals(arr1: lhs.beings2, arr2: rhs.beings2)
             && arrayEquals(arr1: lhs.beings3, arr2: rhs.beings3)
             && lhs.beings4 == nil && rhs.beings4 == nil || arrayEquals(arr1: lhs.beings4, arr2: rhs.beings4)
-            && lhs.dogs == nil && rhs.dogs == nil || arrayEquals(arr1: lhs.dogs, arr2: rhs.dogs)
+            && lhs.dogs == nil && rhs.dogs == nil || lhs.dogs == rhs.dogs
             && lhs.rex == rhs.rex
             && mapEquals(map1: lhs.moreBeings, map2: rhs.moreBeings)
             && lhs.moreBeings2 == nil && rhs.moreBeings2 == nil || mapEquals(map1: lhs.moreBeings2, map2: rhs.moreBeings2)
@@ -1081,6 +1089,8 @@ extension pkl_swift_example_Poly {
             && lhs.nestMapObj4 == nil && rhs.nestMapObj4 == nil || lhs.nestMapObj4 == rhs.nestMapObj4
             && lhs.nestMaps == rhs.nestMaps
             && lhs.sameResultType == rhs.sameResultType
+            && lhs.foosListing == rhs.foosListing
+            && lhs.foosMapping == rhs.foosMapping
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -1159,6 +1169,8 @@ extension pkl_swift_example_Poly {
             hasher.combine(nestMapObj4)
             hasher.combine(nestMaps)
             hasher.combine(sameResultType)
+            hasher.combine(foosListing)
+            hasher.combine(foosMapping)
         }
 
         public init(from decoder: Decoder) throws {
@@ -1346,7 +1358,9 @@ extension pkl_swift_example_Poly {
                 }
             let nestMaps = try dec.decode(NestMaps.self, forKey: PklCodingKey(string: "nestMaps"))
             let sameResultType = try dec.decode(SameResultType.self, forKey: PklCodingKey(string: "sameResultType"))
-            self = Module(beings: beings, beings2: beings2, beings3: beings3, beings4: beings4, dogs: dogs, rex: rex, moreBeings: moreBeings, moreBeings2: moreBeings2, moreBeings3: moreBeings3, moreBeings4: moreBeings4, nestListing1: nestListing1, nestListing2: nestListing2, nestListing3: nestListing3, nestListing4: nestListing4, nestListings: nestListings, nestList1: nestList1, nestList2: nestList2, nestList3: nestList3, nestList4: nestList4, nestLists: nestLists, nestMapping1: nestMapping1, nestMapping2: nestMapping2, nestMapping3: nestMapping3, nestMapping4: nestMapping4, nestMappingObj1: nestMappingObj1, nestMappingObj2: nestMappingObj2, nestMappingObj3: nestMappingObj3, nestMappingObj4: nestMappingObj4, nestMappings: nestMappings, nestMap1: nestMap1, nestMap2: nestMap2, nestMap3: nestMap3, nestMap4: nestMap4, nestMapObj1: nestMapObj1, nestMapObj2: nestMapObj2, nestMapObj3: nestMapObj3, nestMapObj4: nestMapObj4, nestMaps: nestMaps, sameResultType: sameResultType)
+            let foosListing = try dec.decode([Foo].self, forKey: PklCodingKey(string: "foosListing"))
+            let foosMapping = try dec.decode([String: Foo].self, forKey: PklCodingKey(string: "foosMapping"))
+            self = Module(beings: beings, beings2: beings2, beings3: beings3, beings4: beings4, dogs: dogs, rex: rex, moreBeings: moreBeings, moreBeings2: moreBeings2, moreBeings3: moreBeings3, moreBeings4: moreBeings4, nestListing1: nestListing1, nestListing2: nestListing2, nestListing3: nestListing3, nestListing4: nestListing4, nestListings: nestListings, nestList1: nestList1, nestList2: nestList2, nestList3: nestList3, nestList4: nestList4, nestLists: nestLists, nestMapping1: nestMapping1, nestMapping2: nestMapping2, nestMapping3: nestMapping3, nestMapping4: nestMapping4, nestMappingObj1: nestMappingObj1, nestMappingObj2: nestMappingObj2, nestMappingObj3: nestMappingObj3, nestMappingObj4: nestMappingObj4, nestMappings: nestMappings, nestMap1: nestMap1, nestMap2: nestMap2, nestMap3: nestMap3, nestMap4: nestMap4, nestMapObj1: nestMapObj1, nestMapObj2: nestMapObj2, nestMapObj3: nestMapObj3, nestMapObj4: nestMapObj4, nestMaps: nestMaps, sameResultType: sameResultType, foosListing: foosListing, foosMapping: foosMapping)
         }
     }
 
@@ -1420,6 +1434,19 @@ extension pkl_swift_example_Poly {
         public init(str: String, num: Int) {
             self.str = str
             self.num = num
+        }
+    }
+
+    public struct Foo: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "pkl.swift.example.Poly#Foo"
+
+        public var name: String
+
+        public var bars: [String]?
+
+        public init(name: String, bars: [String]?) {
+            self.name = name
+            self.bars = bars
         }
     }
 

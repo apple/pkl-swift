@@ -191,10 +191,10 @@ local synthesizedEqualsEquals =
     "\(module.indent)public static func ==(lhs: \(classInfo.struct.name), rhs: \(classInfo.struct.name)) -> Bool {\n"
     local renderEqualityCheck = (type: Type, prop: String, opt: Boolean) ->
       if (type.isAny) "lhs.\(prop) == rhs.\(prop)"
-      else if (type is Type.Array) "arrayEquals(arr1: lhs.\(prop), arr2: rhs.\(prop))"
-      else if (type is Type.Dictionary) "mapEquals(map1: lhs.\(prop), map2: rhs.\(prop))"
       else if (type.isPolymorphic)
-        if (opt) "lhs.\(prop)?.isDynamicallyEqual(to: rhs.\(prop)) ?? false"
+        if (type is Type.Array) "arrayEquals(arr1: lhs.\(prop), arr2: rhs.\(prop))"
+        else if (type is Type.Dictionary) "mapEquals(map1: lhs.\(prop), map2: rhs.\(prop))"
+        else if (opt) "lhs.\(prop)?.isDynamicallyEqual(to: rhs.\(prop)) ?? false"
         else "lhs.\(prop).isDynamicallyEqual(to: rhs.\(prop))"
       else "lhs.\(prop) == rhs.\(prop)"
     for (prop, field in properties) {

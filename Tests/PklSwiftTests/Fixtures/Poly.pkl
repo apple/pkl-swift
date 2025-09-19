@@ -270,3 +270,21 @@ typealias NestMaps =
   // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>>?
   // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>
   // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>?
+
+
+// these cases ensure that non-polymorphic synthesized ==, hash, and init implementations work correctly
+class Foo {
+  name: String
+  bars: Listing<String>?
+}
+
+foosListing: Listing<Foo> = new {
+  new { name = "baz" }
+  new { name = "quz"; bars { "a"; "b" } }
+}
+
+
+foosMapping: Mapping<String, Foo> = new {
+  ["hello"] { name = "baz" }
+  ["world"] { name = "quz"; bars { "a"; "b" } }
+}

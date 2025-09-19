@@ -161,7 +161,15 @@ class FixturesTest: XCTestCase {
                 nestMapObj3: [:],
                 nestMapObj4: nil,
                 nestMaps: .map_pkl_swift_lib1Being_OptionalString([:]),
-                sameResultType: .listingString([])
+                sameResultType: .listingString([]),
+                foosListing: [
+                    Poly.Foo(name: "baz", bars: nil),
+                    Poly.Foo(name: "quz", bars: ["a", "b"]),
+                ],
+                foosMapping: [
+                    "hello": Poly.Foo(name: "baz", bars: nil),
+                    "world": Poly.Foo(name: "quz", bars: ["a", "b"]),
+                ]
             )
         )
     }

@@ -96,3 +96,25 @@ public func tempFile(suffix: String) throws -> URL {
     let fileName = ProcessInfo.processInfo.globallyUniqueString + suffix
     return try (tempDir()).appendingPathComponent(fileName)
 }
+
+/// Wraps optional dictionary keys to conform them to CodingKeyRepresentable
+/// Required to correctly decode Pkl values like Map<String?, String>
+public struct OptionalDictionaryKey<Wrapped>: Hashable, Decodable, CodingKeyRepresentable where Wrapped: Hashable, Wrapped: Decodable, Wrapped: CodingKeyRepresentable {
+    public let key: Wrapped?
+
+    public init(_ key: Wrapped?) {
+        self.key = key
+    }
+
+    public init(from decoder: Decoder) throws {
+        self.key = try Wrapped(from: decoder)
+    }
+
+    public var codingKey: any CodingKey {
+        self.key?.codingKey ?? PklCodingKey(string: "<nil>")
+    }
+
+    public init?(codingKey: some CodingKey) {
+        fatalError("cannot initialize OptionalDictionaryKey from CodingKey")
+    }
+}
