@@ -105,8 +105,8 @@ facts {
     generateType(reflectedNullables.properties["res3"].type) == "[String?]"
     generateType(reflectedNullables.properties["res4"].type) == "[String]?"
     generateType(reflectedNullables.properties["res5"].type) == "[String?]?"
-    generateType(reflectedNullables.properties["res6"].type) == "[String?: String]"
+    generateType(reflectedNullables.properties["res6"].type) == "[PklSwift.OptionalDictionaryKey<String>: String]"
     generateType(reflectedNullables.properties["res7"].type) == "[String: String]?"
-    generateType(reflectedNullables.properties["res8"].type) == "[String?: String?]?"
+    generateType(reflectedNullables.properties["res8"].type) == "[PklSwift.OptionalDictionaryKey<String>: String?]?"
   }
 }

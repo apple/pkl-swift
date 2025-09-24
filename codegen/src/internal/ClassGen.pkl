@@ -163,20 +163,20 @@ local struct: String = new Listing {
     }
     "\n"
   }
-  synthesisedInit
+  synthesizedInit
   when (properties.values.any((p) -> p.isPolymorphic)) {
     // need to implement ==, hash and both inits
     "\n\n"
-    synthesisedEqualsEquals
+    synthesizedEqualsEquals
     "\n\n"
-    synthesisedHash
+    synthesizedHash
     "\n\n"
-    synthesisedInitDecoder
+    synthesizedInitDecoder
   } else {
     when (properties.values.any((p) -> p.isAny)) {
       // need to implement both inits
       "\n\n"
-      synthesisedInitDecoder
+      synthesizedInitDecoder
     }
   }
   when (codingKeys != null) {
@@ -186,67 +186,48 @@ local struct: String = new Listing {
   "\n}"
 }.join("")
 
-local synthesisedEqualsEquals =
+local synthesizedEqualsEquals =
   new Listing {
     "\(module.indent)public static func ==(lhs: \(classInfo.struct.name), rhs: \(classInfo.struct.name)) -> Bool {\n"
+    local renderEqualityCheck = (type: Type, prop: String, opt: Boolean) ->
+      if (type.isAny) "lhs.\(prop) == rhs.\(prop)"
+      else if (type.isPolymorphic)
+        if (type is Type.Array) "arrayEquals(arr1: lhs.\(prop), arr2: rhs.\(prop))"
+        else if (type is Type.Dictionary) "mapEquals(map1: lhs.\(prop), map2: rhs.\(prop))"
+        else if (opt) "lhs.\(prop)?.isDynamicallyEqual(to: rhs.\(prop)) ?? false"
+        else "lhs.\(prop).isDynamicallyEqual(to: rhs.\(prop))"
+      else "lhs.\(prop) == rhs.\(prop)"
     for (prop, field in properties) {
       when (prop != properties.keys.first) {
         "\n\(module.indent.repeat(2))&& "
       } else {
         module.indent.repeat(2)
       }
-      when (field.isPolymorphic) {
-        if (field.type is Type.Array)
-          "arrayEquals(arr1: lhs.\(prop), arr2: rhs.\(prop))"
-        else if (field.type is Type.Dictionary)
-          "mapEquals(map1: lhs.\(prop), map2: rhs.\(prop))"
-        else if (field.type is Type.Nullable)
-          "((lhs.\(prop) == nil && rhs.\(prop) == nil) || lhs.\(prop)?.isDynamicallyEqual(to: rhs.\(prop)) ?? false)"
-        else
-          "lhs.\(prop).isDynamicallyEqual(to: rhs.\(prop))"
+      when (field.type is Type.Optional) {
+        "lhs.\(prop) == nil && rhs.\(prop) == nil || \(renderEqualityCheck.apply(field.type.elem, prop, true))"
       } else {
-        "lhs.\(prop) == rhs.\(prop)"
+        renderEqualityCheck.apply(field.type, prop, false)
       }
     }
     "\n"
     "\(module.indent)}"
   }.join("")
 
-local synthesisedHash =
+local synthesizedHash =
   new Listing {
     "\(module.indent)public func hash(into hasher: inout Hasher) {\n"
     properties.keys.map((pklPropertyName) ->
       let (field = properties[pklPropertyName])
-      if (field.isPolymorphic)
-        if (field.type is Type.Array)
-          """
-          \(module.indent.repeat(2))for x in self.\(field.name) {
-          \(module.indent.repeat(3))hasher.combine(x)
-          \(module.indent.repeat(2))}
-          """
-        else if (field.type is Type.Dictionary)
-          """
-          \(module.indent.repeat(2))for (k, v) in self.\(field.name) {
-          \(module.indent.repeat(3))hasher.combine(k)
-          \(module.indent.repeat(3))hasher.combine(v)
-          \(module.indent.repeat(2))}
-          """
-        else if (field.type is Type.Nullable)
-          """
-          \(module.indent.repeat(2))if let \(field.name) {
-          \(module.indent.repeat(3))hasher.combine(\(field.name))
-          \(module.indent.repeat(2))}
-          """
-        else
+        if (!field.isPolymorphic)
           "\(module.indent.repeat(2))hasher.combine(\(field.name))"
-      else
-        "\(module.indent.repeat(2))hasher.combine(\(field.name))"
+        else
+          module.renderInnerHash(field.type, 2, field.name, false)
     ).join("\n")
     "\n"
     "\(module.indent)}"
   }.join("")
 
-local synthesisedInit =
+local synthesizedInit =
   if (properties.isEmpty) "\(module.indent)public init() {}"
   else
     let (renderedProperties = properties.keys.map((name) -> renderPropertyBase(properties[name])))
@@ -276,7 +257,28 @@ local synthesisedInit =
         "\(module.indent)}"
       }.join("")
 
-local synthesisedInitDecoder =
+local function renderInitDecoderInner(type: Type, rpt: Int, prefix: String, opt: Boolean): String =
+  if (type is Type.Optional && type != typegen.anyType)
+    renderInitDecoderInner(type.elem, rpt, prefix, true)
+  else
+    (
+      let (optStr = if (opt && type is Type.Array|Type.Dictionary) "?" else "")
+      if (prefix == "") "\(optStr)\n\(module.indent.repeat(rpt))"
+      else "\(module.indent.repeat(rpt))\(prefix)\(optStr)"
+    )
+    + (
+      if (type is Type.Array)
+        ".map {\n\(renderInitDecoderInner(type.elem, rpt+1, "$0", false))\n\(module.indent.repeat(rpt))}"
+      else if (type is Type.Dictionary)
+        ".mapValues {\n\(renderInitDecoderInner(type.elem, rpt+1, "$0", false))\n\(module.indent.repeat(rpt))}"
+      else if (type == typegen.anyType)
+        ".value"
+      else
+        ".value as! " + (if (opt) new Type.Optional { elem = type } else type)
+          .render(classInfo.namespaceName)
+    )
+
+local synthesizedInitDecoder =
   new Listing {
     "\(module.indent)public init(from decoder: Decoder) throws {\n"
     "\(module.indent.repeat(2))let dec = try decoder.container(keyedBy: PklCodingKey.self)\n"
@@ -289,14 +291,7 @@ local synthesisedInitDecoder =
       }
       ".self, forKey: PklCodingKey(string: \"\(pklPropertyName)\"))"
       when (field.isPolymorphic || field.isAny) {
-        if (field.type is Type.Array)
-          "\n\(module.indent.repeat(4)).map { $0.value as! \((field.type as Type.Array).elem.render(classInfo.namespaceName)) }"
-        else if (field.type is Type.Dictionary)
-          "\n\(module.indent.repeat(4)).mapValues { $0.value as! \((field.type as Type.Dictionary).elem.render(classInfo.namespaceName)) }"
-        else if (field.type == typegen.anyType)
-          ".value"
-        else
-          "\n\(module.indent.repeat(4)).value as! \(field.type.render(classInfo.namespaceName))"
+        renderInitDecoderInner(field.type, 3, "", false)
       }
       "\n"
     }

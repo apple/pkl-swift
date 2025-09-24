@@ -107,8 +107,9 @@ final class _PklDecoder: Decoder {
 
     let value: MessagePackValue
 
-    init(value: MessagePackValue) throws {
+    init(value: MessagePackValue, codingPath: [CodingKey] = []) throws {
         self.value = value
+        self.codingPath = codingPath
     }
 
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key>

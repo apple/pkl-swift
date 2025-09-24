@@ -114,7 +114,7 @@ extension _PklDecoder {
             }
         }
 
-        func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
+        func decode<T: Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
             guard let propertyValue = properties[key.stringValue] else {
                 throw DecodingError.dataCorruptedError(
                     forKey: key, in: self, debugDescription: "Missing key \(key)"
