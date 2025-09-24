@@ -91,10 +91,10 @@ The below table describes how Pkl types are mapped into Swift types.
 |Not supported
 
 |`Class`
-|Not supported
+|`PklSwift.PklClass`
 
 |`TypeAlias`
-|Not supported
+|`PklSwift.PklTypeAlias`
 
 |`Any`
 |`AnyHashable?`

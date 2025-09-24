@@ -18,21 +18,21 @@ import Foundation
 import MessagePack
 
 public enum PklValueType: UInt8, Decodable, Sendable {
-    case object = 0x1
-    case map = 0x2
-    case mapping = 0x3
-    case list = 0x4
-    case listing = 0x5
-    case set = 0x6
-    case duration = 0x7
-    case dataSize = 0x8
-    case pair = 0x9
-    case intSeq = 0xA
-    case regex = 0xB
-    case `class` = 0xC
-    case `typealias` = 0xD
-    case function = 0xE
-    case bytes = 0xF
+    case object = 0x01
+    case map = 0x02
+    case mapping = 0x03
+    case list = 0x04
+    case listing = 0x05
+    case set = 0x06
+    case duration = 0x07
+    case dataSize = 0x08
+    case pair = 0x09
+    case intSeq = 0x0A
+    case regex = 0x0B
+    case `class` = 0x0C
+    case `typealias` = 0x0D
+    case function = 0x0E
+    case bytes = 0x0F
     case objectMemberProperty = 0x10
     case objectMemberEntry = 0x11
     case objectMemberElement = 0x12
@@ -40,6 +40,20 @@ public enum PklValueType: UInt8, Decodable, Sendable {
 
 public protocol PklSerializableType: Decodable {
     static var messageTag: PklValueType { get }
+
+    static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Self
+}
+
+extension PklSerializableType {
+    static func checkFieldCount(_ fields: [MessagePackValue], codingPath: [any CodingKey], min: Int) throws {
+        guard fields.count >= min else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected at least \(min) fields but got \(fields.count)"
+                ))
+        }
+    }
 }
 
 public protocol PklSerializableValueUnitType: PklSerializableType {
@@ -49,12 +63,41 @@ public protocol PklSerializableValueUnitType: PklSerializableType {
     init(_: ValueType, unit: UnitType)
 }
 
-extension Decodable where Self: PklSerializableValueUnitType {
+extension Decodable where Self: PklSerializableType {
     public init(from decoder: Decoder) throws {
         guard let decoder = decoder as? _PklDecoder else {
             fatalError("\(Self.self) can only be decoded using \(_PklDecoder.self), but was: \(decoder)")
         }
-        self = try Self.decodeValueUnitType(from: decoder.value, at: decoder.codingPath)
+        let codingPath = decoder.codingPath
+        guard case .array(let arr) = decoder.value else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected array but got \(decoder.value.debugDataTypeDescription)"
+                ))
+        }
+        let code = try arr[0].decode(PklValueType.self)
+        guard arr.count > 0 else {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected non-empty array"
+                ))
+        }
+        guard Self.messageTag == code else {
+            throw DecodingError.dataCorrupted(
+                .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)"))
+        }
+        self = try Self.decode(arr, codingPath: codingPath)
+    }
+}
+
+extension Decodable where Self: PklSerializableValueUnitType {
+    public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Self {
+        try checkFieldCount(fields, codingPath: codingPath, min: 3)
+        let value = try fields[1].decode(Self.ValueType.self)
+        let unit = try fields[2].decode(Self.UnitType.self)
+        return Self(value, unit: unit)
     }
 }
 
@@ -238,6 +281,12 @@ extension _PklDecoder {
             case .dataSize:
                 let decoder = try _PklDecoder(value: propertyValue)
                 return try PklAny(value: DataSize(from: decoder))
+            case .class:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: Class(from: decoder))
+            case .typealias:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: TypeAlias(from: decoder))
             case .bytes:
                 guard case .bin(let bytes) = value[1] else {
                     throw DecodingError.dataCorrupted(

@@ -11,11 +11,28 @@ extension ApiTypes {
 
         public var res2: DataSize
 
-        public init(res1: Duration, res2: DataSize) {
+        public var stringClass: Class
+
+        public var moduleClass: Class
+
+        public var typeAlias: TypeAlias
+
+        public init(
+            res1: Duration,
+            res2: DataSize,
+            stringClass: Class,
+            moduleClass: Class,
+            typeAlias: TypeAlias
+        ) {
             self.res1 = res1
             self.res2 = res2
+            self.stringClass = stringClass
+            self.moduleClass = moduleClass
+            self.typeAlias = typeAlias
         }
     }
+
+    public typealias Foo = String
 
     /// Load the Pkl module at the given source and evaluate it into `ApiTypes.Module`.
     ///
