@@ -90,14 +90,29 @@ class FixturesTest: XCTestCase {
             evaluator: self.evaluator,
             source: .path("\(#filePath)/../Fixtures/ApiTypes.pkl")
         )
+
+        let stringClass: Class
+        let moduleClass: Class
+        let typeAlias: TypeAlias
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_30 {
+            stringClass = Class(moduleUri: "", qualifiedName: "")
+            moduleClass = Class(moduleUri: "", qualifiedName: "")
+            typeAlias = TypeAlias(moduleUri: "", qualifiedName: "")
+        } else {
+            stringClass = Class(moduleUri: "pkl:base", qualifiedName: "pkl.base#String")
+            moduleClass = Class(moduleUri: "pkl:base", qualifiedName: "pkl.base")
+            typeAlias = TypeAlias(moduleUri: "pkl:base", qualifiedName: "pkl.base#UInt8")
+        }
+
         XCTAssertEqual(
             result,
             ApiTypes.Module(
                 res1: .hours(10),
                 res2: .gibibytes(1.2345),
-                stringClass: Class(),
-                moduleClass: Class(),
-                typeAlias: TypeAlias()
+                stringClass: stringClass,
+                moduleClass: moduleClass,
+                typeAlias: typeAlias
             )
         )
     }

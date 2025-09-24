@@ -32,8 +32,6 @@ extension ApiTypes {
         }
     }
 
-    public typealias Foo = String
-
     /// Load the Pkl module at the given source and evaluate it into `ApiTypes.Module`.
     ///
     /// - Parameter source: The source of the Pkl module.
