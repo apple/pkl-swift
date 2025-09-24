@@ -92,9 +92,9 @@ extension Classes {
 
         public var bagOfStuff: Object
 
-        public var bugClass: PklClass
+        public var bugClass: Class
 
-        public var bugTypeAlias: PklTypeAlias
+        public var bugTypeAlias: TypeAlias
 
         public init(
             owner: (any Person)?,
@@ -106,8 +106,8 @@ extension Classes {
             kind3: BugKindThree,
             kind4: BugKindFour,
             bagOfStuff: Object,
-            bugClass: PklClass,
-            bugTypeAlias: PklTypeAlias
+            bugClass: Class,
+            bugTypeAlias: TypeAlias
         ) {
             self.owner = owner
             self.age = age
@@ -164,8 +164,8 @@ extension Classes {
             let kind3 = try dec.decode(BugKindThree.self, forKey: PklCodingKey(string: "kind3"))
             let kind4 = try dec.decode(BugKindFour.self, forKey: PklCodingKey(string: "kind4"))
             let bagOfStuff = try dec.decode(Object.self, forKey: PklCodingKey(string: "bagOfStuff"))
-            let bugClass = try dec.decode(PklClass.self, forKey: PklCodingKey(string: "bugClass"))
-            let bugTypeAlias = try dec.decode(PklTypeAlias.self, forKey: PklCodingKey(string: "bugTypeAlias"))
+            let bugClass = try dec.decode(Class.self, forKey: PklCodingKey(string: "bugClass"))
+            let bugTypeAlias = try dec.decode(TypeAlias.self, forKey: PklCodingKey(string: "bugTypeAlias"))
             self = Bug(owner: owner, age: age, holdsBreathFor: holdsBreathFor, size: size, kind: kind, kind2: kind2, kind3: kind3, kind4: kind4, bagOfStuff: bagOfStuff, bugClass: bugClass, bugTypeAlias: bugTypeAlias)
         }
     }

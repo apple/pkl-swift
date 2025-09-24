@@ -11,18 +11,18 @@ extension ApiTypes {
 
         public var res2: DataSize
 
-        public var stringClass: PklClass
+        public var stringClass: Class
 
-        public var moduleClass: PklClass
+        public var moduleClass: Class
 
-        public var typeAlias: PklTypeAlias
+        public var typeAlias: TypeAlias
 
         public init(
             res1: Duration,
             res2: DataSize,
-            stringClass: PklClass,
-            moduleClass: PklClass,
-            typeAlias: PklTypeAlias
+            stringClass: Class,
+            moduleClass: Class,
+            typeAlias: TypeAlias
         ) {
             self.res1 = res1
             self.res2 = res2

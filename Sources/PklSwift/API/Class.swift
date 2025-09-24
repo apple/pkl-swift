@@ -16,13 +16,14 @@
 
 import MessagePack
 
-public struct PklTypeAlias: Hashable {}
+/// Class is the Swift representation of Pkl's `pkl.base#Class`.
+public struct Class: Hashable {}
 
-extension PklTypeAlias: PklSerializableType, Sendable {
-    public static let messageTag: PklValueType = .typealias
+extension Class: PklSerializableType, Sendable {
+    public static let messageTag: PklValueType = .class
 
-    public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> PklTypeAlias {
+    public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Class {
         try checkFieldCount(fields, codingPath: codingPath, min: 1)
-        return PklTypeAlias()
+        return Class()
     }
 }

@@ -114,11 +114,11 @@ mappedTypes: Mapping<Class|TypeAlias, Type> = new {
   }
   [Class] = new Type.Declared {
     swiftModuleName = "PklSwift"
-    typeName = "PklClass"
+    typeName = "Class"
   }
   [TypeAlias] = new Type.Declared {
     swiftModuleName = "PklSwift"
-    typeName = "PklTypeAlias"
+    typeName = "TypeAlias"
   }
   [Bytes] = new Type.Array {
     elem = new Type.Declared {

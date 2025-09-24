@@ -283,10 +283,10 @@ extension _PklDecoder {
                 return try PklAny(value: DataSize(from: decoder))
             case .class:
                 let decoder = try _PklDecoder(value: propertyValue)
-                return try PklAny(value: PklClass(from: decoder))
+                return try PklAny(value: Class(from: decoder))
             case .typealias:
                 let decoder = try _PklDecoder(value: propertyValue)
-                return try PklAny(value: PklTypeAlias(from: decoder))
+                return try PklAny(value: TypeAlias(from: decoder))
             case .bytes:
                 guard case .bin(let bytes) = value[1] else {
                     throw DecodingError.dataCorrupted(

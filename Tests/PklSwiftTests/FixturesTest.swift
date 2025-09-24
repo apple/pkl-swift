@@ -95,9 +95,9 @@ class FixturesTest: XCTestCase {
             ApiTypes.Module(
                 res1: .hours(10),
                 res2: .gibibytes(1.2345),
-                stringClass: PklClass(),
-                moduleClass: PklClass(),
-                typeAlias: PklTypeAlias()
+                stringClass: Class(),
+                moduleClass: Class(),
+                typeAlias: TypeAlias()
             )
         )
     }
