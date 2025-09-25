@@ -13,7 +13,7 @@ public protocol Classes_Person: Classes_Being {
     var things: Set<Int> { get }
 }
 
-public protocol Classes_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Classes_Being: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var isAlive: Bool { get }
 }
 
@@ -25,7 +25,7 @@ public protocol Classes_B: Classes_A {
     var b: String { get }
 }
 
-public protocol Classes_A: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Classes_A: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var a: String { get }
 }
 

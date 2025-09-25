@@ -3,7 +3,7 @@ import PklSwift
 
 public enum ExtendsAbstractClass {}
 
-public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol ExtendsAbstractClass_A: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var b: String { get }
 }
 
