@@ -3,7 +3,7 @@ import PklSwift
 
 public enum ExtendingOpenClass {}
 
-public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol ExtendingOpenClass_MyOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var myStr: String { get }
 }
 

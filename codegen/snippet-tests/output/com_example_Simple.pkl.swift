@@ -3,13 +3,13 @@ import PklSwift
 
 public enum com_example_Simple {}
 
-public protocol com_example_Simple_Person: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol com_example_Simple_Person: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var theName: String { get }
 
     var `enum`: String { get }
 }
 
-public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol com_example_Simple_OpenClassExtendingOpenClass: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var someOtherProp: Bool? { get }
 }
 

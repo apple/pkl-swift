@@ -7,7 +7,7 @@ public protocol Foo_Animal: Foo_Being {
     var name: String { get }
 }
 
-public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol Foo_Being: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var exists: Bool { get }
 }
 
