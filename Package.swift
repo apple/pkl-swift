@@ -95,7 +95,7 @@ let package = Package(
                 "Fixtures/ApiTypes.pkl",
                 "Fixtures/Collections2.pkl",
                 "Fixtures/UnusedClass.pkl",
-                "Fixtures/Imports/UnusedClassDefs.pkl"
+                "Fixtures/Imports/UnusedClassDefs.pkl",
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
