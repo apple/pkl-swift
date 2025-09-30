@@ -1,0 +1,4 @@
+typealias ReferencedAlias = String
+
+class ThisClassShouldAlsoGenerate {
+}
