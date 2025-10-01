@@ -42,7 +42,13 @@ function gatherTypeDeclarations(
         |> gatherModuleTypeAliases(decl)
         |> gatherModule(decl)
   else if (decl is reflect.TypeAlias)
-    seen.add(decl) |> gatherTypeArguments(decl)
+    // If you reference a TypeAlias, gather that alias as well as all of the
+    // other declarations in alias's module. This resolves the issue where a
+    // caller only references a type alias from a module, which would cause
+    // the alias's sibling classes to not generate.
+    seen.add(decl)
+      |> gatherTypeArguments(decl)
+      |> (seen: List<reflect.TypeDeclaration>) -> gatherTypeDeclarations(decl.enclosingDeclaration.moduleClass, seen)
   else seen
 
 /// Tells if this class is part of the stdlib.

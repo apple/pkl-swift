@@ -1,0 +1,6 @@
+import "Imports/UnusedClassDefs.pkl" as defs
+
+// This test imports UnusedClassDefs, but it ONLY references the typealias and
+// not any of the classes. This caused the Module to be elided by the generator,
+// which results in a compilation failure.
+referencedAlias: defs.ReferencedAlias
