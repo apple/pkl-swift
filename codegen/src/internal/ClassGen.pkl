@@ -133,6 +133,8 @@ local function doesNotInherit(clazz: reflect.Class?) =
   clazz.superclass == null
   || clazz.superclass.reflectee == Typed
 
+local sendable = if (hasAnyHashable) "@unchecked Sendable" else "Sendable"
+
 local structSuperclasses: String =
   if (classInfo.protocol != null)
     classInfo.protocol.name
@@ -142,7 +144,6 @@ local structSuperclasses: String =
     else
       "\(superClass.namespaceName).\(superClass.name)"
   else
-    let (sendable = if (hasAnyHashable) "@unchecked Sendable" else "Sendable")
       "PklRegisteredType, Decodable, Hashable, \(sendable)"
 
 local struct: String = new Listing {
@@ -337,7 +338,7 @@ local protocol: String? =
         when (superClass != null) {
           "\(superClass.protocol.fullName) {\n"
         } else {
-          "PklRegisteredType, DynamicallyEquatable, Hashable {\n"
+          "PklRegisteredType, DynamicallyEquatable, Hashable, \(sendable) {\n"
         }
         for (key, field in methodsToGenerate) {
           when (key != methodsToGenerate.keys.first) {

@@ -3,7 +3,7 @@ import PklSwift
 
 public enum lib3 {}
 
-public protocol lib3_GoGoGo: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol lib3_GoGoGo: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var duck: String { get }
 }
 

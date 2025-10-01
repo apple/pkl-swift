@@ -3,7 +3,7 @@ import PklSwift
 
 public enum override {}
 
-public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol override_Foo: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var myProp: String { get }
 }
 

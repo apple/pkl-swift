@@ -3,7 +3,7 @@ import PklSwift
 
 public enum EmptyOpenModule {}
 
-public protocol EmptyOpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol EmptyOpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
 }
 
 extension EmptyOpenModule {
