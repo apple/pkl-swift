@@ -7,7 +7,7 @@
 
 * Avoid unnecessary computations when debug logs are omitted (https://github.com/apple/pkl-swift/pull/60[#60]).
 * Avoid generating typealiases of hidden properties (https://github.com/apple/pkl-swift/pull/63[#63]).
-* Fix decoding of polymorphic types wihtin collections (https://github.com/apple/pkl-swift/pull/66[#66]).
+* Fix decoding of polymorphic types within collections (https://github.com/apple/pkl-swift/pull/66[#66]).
 * Generate sibling types of an imported typealias (https://github.com/apple/pkl-swift/pull/70[#70]).
 
 === Additions
@@ -17,7 +17,7 @@
 
 === Breaking Changes 
 
-* The code generation of optional keys has changed. A `Mapping` or `Map` with an optional key will be represented as `OptionalDictionaryKey<T>` in Swift. For example, `Mapping<String?, String>` becomes `[OptionalDictionaryKey<String>: String]` in Swift https://github.com/apple/pkl-swift/pull/66[#66]).
+* The code generation of optional keys has changed. A `Mapping` or `Map` with an optional key will be represented as `OptionalDictionaryKey<T>` in Swift. For example, `Mapping<String?, String>` becomes `[OptionalDictionaryKey<String>: String]` in Swift (https://github.com/apple/pkl-swift/pull/66[#66]).
 +
 [NOTE]
 ====
