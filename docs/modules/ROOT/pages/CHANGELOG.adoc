@@ -1,5 +1,39 @@
 = Changelog
 
+[[release-0.6.0]]
+== 0.6.0 (2025-10-02)
+
+=== Fixes
+
+* Avoid unnecessary computations when debug logs are omitted (https://github.com/apple/pkl-swift/pull/60[#60]).
+* Avoid generating typealiases of hidden properties (https://github.com/apple/pkl-swift/pull/63[#63]).
+* Fix decoding of polymorphic types wihtin collections (https://github.com/apple/pkl-swift/pull/66[#66]).
+* Generate sibling types of an imported typealias (https://github.com/apple/pkl-swift/pull/70[#70]).
+
+=== Additions
+
+* Adds support for Swift 6 (https://github.com/apple/pkl-swift/pull/61[#61], https://github.com/apple/pkl-swift/pull/68[#68]).
+* Adds support for decoding `Class` and `TypeAlias` values (https://github.com/apple/pkl-swift/pull/64[#64]).
+
+=== Breaking Changes 
+
+* The code generation of optional keys has changed. A `Mapping` or `Map` with an optional key will be represented as `OptionalDictionaryKey<T>` in Swift. For example, `Mapping<String?, String>` becomes `[OptionalDictionaryKey<String>: String]` in Swift https://github.com/apple/pkl-swift/pull/66[#66]).
++
+[NOTE]
+====
+This is a breaking change to code that was already technically broken, because pkl-swift was incorrectly decoding `null` keys (see https://github.com/apple/pkl-swift/pull/66[#66]).
+====
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+* https://github.com/HT154[@HT154]
+* https://github.com/jcubit[@jcubit]
+* https://github.com/mschrag[@mschrag]
+* https://github.com/stackoverflow[@stackoverflow]
+
 [[release-0.5.0]]
 == 0.5.0 (2025-07-2)
 
