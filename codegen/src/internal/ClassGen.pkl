@@ -281,7 +281,7 @@ local function renderInitDecoderInner(type: Type, rpt: Int, prefix: String, opt:
 
 local synthesizedInitDecoder =
   new Listing {
-    "\(module.indent)public init(from decoder: Decoder) throws {\n"
+    "\(module.indent)public init(from decoder: any Decoder) throws {\n"
     "\(module.indent.repeat(2))let dec = try decoder.container(keyedBy: PklCodingKey.self)\n"
     for (pklPropertyName, field in properties) {
       "\(module.indent.repeat(2))let \(field.name) = try dec.decode("

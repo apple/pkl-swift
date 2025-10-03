@@ -3,7 +3,7 @@ import PklSwift
 
 public enum OpenModule {}
 
-public protocol OpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol OpenModule_Module: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var foo: String { get }
 
     var bar: Int { get }

@@ -3,11 +3,11 @@ import PklSwift
 
 public enum UnionTypes {}
 
-public protocol UnionTypes_Animal: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol UnionTypes_Animal: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var name: String { get }
 }
 
-public protocol UnionTypes_Shape: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol UnionTypes_Shape: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
 }
 
 extension UnionTypes {

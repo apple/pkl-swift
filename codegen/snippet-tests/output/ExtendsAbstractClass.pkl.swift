@@ -25,7 +25,7 @@ extension ExtendsAbstractClass {
             hasher.combine(a)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let a = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "a"))
                 .value as! any A

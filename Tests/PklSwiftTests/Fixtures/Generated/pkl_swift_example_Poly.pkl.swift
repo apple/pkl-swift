@@ -1173,7 +1173,7 @@ extension pkl_swift_example_Poly {
             hasher.combine(foosMapping)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let beings = try dec.decode([PklSwift.PklAny].self, forKey: PklCodingKey(string: "beings"))
                 .map {
@@ -1398,7 +1398,7 @@ extension pkl_swift_example_Poly {
             hasher.combine(exists)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let barks = try dec.decode(Bool.self, forKey: PklCodingKey(string: "barks"))
             let hates = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "hates"))

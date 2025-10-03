@@ -47,7 +47,7 @@ extension AnyType {
             self.dataSize = dataSize
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let bird = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "bird"))
                 .value
