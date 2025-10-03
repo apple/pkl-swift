@@ -31,7 +31,7 @@ extension Foo {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let animals = try dec.decode([PklSwift.PklAny].self, forKey: PklCodingKey(string: "animals"))
                 .map {

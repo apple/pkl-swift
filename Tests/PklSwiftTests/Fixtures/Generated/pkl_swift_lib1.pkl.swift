@@ -3,7 +3,7 @@ import PklSwift
 
 public enum pkl_swift_lib1 {}
 
-public protocol pkl_swift_lib1_Being: PklRegisteredType, DynamicallyEquatable, Hashable {
+public protocol pkl_swift_lib1_Being: PklRegisteredType, DynamicallyEquatable, Hashable, Sendable {
     var exists: Bool { get }
 }
 

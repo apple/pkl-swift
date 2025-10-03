@@ -152,7 +152,7 @@ extension Classes {
             hasher.combine(bugTypeAlias)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let owner = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "owner"))
                 .value as! (any Person)?
@@ -288,7 +288,7 @@ extension Classes {
             hasher.combine(isAlive)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let myself = try dec.decode(ThisPerson.self, forKey: PklCodingKey(string: "myself"))
             let someoneElse = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "someoneElse"))

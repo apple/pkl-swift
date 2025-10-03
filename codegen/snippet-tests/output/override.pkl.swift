@@ -25,7 +25,7 @@ extension override {
             hasher.combine(foo)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let foo = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "foo"))
                 .value as! any Foo

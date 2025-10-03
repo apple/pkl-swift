@@ -32,7 +32,7 @@ extension com_example_Simple {
             hasher.combine(person)
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let person = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "person"))
                 .value as! any Person
