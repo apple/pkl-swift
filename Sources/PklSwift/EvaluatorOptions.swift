@@ -34,7 +34,8 @@ public struct EvaluatorOptions: Sendable {
         http: Http? = nil,
         declaredProjectDependencies: [String: ProjectDependency]? = nil,
         externalModuleReaders: [String: ExternalReader]? = nil,
-        externalResourceReaders: [String: ExternalReader]? = nil
+        externalResourceReaders: [String: ExternalReader]? = nil,
+        traceMode: TraceMode? = nil
     ) {
         self.allowedModules = allowedModules
         self.allowedResources = allowedResources
@@ -53,6 +54,7 @@ public struct EvaluatorOptions: Sendable {
         self.declaredProjectDependencies = declaredProjectDependencies
         self.externalModuleReaders = externalModuleReaders
         self.externalResourceReaders = externalResourceReaders
+        self.traceMode = traceMode
     }
 
     /// Regular expression patterns that control what modules are allowed to be imported in a Pkl program.
@@ -139,6 +141,12 @@ public struct EvaluatorOptions: Sendable {
     /// Added in Pkl 0.27.
     /// If the underlying Pkl does not support external readers, evaluation will fail when a registered scheme is used.
     public var externalResourceReaders: [String: ExternalReader]?
+
+    /// Dictates how Pkl will format messages logged by `trace()`.
+    ///
+    /// Added in Pkl 0.30.
+    /// If the underlying Pkl does not support trace modes, this option will be ignored.
+    public var traceMode: TraceMode?
 }
 
 extension EvaluatorOptions {
@@ -180,7 +188,8 @@ extension EvaluatorOptions {
             project: self.project(),
             http: self.http,
             externalModuleReaders: self.externalModuleReaders,
-            externalResourceReaders: self.externalResourceReaders
+            externalResourceReaders: self.externalResourceReaders,
+            traceMode: self.traceMode?.rawValue
         )
     }
 
@@ -350,4 +359,9 @@ public struct ProjectLocalDependency: Codable, Sendable {
     let projectFileUri: String
 
     let dependencies: [String: ProjectDependency]
+}
+
+public enum TraceMode: String, CaseIterable, CodingKeyRepresentable, Codable, Sendable {
+    case compact
+    case pretty
 }
