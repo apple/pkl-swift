@@ -140,6 +140,7 @@ struct CreateEvaluatorRequest: ClientRequestMessage, Sendable {
     var http: Http?
     var externalModuleReaders: [String: ExternalReader]?
     var externalResourceReaders: [String: ExternalReader]?
+    var traceMode: String?
 }
 
 struct ProjectOrDependency: Codable, Sendable {
