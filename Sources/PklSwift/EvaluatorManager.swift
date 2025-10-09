@@ -313,20 +313,33 @@ public actor EvaluatorManager {
         try self.tell(CloseEvaluatorRequest(evaluatorId: evaluatorId))
     }
 
-    private func closeError(error: Error) {
+    private func closeError(error: Error) async {
         for (id, req) in self.inFlightRequests {
             self.inFlightRequests.removeValue(forKey: id)
             req.resume(throwing: error)
         }
-        self.close()
+        await self.close()
     }
 
     /// Closes the evaluator manager, and closes any evaluators that have spawned.
-    public func close() {
+    public func close() async {
         self.isClosed = true
-        for (evaluatorID, _) in self.evaluators {
-            Task { try await self.closeEvaluator(evaluatorID) }
+
+        let evaluatorIDsToClose = Array(self.evaluators.keys)
+
+        await withTaskGroup(of: Void.self) { group in
+            for evaluatorID in evaluatorIDsToClose {
+                group.addTask { [weak self] in
+                    guard let self else { return }
+                    do {
+                        try await self.closeEvaluator(evaluatorID)
+                    } catch {
+                        debug("Warning: Failed to close evaluator \(evaluatorID): \(error)")
+                    }
+                }
+            }
         }
+        
         self.transport.close()
     }
 
