@@ -282,6 +282,7 @@ extension EvaluatorOptions {
         }
         options.externalModuleReaders = evaluatorSettings.externalModuleReaders ?? options.externalModuleReaders
         options.externalResourceReaders = evaluatorSettings.externalResourceReaders ?? options.externalResourceReaders
+        options.traceMode = evaluatorSettings.traceMode ?? options.traceMode
         return options
     }
 
