@@ -339,7 +339,7 @@ public actor EvaluatorManager {
                 }
             }
         }
-        
+
         self.transport.close()
     }
 
