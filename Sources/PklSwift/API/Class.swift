@@ -22,24 +22,24 @@ public struct Class: Hashable {
     /// Will be an empty string for values encoded by Pkl versions older than 0.30.
     public let moduleUri: String
 
-    /// The qualified name of this class.
+    /// The name of this class.
     /// Will be an empty string for values encoded by Pkl versions older than 0.30.
-    public let qualifiedName: String
+    public let name: String
 }
 
 extension Class: PklSerializableType, Sendable {
     public static let messageTag: PklValueType = .class
 
     public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> Class {
-        if fields.count > 1 { // pkl 0.30+ includes the qualified name and module uri
+        if fields.count > 1 { // pkl 0.30+ includes the name and module uri
             try checkFieldCount(fields, codingPath: codingPath, min: 3)
             return try Class(
-                moduleUri: fields[1].decode(String.self),
-                qualifiedName: fields[2].decode(String.self)
+                moduleUri: fields[2].decode(String.self),
+                name: fields[1].decode(String.self)
             )
         }
 
         try checkFieldCount(fields, codingPath: codingPath, min: 1)
-        return Class(moduleUri: "", qualifiedName: "")
+        return Class(moduleUri: "", name: "")
     }
 }

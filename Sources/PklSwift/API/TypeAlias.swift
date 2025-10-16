@@ -22,24 +22,24 @@ public struct TypeAlias: Hashable {
     /// Will be an empty string for values encoded by Pkl versions older than 0.30.
     public let moduleUri: String
 
-    /// The qualified name of this typealias.
+    /// The name of this typealias.
     /// Will be an empty string for values encoded by Pkl versions older than 0.30.
-    public let qualifiedName: String
+    public let name: String
 }
 
 extension TypeAlias: PklSerializableType, Sendable {
     public static let messageTag: PklValueType = .typealias
 
     public static func decode(_ fields: [MessagePackValue], codingPath: [any CodingKey]) throws -> TypeAlias {
-        if fields.count > 1 { // pkl 0.30+ includes the qualified name and module uri
+        if fields.count > 1 { // pkl 0.30+ includes the name and module uri
             try checkFieldCount(fields, codingPath: codingPath, min: 3)
             return try TypeAlias(
-                moduleUri: fields[1].decode(String.self),
-                qualifiedName: fields[2].decode(String.self)
+                moduleUri: fields[2].decode(String.self),
+                name: fields[1].decode(String.self)
             )
         }
 
         try checkFieldCount(fields, codingPath: codingPath, min: 1)
-        return TypeAlias(moduleUri: "", qualifiedName: "")
+        return TypeAlias(moduleUri: "", name: "")
     }
 }
