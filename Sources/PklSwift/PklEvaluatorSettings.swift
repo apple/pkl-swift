@@ -37,6 +37,9 @@ public struct PklEvaluatorSettings: Decodable, Hashable, Sendable {
     ///
     /// Added in Pkl 0.27
     let color: PklEvaluatorSettingsColor?
+
+    /// Added in Pkl 0.30
+    let traceMode: TraceMode?
 }
 
 public enum PklEvaluatorSettingsColor: String, CaseIterable, Decodable, Hashable, Sendable {

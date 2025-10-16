@@ -73,6 +73,7 @@ class ProjectTest: XCTestCase {
         }
         """
         let colorSetting = version < pklVersion0_27 ? "" : #"color = "always""#
+        let traceModeSetting = version < pklVersion0_30 ? "" : #"traceMode = "pretty""#
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
             caCertificates: nil,
             proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
@@ -86,6 +87,7 @@ class ProjectTest: XCTestCase {
             "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
         ]
         let color: PklEvaluatorSettingsColor? = version < pklVersion0_27 ? nil : .always
+        let traceMode: TraceMode? = version < pklVersion0_30 ? nil : .pretty
         try #"""
         amends "pkl:Project"
 
@@ -133,6 +135,7 @@ class ProjectTest: XCTestCase {
           \#(externalReaderSettings)
           \#(httpSetting)
           \#(colorSetting)
+          \#(traceModeSetting)
         }
 
         dependencies {
@@ -160,7 +163,8 @@ class ProjectTest: XCTestCase {
                 http: httpExpectation,
                 externalModuleReaders: externalModuleReadersExpectation,
                 externalResourceReaders: externalResourceReadersExpectation,
-                color: color
+                color: color,
+                traceMode: traceMode
             )
             let expectedPackage = PklSwift.Project.Package(
                 name: "hawk",
@@ -218,7 +222,8 @@ class ProjectTest: XCTestCase {
                         http: nil,
                         externalModuleReaders: nil,
                         externalResourceReaders: nil,
-                        color: nil
+                        color: nil,
+                        traceMode: nil
                     ),
                     projectFileUri: "\(otherProjectFile)",
                     tests: [],
