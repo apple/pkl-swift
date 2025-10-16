@@ -86,23 +86,31 @@ class FixturesTest: XCTestCase {
     }
 
     func testEvaluateApiTypes() async throws {
+        let inputPath = "\(#filePath)/../Fixtures/ApiTypes.pkl"
         let result = try await ApiTypes.loadFrom(
             evaluator: self.evaluator,
-            source: .path("\(#filePath)/../Fixtures/ApiTypes.pkl")
+            source: .path(inputPath)
         )
 
         let stringClass: Class
-        let moduleClass: Class
-        let typeAlias: TypeAlias
+        let baseModuleClass: Class
+        let uint8TypeAlias: TypeAlias
+        let fooClass: Class
+        let barTypeAlias: TypeAlias
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
         if version < pklVersion0_30 {
-            stringClass = Class(moduleUri: "", qualifiedName: "")
-            moduleClass = Class(moduleUri: "", qualifiedName: "")
-            typeAlias = TypeAlias(moduleUri: "", qualifiedName: "")
+            stringClass = Class(moduleUri: "", name: "")
+            baseModuleClass = Class(moduleUri: "", name: "")
+            uint8TypeAlias = TypeAlias(moduleUri: "", name: "")
+            fooClass = Class(moduleUri: "", name: "")
+            barTypeAlias = TypeAlias(moduleUri: "", name: "")
         } else {
-            stringClass = Class(moduleUri: "pkl:base", qualifiedName: "pkl.base#String")
-            moduleClass = Class(moduleUri: "pkl:base", qualifiedName: "pkl.base")
-            typeAlias = TypeAlias(moduleUri: "pkl:base", qualifiedName: "pkl.base#UInt8")
+            let inputModuleURI = URL(filePath: inputPath).absoluteString
+            stringClass = Class(moduleUri: "pkl:base", name: "String")
+            baseModuleClass = Class(moduleUri: "pkl:base", name: "ModuleClass")
+            uint8TypeAlias = TypeAlias(moduleUri: "pkl:base", name: "UInt8")
+            fooClass = Class(moduleUri: inputModuleURI, name: "ApiTypes#Foo")
+            barTypeAlias = TypeAlias(moduleUri: inputModuleURI, name: "ApiTypes#Bar")
         }
 
         XCTAssertEqual(
@@ -111,8 +119,10 @@ class FixturesTest: XCTestCase {
                 res1: .hours(10),
                 res2: .gibibytes(1.2345),
                 stringClass: stringClass,
-                moduleClass: moduleClass,
-                typeAlias: typeAlias
+                baseModuleClass: baseModuleClass,
+                uint8TypeAlias: uint8TypeAlias,
+                fooClass: fooClass,
+                barTypeAlias: barTypeAlias
             )
         )
     }

@@ -13,24 +13,40 @@ extension ApiTypes {
 
         public var stringClass: Class
 
-        public var moduleClass: Class
+        public var baseModuleClass: Class
 
-        public var typeAlias: TypeAlias
+        public var uint8TypeAlias: TypeAlias
+
+        public var fooClass: Class
+
+        public var barTypeAlias: TypeAlias
 
         public init(
             res1: Duration,
             res2: DataSize,
             stringClass: Class,
-            moduleClass: Class,
-            typeAlias: TypeAlias
+            baseModuleClass: Class,
+            uint8TypeAlias: TypeAlias,
+            fooClass: Class,
+            barTypeAlias: TypeAlias
         ) {
             self.res1 = res1
             self.res2 = res2
             self.stringClass = stringClass
-            self.moduleClass = moduleClass
-            self.typeAlias = typeAlias
+            self.baseModuleClass = baseModuleClass
+            self.uint8TypeAlias = uint8TypeAlias
+            self.fooClass = fooClass
+            self.barTypeAlias = barTypeAlias
         }
     }
+
+    public struct Foo: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "ApiTypes#Foo"
+
+        public init() {}
+    }
+
+    public typealias Bar = Foo
 
     /// Load the Pkl module at the given source and evaluate it into `ApiTypes.Module`.
     ///

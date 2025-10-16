@@ -4,6 +4,10 @@ res1: Duration = 10.h
 res2: DataSize = 1.2345.gib
 
 stringClass: Class = String
-moduleClass: Class = base.getClass()
-typeAlias: TypeAlias = UInt8
+baseModuleClass: Class = base.getClass()
+uint8TypeAlias: TypeAlias = UInt8
+fooClass: Class = Foo
+barTypeAlias: TypeAlias = Bar
 
+class Foo {}
+typealias Bar = Foo
