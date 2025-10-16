@@ -50,6 +50,7 @@ class FakeMessageTransport: MessageTransport, @unchecked Sendable {
     }
 }
 
+#if os(macOS) || os(Linux) || os(Windows)
 class EvaluatorManagerTest: XCTestCase {
     func testConcurrentEvaluatorManagers() async throws {
         let manager1 = EvaluatorManager()
@@ -141,3 +142,4 @@ class EvaluatorManagerTest: XCTestCase {
         }
     }
 }
+#endif

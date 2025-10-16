@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ===----------------------------------------------------------------------===//
-amends "package://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.circleci@1.1.1#/PklCI.pkl"
+amends "package://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.circleci@1.2.1#/PklCI.pkl"
 
 import "pkl:semver"
 
@@ -53,6 +53,62 @@ local pklCurrent: PklDistribution = new {
 local pklDistributions: Listing<PklDistribution> = new {
   new { version = "0.25.3" }
   pklCurrent
+}
+
+local typealias Platform ="iOS Simulator"|"watchOS Simulator"|"tvOS Simulator"|"visionOS Simulator"|"Mac Catalyst"
+
+local class SimulatorRuntime {
+  name: String
+  platform: Platform
+  fixed sdk: String = Map(
+    "iOS Simulator", "iphonesimulator",
+    "watchOS Simulator", "watchsimulator",
+    "tvOS Simulator", "appletvsimulator",
+    "visionOS Simulator", "xrsimulator",
+    "Mac Catalyst", "macosx"
+  )[platform]
+  hidden destination: String = "platform=\(platform),name=\(name)"
+  settings: Mapping<String, Any> = new {
+    ["ONLY_ACTIVE_ARCH"] = "YES"
+    ["CODE_SIGNING_REQUIRED"] = "NO"
+    ["CODE_SIGNING_ALLOWED"] = "YES"
+    ["COMPILER_INDEX_STORE_ENABLE"] = "NO"
+  }
+  flags: Listing<String> = new {
+    "-sdk \(sdk)"
+    "-destination  '\(destination)'"
+    for (k, v in settings) {
+      "\(k)=\(v)"
+    }
+  }
+}
+
+local simulators: Mapping<Platform, SimulatorRuntime> = new {
+  default { key -> platform = key }
+  ["iOS Simulator"] {
+    name = "iPhone 17"
+  }
+  ["watchOS Simulator"] {
+    name = "Apple Watch Series 11 (42mm)"
+  }
+  ["tvOS Simulator"] {
+    name = "Apple TV 4K (3rd generation)"
+  }
+  // ["visionOS Simulator"] {
+  //   name = "Apple Vision Pro"
+  // }
+  ["Mac Catalyst"] {
+    destination = "platform=macOS,variant=Mac Catalyst,arch=\(settings["ARCH"])"
+    settings {
+      ["ARCH"] = "arm64"
+      ["VALID_ARCHS"] = this["ARCH"]
+      ["SUPPORTS_MACCATALYST"] = "YES"
+      ["TARGETED_DEVICE_FAMILY"] = 2
+      ["CODE_SIGN_IDENTITY"] = "-"
+      ["CODE_SIGNING_REQUIRED"] = "NO"
+      ["CODE_SIGNING_ALLOWED"] = "NO"
+    }
+  }
 }
 
 local testJobs = jobs.keys.filter((it) -> it.startsWith("test"))
@@ -138,6 +194,30 @@ jobs {
           new RunStep { command = "make test-snippets" }
           new RunStep { command = "make test-pkl" }
           new RunStep { command = "make generate-fixtures" }
+        }
+        new StoreTestResults {
+          path = ".out/test-results/"
+        }
+      }
+    }
+  }
+
+  for (simulator in simulators) {
+    ["test-\(simulator.platform.toLowerCase().replaceAll(" ", "-"))"] {
+      macos {
+        xcode = "26.0.1"
+      }
+      resource_class = "m4pro.large"
+      steps {
+        "checkout"
+        new RunStep { command = "gem install xcpretty" }
+        new RunStep {
+          name = "xcodebuild test"
+          command =
+            #"""
+            xcodebuild -scheme pkl-swift-Package \#(simulator.flags.join(" ")) test \
+              | xcpretty --report junit --output .out/test-results/junit.xml
+            """#
         }
         new StoreTestResults {
           path = ".out/test-results/"

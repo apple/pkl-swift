@@ -53,7 +53,7 @@ let package = Package(
         .target(
             name: "PklSwift",
             dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"],
-            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
         ),
         .target(
             name: "PklSwiftInternals",

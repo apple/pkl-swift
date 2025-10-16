@@ -153,7 +153,7 @@ public actor EvaluatorManager {
         self.pklVersion = String(output[1])
         return self.pklVersion!
         #else
-        fatalError("cannot spawn pkl cli on this platform")
+        throw PklError("cannot spawn pkl cli on this platform")
         #endif
     }
 

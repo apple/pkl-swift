@@ -18,6 +18,7 @@
 import SemanticVersion
 import XCTest
 
+#if os(macOS) || os(Linux) || os(Windows)
 class FixturesTest: XCTestCase {
     var manager: EvaluatorManager!
     var evaluator: Evaluator!
@@ -264,3 +265,4 @@ class FixturesTest: XCTestCase {
         ))
     }
 }
+#endif
