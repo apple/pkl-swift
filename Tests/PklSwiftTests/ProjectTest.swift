@@ -19,6 +19,7 @@ import XCTest
 
 @testable import PklSwift
 
+#if os(macOS) || os(Linux) || os(Windows)
 class ProjectTest: XCTestCase {
     func testLoadProject() async throws {
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
@@ -242,3 +243,4 @@ class ProjectTest: XCTestCase {
         }
     }
 }
+#endif

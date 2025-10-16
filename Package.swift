@@ -20,8 +20,11 @@ import PackageDescription
 let package = Package(
     name: "pkl-swift",
     platforms: [
-        // required because of `Duration` API
         .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9),
+        .visionOS(.v1),
     ],
     products: [
         .library(
@@ -50,7 +53,7 @@ let package = Package(
         .target(
             name: "PklSwift",
             dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"],
-            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
         ),
         .target(
             name: "PklSwiftInternals",

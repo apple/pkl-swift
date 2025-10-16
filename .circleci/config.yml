@@ -53,6 +53,66 @@ jobs:
     resource_class: xlarge
     docker:
     - image: swift:6.1-rhel-ubi9
+  test-ios-simulator:
+    steps:
+    - checkout
+    - run:
+        command: gem install xcpretty
+    - run:
+        command: |-
+          xcodebuild -scheme pkl-swift-Package -sdk iphonesimulator -destination  'platform=iOS Simulator,name=iPhone 17' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
+            | xcpretty --report junit --output .out/test-results/junit.xml
+        name: xcodebuild test
+    - store_test_results:
+        path: .out/test-results/
+    resource_class: m4pro.large
+    macos:
+      xcode: 26.0.1
+  test-watchos-simulator:
+    steps:
+    - checkout
+    - run:
+        command: gem install xcpretty
+    - run:
+        command: |-
+          xcodebuild -scheme pkl-swift-Package -sdk watchsimulator -destination  'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
+            | xcpretty --report junit --output .out/test-results/junit.xml
+        name: xcodebuild test
+    - store_test_results:
+        path: .out/test-results/
+    resource_class: m4pro.large
+    macos:
+      xcode: 26.0.1
+  test-tvos-simulator:
+    steps:
+    - checkout
+    - run:
+        command: gem install xcpretty
+    - run:
+        command: |-
+          xcodebuild -scheme pkl-swift-Package -sdk appletvsimulator -destination  'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
+            | xcpretty --report junit --output .out/test-results/junit.xml
+        name: xcodebuild test
+    - store_test_results:
+        path: .out/test-results/
+    resource_class: m4pro.large
+    macos:
+      xcode: 26.0.1
+  test-mac-catalyst:
+    steps:
+    - checkout
+    - run:
+        command: gem install xcpretty
+    - run:
+        command: |-
+          xcodebuild -scheme pkl-swift-Package -sdk macosx -destination  'platform=macOS,variant=Mac Catalyst,arch=arm64' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO ARCH=arm64 VALID_ARCHS=arm64 SUPPORTS_MACCATALYST=YES TARGETED_DEVICE_FAMILY=2 CODE_SIGN_IDENTITY=- test \
+            | xcpretty --report junit --output .out/test-results/junit.xml
+        name: xcodebuild test
+    - store_test_results:
+        path: .out/test-results/
+    resource_class: m4pro.large
+    macos:
+      xcode: 26.0.1
   test-license-headers:
     steps:
     - checkout
@@ -208,6 +268,18 @@ workflows:
     - test-pkl-0-29-0:
         requires:
         - hold
+    - test-ios-simulator:
+        requires:
+        - hold
+    - test-watchos-simulator:
+        requires:
+        - hold
+    - test-tvos-simulator:
+        requires:
+        - hold
+    - test-mac-catalyst:
+        requires:
+        - hold
     - test-license-headers:
         requires:
         - hold
@@ -222,6 +294,10 @@ workflows:
     jobs:
     - test-pkl-0-25-3
     - test-pkl-0-29-0
+    - test-ios-simulator
+    - test-watchos-simulator
+    - test-tvos-simulator
+    - test-mac-catalyst
     - test-license-headers
     - test-format
     when:
@@ -237,6 +313,30 @@ workflows:
           tags:
             only: /^v?\d+\.\d+\.\d+$/
     - test-pkl-0-29-0:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-ios-simulator:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-watchos-simulator:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-tvos-simulator:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-mac-catalyst:
         filters:
           branches:
             ignore: /.*/
@@ -258,6 +358,10 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-29-0
+        - test-ios-simulator
+        - test-watchos-simulator
+        - test-tvos-simulator
+        - test-mac-catalyst
         - test-license-headers
         - test-format
         filters:
@@ -269,6 +373,10 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-29-0
+        - test-ios-simulator
+        - test-watchos-simulator
+        - test-tvos-simulator
+        - test-mac-catalyst
         - test-license-headers
         - test-format
         filters:
@@ -280,6 +388,10 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-29-0
+        - test-ios-simulator
+        - test-watchos-simulator
+        - test-tvos-simulator
+        - test-mac-catalyst
         - test-license-headers
         - test-format
         filters:
@@ -291,6 +403,10 @@ workflows:
         requires:
         - test-pkl-0-25-3
         - test-pkl-0-29-0
+        - test-ios-simulator
+        - test-watchos-simulator
+        - test-tvos-simulator
+        - test-mac-catalyst
         - test-license-headers
         - test-format
         filters:

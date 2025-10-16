@@ -74,6 +74,7 @@ struct VirtualResourceReader: ResourceReader {
     }
 }
 
+#if os(macOS) || os(Linux) || os(Windows)
 final class PklSwiftTests: XCTestCase {
     var manager: EvaluatorManager!
 
@@ -458,3 +459,4 @@ final class PklSwiftTests: XCTestCase {
 //        }
 //    }
 }
+#endif

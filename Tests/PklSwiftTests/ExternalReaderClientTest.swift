@@ -19,6 +19,7 @@ import XCTest
 
 @testable import PklSwift
 
+#if os(macOS) || os(Linux) || os(Windows)
 class ExternalReaderClientTest: XCTestCase {
     func testE2E() async throws {
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
@@ -63,3 +64,4 @@ class ExternalReaderClientTest: XCTestCase {
         }
     }
 }
+#endif
