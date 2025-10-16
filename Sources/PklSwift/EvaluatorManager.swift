@@ -26,7 +26,7 @@ let PKL_EXEC_NAME="pkl.exe"
 let ENV_SEPARATOR=":"
 let PKL_EXEC_NAME="pkl"
 #endif
-/// Perfoms `action`, returns its result and then closes the manager.
+/// Performs `action`, returns its result and then closes the manager.
 ///
 /// - Parameter action: The action to perform
 /// - Returns: The result of `action`
@@ -109,7 +109,11 @@ public actor EvaluatorManager {
 
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
+        #if os(macOS) || os(Linux) || os(Windows)
         self.init(transport: ServerMessageTransport())
+        #else
+        fatalError("cannot spawn pkl cli on this platform")
+        #endif
     }
 
     // Used for testing only.
@@ -126,6 +130,7 @@ public actor EvaluatorManager {
 
     /// Get the semantic version as a String of the Pkl interpreter being used.
     func getVersion() throws -> String {
+        #if os(macOS) || os(Linux) || os(Windows)
         if let pklVersion {
             return pklVersion
         }
@@ -147,6 +152,9 @@ public actor EvaluatorManager {
 
         self.pklVersion = String(output[1])
         return self.pklVersion!
+        #else
+        fatalError("cannot spawn pkl cli on this platform")
+        #endif
     }
 
     private func listenForIncomingMessages() async throws {

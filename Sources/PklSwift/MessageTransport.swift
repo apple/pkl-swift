@@ -122,6 +122,7 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
 }
 
 /// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
+#if os(macOS) || os(Linux) || os(Windows)
 public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     var process: Process?
     let pklCommand: [String]?
@@ -194,6 +195,7 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         return try super.getMessages()
     }
 }
+#endif
 
 public class ExternalReaderMessageTransport: BaseMessageTransport, @unchecked Sendable {
     override var running: Bool { self._running }
