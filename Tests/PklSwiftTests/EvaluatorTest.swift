@@ -347,6 +347,23 @@ final class PklSwiftTests: XCTestCase {
         XCTAssertEqual(output, #"result = "yes pizza"\#n"#)
     }
 
+    func testCustomResourceReaderWithSchemeContainingRegexControlCharacters() async throws {
+        let reader = VirtualResourceReader(
+            scheme: "foo+bar.baz",
+            isGlobbable: false,
+            hasHierarchicalUris: false,
+            read: { _ in [UInt8]("Hello, World!".utf8) },
+            listElements: { _ in [] }
+        )
+        let options = EvaluatorOptions.preconfigured.withResourceReader(reader)
+        XCTAssert(options.allowedResources!.contains(#"\Qfoo+bar.baz:\E"#))
+        let evaluator = try await manager.newEvaluator(options: options)
+        let output = try await evaluator.evaluateOutputText(source: .text("""
+        result = read("foo+bar.baz:quz").text
+        """))
+        XCTAssertEqual(output, #"result = "Hello, World!"\#n"#)
+    }
+
     func testFailedEvaluation() async throws {
         let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
         do {

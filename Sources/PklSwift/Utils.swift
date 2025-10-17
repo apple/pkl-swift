@@ -118,3 +118,14 @@ public struct OptionalDictionaryKey<Wrapped>: Hashable, Decodable, CodingKeyRepr
         fatalError("cannot initialize OptionalDictionaryKey from CodingKey")
     }
 }
+
+private let regexSpecialCharacters = CharacterSet(charactersIn: #"\.+*?()|[]{}^$"#)
+
+func quoteRegex(_ pattern: String) -> String {
+    if pattern.rangeOfCharacter(from: regexSpecialCharacters) == nil {
+        return pattern
+    }
+
+    // return quoted pattern per https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html
+    return #"\Q\#(pattern)\E"#
+}

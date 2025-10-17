@@ -244,7 +244,7 @@ extension EvaluatorOptions {
     public func withModuleReader(_ reader: ModuleReader) -> EvaluatorOptions {
         var options = self
         var allowedModules = options.allowedModules ?? []
-        allowedModules.append(reader.scheme)
+        allowedModules.append(quoteRegex(reader.scheme+":"))
         var moduleReaders = options.moduleReaders ?? []
         moduleReaders.append(reader)
         options.allowedModules = allowedModules
@@ -256,7 +256,7 @@ extension EvaluatorOptions {
     public func withResourceReader(_ reader: ResourceReader) -> EvaluatorOptions {
         var options = self
         var allowedResources = options.allowedResources ?? []
-        allowedResources.append(reader.scheme)
+        allowedResources.append(quoteRegex(reader.scheme+":"))
         var resourceReaders = options.resourceReaders ?? []
         resourceReaders.append(reader)
         options.allowedResources = allowedResources
