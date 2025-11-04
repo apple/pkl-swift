@@ -20,10 +20,11 @@ module pkl.swift.internal.EnumGen
 extends "Gen.pkl"
 
 import "pkl:reflect"
+
 import "SwiftMapping.pkl"
-import "utils.pkl"
-import "typegen.pkl"
 import "Type.pkl"
+import "typegen.pkl"
+import "utils.pkl"
 
 alias: reflect.TypeAlias = mapping.source as reflect.TypeAlias
 
@@ -37,34 +38,35 @@ local isStringLiteralUnion =
   let (stringLiterals = unionMembers.filterIsInstance(reflect.StringLiteralType))
     unionMembers.length == stringLiterals.length
 
-local enumBaseMembers: List<EnumMember> = unionMembers
-  .map((it) ->
-    new EnumMember {
-      pklType = it
-      renderedType = type.render(module.namespaceName)
-      type = typegen.generateType(it, module.mapping.source, module.mappings)
-    }
-  )
+local enumBaseMembers: List<EnumMember> =
+  unionMembers.map((it) -> new EnumMember {
+    pklType = it
+    renderedType = type.render(module.namespaceName)
+    type = typegen.generateType(it, module.mapping.source, module.mappings)
+  })
 
-local enumStringLiteralMembers = enumBaseMembers.map((it) -> (it) {
-  name = utils.normalizeEnumName((it.pklType as reflect.StringLiteralType).value)
-})
+local enumStringLiteralMembers =
+  enumBaseMembers.map((it) -> (it) {
+    name = utils.normalizeEnumName((it.pklType as reflect.StringLiteralType).value)
+  })
 
-local enumNormalMembers = enumBaseMembers.map((it) -> (it) {
-  name = let (baseName = type.renderEnumCaseName(module.namespaceName).first)
-    baseName[0].toLowerCase() + baseName.drop(1)
-})
+local enumNormalMembers =
+  enumBaseMembers.map((it) -> (it) {
+    name =
+      let (baseName = type.renderEnumCaseName(module.namespaceName).first)
+        baseName[0].toLowerCase() + baseName.drop(1)
+  })
 
 local enumNonNumericMembers = enumNormalMembers.filter((it) -> !it.type.isNumeric)
-local hasAnyHashable: Boolean =
-  enumNormalMembers.any((it) -> it.type.isAny)
-
+local hasAnyHashable: Boolean = enumNormalMembers.any((it) -> it.type.isAny)
 
 local enumNumericMembers = enumNormalMembers.filter((it) -> it.type.isNumeric)
 
 contents =
-  if (isStringLiteralUnion) stringLiteralEnumContents
-  else enumContents
+  if (isStringLiteralUnion)
+    stringLiteralEnumContents
+  else
+    enumContents
 
 local stringLiteralEnumContents =
   new Listing {
@@ -105,95 +107,104 @@ local enumContents =
     "}"
   }.join("\n")
 
-local throwTypeMismatch = new Listing {
-  "\(module.indent.repeat(2))throw DecodingError.typeMismatch("
-  "\(module.indent.repeat(3))\(module.mapping.name).self,"
-  "\(module.indent.repeat(3)).init("
-  "\(module.indent.repeat(4))codingPath: decoder.codingPath,"
-  "\(module.indent.repeat(4))debugDescription: \"Expected type \(module.mapping.name), but got \\(String(describing: value))\""
-  "\(module.indent.repeat(3)))"
-  "\(module.indent.repeat(2)))"
-}.join("\n")
+local throwTypeMismatch =
+  new Listing {
+    "\(module.indent.repeat(2))throw DecodingError.typeMismatch("
+    "\(module.indent.repeat(3))\(module.mapping.name).self,"
+    "\(module.indent.repeat(3)).init("
+    "\(module.indent.repeat(4))codingPath: decoder.codingPath,"
+    "\(module.indent.repeat(4))debugDescription: \"Expected type \(module.mapping.name), but got \\(String(describing: value))\""
+    "\(module.indent.repeat(3)))"
+    "\(module.indent.repeat(2)))"
+  }.join("\n")
 
-local initMethod = new Listing {
-  "\(module.indent)public init(from decoder: Decoder) throws {"
-  "\(module.indent.repeat(2))let container = try decoder.singleValueContainer()"
-  when (!enumNumericMembers.isEmpty) {
-    "\(module.indent.repeat(2))let decoded = \(module.mapping.name).decodeNumeric(from: decoder, container)"
-    "\(module.indent.repeat(2))if decoded != nil {"
-    "\(module.indent.repeat(3))self = decoded!"
-    "\(module.indent.repeat(3))return"
-    "\(module.indent.repeat(2))}"
-  }
-  "\(module.indent.repeat(2))let value = try container.decode(PklSwift.PklAny.self).value"
-  when (!enumNonNumericMembers.isEmpty) {
-    "\(module.indent.repeat(2))switch value?.base {"
-    for (member in enumNonNumericMembers) {
-      "\(module.indent.repeat(2))case let decoded as \(member.renderedType):"
-      "\(module.indent.repeat(3))self = \(module.mapping.name).\(member.name)(decoded)"
+local initMethod =
+  new Listing {
+    "\(module.indent)public init(from decoder: Decoder) throws {"
+    "\(module.indent.repeat(2))let container = try decoder.singleValueContainer()"
+    when (!enumNumericMembers.isEmpty) {
+      "\(module.indent.repeat(2))let decoded = \(module.mapping.name).decodeNumeric(from: decoder, container)"
+      "\(module.indent.repeat(2))if decoded != nil {"
+      "\(module.indent.repeat(3))self = decoded!"
+      "\(module.indent.repeat(3))return"
+      "\(module.indent.repeat(2))}"
     }
-    "\(module.indent.repeat(2))default:"
-    // indent one more level
-    module.indent + throwTypeMismatch.split("\n").join("\n" + module.indent)
-    "\(module.indent.repeat(2))}"
-  } else {
-    throwTypeMismatch
-  }
-  "\(module.indent)}"
-}
-  .join("\n")
-
-local synthesizedEquals = new Listing {
-  "\(module.indent)public static func ==(lhs: \(module.mapping.name), rhs: \(module.mapping.name)) -> Bool {"
-  "\(module.indent.repeat(2))switch (lhs, rhs) {"
-  local renderEqualityCheck = (type: Type) ->
-    if (type.isAny) "a == b"
-    else if (type is Type.Array) "arrayEquals(arr1: a, arr2: b)"
-    else if (type is Type.Dictionary) "mapEquals(map1: a, map2: b)"
-    else if (type.isPolymorphic) "a.isDynamicallyEqual(to: b)"
-    else "a == b"
-  for (member in enumNormalMembers) {
-    "\(module.indent.repeat(2))case let (.\(member.name)(a), .\(member.name)(b)):"
-    when (member.type is Type.Optional) {
-      "\(module.indent.repeat(3))return a == nil && b == nil || \(renderEqualityCheck.apply(member.type.elem))"
+    "\(module.indent.repeat(2))let value = try container.decode(PklSwift.PklAny.self).value"
+    when (!enumNonNumericMembers.isEmpty) {
+      "\(module.indent.repeat(2))switch value?.base {"
+      for (member in enumNonNumericMembers) {
+        "\(module.indent.repeat(2))case let decoded as \(member.renderedType):"
+        "\(module.indent.repeat(3))self = \(module.mapping.name).\(member.name)(decoded)"
+      }
+      "\(module.indent.repeat(2))default:"
+      // indent one more level
+      module.indent + throwTypeMismatch.split("\n").join("\n" + module.indent)
+      "\(module.indent.repeat(2))}"
     } else {
-      "\(module.indent.repeat(3))return \(renderEqualityCheck.apply(member.type))"
+      throwTypeMismatch
     }
-  }
-  "\(module.indent.repeat(2))default:"
-  "\(module.indent.repeat(3))return false"
-  "\(module.indent.repeat(2))}"
-  "\(module.indent)}"
-}.join("\n")
+    "\(module.indent)}"
+  }.join("\n")
 
-local synthesizedHash = new Listing {
-  "\(module.indent)public func hash(into hasher: inout Hasher) {"
-  "\(module.indent.repeat(2))switch self {"
-  for (member in enumNormalMembers) {
-    "\(module.indent.repeat(2))case let .\(member.name)(value):"
-    "\(module.indent.repeat(3))hasher.combine(\"\(member.name)\")"
-    module.renderInnerHash(member.type, 3, "value", false)
-  }
-  "\(module.indent.repeat(2))}"
-  "\(module.indent)}"
-}.join("\n")
-
-local decodeNumeric = new Listing {
-  "\(module.indent)private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> \(module.mapping.name)? {"
-  when (enumNumericMembers.length == 1) {
-    local member = enumNumericMembers.first
-    "\(module.indent.repeat(2))return try? .\(member.name)(container.decode(\(member.renderedType).self))"
-  } else {
-    for (idx, member in enumNumericMembers) {
-      when (idx == 0) {
-        "\(module.indent.repeat(2))return (try? .\(member.name)(container.decode(\(member.renderedType).self)))"
+local synthesizedEquals =
+  new Listing {
+    "\(module.indent)public static func ==(lhs: \(module.mapping.name), rhs: \(module.mapping.name)) -> Bool {"
+    "\(module.indent.repeat(2))switch (lhs, rhs) {"
+    local renderEqualityCheck = (type: Type) ->
+      if (type.isAny)
+        "a == b"
+      else if (type is Type.Array)
+        "arrayEquals(arr1: a, arr2: b)"
+      else if (type is Type.Dictionary)
+        "mapEquals(map1: a, map2: b)"
+      else if (type.isPolymorphic)
+        "a.isDynamicallyEqual(to: b)"
+      else
+        "a == b"
+    for (member in enumNormalMembers) {
+      "\(module.indent.repeat(2))case let (.\(member.name)(a), .\(member.name)(b)):"
+      when (member.type is Type.Optional) {
+        "\(module.indent.repeat(3))return a == nil && b == nil || \(renderEqualityCheck.apply(member.type.elem))"
       } else {
-        "\(module.indent.repeat(3))?? (try? .\(member.name)(container.decode(\(member.renderedType).self)))"
+        "\(module.indent.repeat(3))return \(renderEqualityCheck.apply(member.type))"
       }
     }
-  }
-  "\(module.indent)}"
-}.join("\n")
+    "\(module.indent.repeat(2))default:"
+    "\(module.indent.repeat(3))return false"
+    "\(module.indent.repeat(2))}"
+    "\(module.indent)}"
+  }.join("\n")
+
+local synthesizedHash =
+  new Listing {
+    "\(module.indent)public func hash(into hasher: inout Hasher) {"
+    "\(module.indent.repeat(2))switch self {"
+    for (member in enumNormalMembers) {
+      "\(module.indent.repeat(2))case let .\(member.name)(value):"
+      "\(module.indent.repeat(3))hasher.combine(\"\(member.name)\")"
+      module.renderInnerHash(member.type, 3, "value", false)
+    }
+    "\(module.indent.repeat(2))}"
+    "\(module.indent)}"
+  }.join("\n")
+
+local decodeNumeric =
+  new Listing {
+    "\(module.indent)private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> \(module.mapping.name)? {"
+    when (enumNumericMembers.length == 1) {
+      local member = enumNumericMembers.first
+      "\(module.indent.repeat(2))return try? .\(member.name)(container.decode(\(member.renderedType).self))"
+    } else {
+      for (idx, member in enumNumericMembers) {
+        when (idx == 0) {
+          "\(module.indent.repeat(2))return (try? .\(member.name)(container.decode(\(member.renderedType).self)))"
+        } else {
+          "\(module.indent.repeat(3))?? (try? .\(member.name)(container.decode(\(member.renderedType).self)))"
+        }
+      }
+    }
+    "\(module.indent)}"
+  }.join("\n")
 
 local class EnumMember {
   name: String

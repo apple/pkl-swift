@@ -19,7 +19,8 @@ import "pkl:semver"
 
 local swiftTest = new RunStep {
   name = "swift test"
-  command = """
+  command =
+    """
     mkdir -p .out/test-results/
     swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
     """
@@ -33,11 +34,13 @@ local class PklDistribution {
   fixed normalizedVersion: String = version.replaceAll(".", "-")
 
   /// The URL to download this distribution
-  fixed downloadUrl: String = "https://github.com/apple/pkl/releases/download/\(version)/pkl-linux-amd64"
+  fixed downloadUrl: String =
+    "https://github.com/apple/pkl/releases/download/\(version)/pkl-linux-amd64"
 
   fixed downloadRunStep: RunStep = new {
     name = "Downloading pkl-\(version)"
-    command = """
+    command =
+      """
       PKL=$(mktemp /tmp/pkl-\(version)-XXXXXX)
       curl -L "\(downloadUrl)" > $PKL
       chmod +x $PKL
@@ -47,7 +50,7 @@ local class PklDistribution {
 }
 
 local pklCurrent: PklDistribution = new {
-  version = "0.29.0"
+  version = "0.30.0"
 }
 
 local pklDistributions: Listing<PklDistribution> = new {
@@ -55,18 +58,20 @@ local pklDistributions: Listing<PklDistribution> = new {
   pklCurrent
 }
 
-local typealias Platform ="iOS Simulator"|"watchOS Simulator"|"tvOS Simulator"|"visionOS Simulator"|"Mac Catalyst"
+local typealias Platform =
+  "iOS Simulator" | "watchOS Simulator" | "tvOS Simulator" | "visionOS Simulator" | "Mac Catalyst"
 
 local class SimulatorRuntime {
   name: String
   platform: Platform
-  fixed sdk: String = Map(
-    "iOS Simulator", "iphonesimulator",
-    "watchOS Simulator", "watchsimulator",
-    "tvOS Simulator", "appletvsimulator",
-    "visionOS Simulator", "xrsimulator",
-    "Mac Catalyst", "macosx"
-  )[platform]
+  fixed sdk: String =
+    Map(
+      "iOS Simulator", "iphonesimulator",
+      "watchOS Simulator", "watchsimulator",
+      "tvOS Simulator", "appletvsimulator",
+      "visionOS Simulator", "xrsimulator",
+      "Mac Catalyst", "macosx"
+    )[platform]
   hidden destination: String = "platform=\(platform),name=\(name)"
   settings: Mapping<String, Any> = new {
     ["ONLY_ACTIVE_ARCH"] = "YES"
@@ -239,8 +244,8 @@ jobs {
       }
     }
   }
-  
-  ["test-format"] {
+
+  ["test-format-swift"] {
     docker {
       new {
         image = "swift:6.1-rhel-ubi9"
@@ -254,6 +259,22 @@ jobs {
     }
   }
 
+  ["test-format-pkl"] {
+    docker {
+      new {
+        image = "cimg/base:2024.01"
+      }
+    }
+    steps {
+      "checkout"
+      pklCurrent.downloadRunStep
+      new RunStep {
+        name = "Check Formatting"
+        command = "make pkl-format-lint"
+      }
+    }
+  }
+
   ["pkl-gen-swift-macos"] {
     macos {
       xcode = "16.4.0"
@@ -263,7 +284,8 @@ jobs {
       "checkout"
       new RunStep {
         name = "Build pkl-gen-swift"
-        command = """
+        command =
+          """
           make pkl-gen-swift-release
           mkdir -p out/pkl-gen-swift/
           cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
@@ -285,7 +307,8 @@ jobs {
         "checkout"
         new RunStep {
           name = "Build pkl-gen-swift"
-          command = """
+          command =
+            """
             make pkl-gen-swift-release
             mkdir -p out/pkl-gen-swift/
             cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-\(arch).bin
@@ -305,7 +328,8 @@ jobs {
       pklCurrent.downloadRunStep
       new RunStep {
         // TODO remove skip-publish-check after initial release
-        command = #"$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/"#
+        command =
+          #"$PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/"#
       }
       new PersistToWorkspaceStep {
         paths {
@@ -326,7 +350,8 @@ jobs {
       new RunStep {
         name = "Do release"
         // language=bash
-        command = #"""
+        command =
+          #"""
           EXPECTED_VERSION=$(cat VERSION.txt)
 
           if [ "${EXPECTED_VERSION}" != "${CIRCLE_TAG}" ]; then

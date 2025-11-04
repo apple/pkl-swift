@@ -65,18 +65,32 @@ class Dictionary extends Type {
   isAny = key.isAny || elem.isAny
 
   function render(withinNamespace: String?) =
-    let (renderedKey =
-      if (key.isPolymorphic) throw("Illegal: Polymorphic key `\(key.render(withinNamespace))` is not supported when generating Swift.")
-      else if (key is Optional && !key.isAny) "PklSwift.OptionalDictionaryKey<\(key.elem.render(withinNamespace))>"
-      else key.render(withinNamespace))
-    "[\(renderedKey): \(elem.render(withinNamespace))]"
+    let (
+      renderedKey =
+        if (key.isPolymorphic)
+          throw(
+            "Illegal: Polymorphic key `\(key.render(withinNamespace))` is not supported when generating Swift."
+          )
+        else if (key is Optional && !key.isAny)
+          "PklSwift.OptionalDictionaryKey<\(key.elem.render(withinNamespace))>"
+        else
+          key.render(withinNamespace)
+    )
+      "[\(renderedKey): \(elem.render(withinNamespace))]"
 
   function renderGeneric(withinNamespace: String?) =
-    let (renderedKey =
-      if (key.isPolymorphic) throw("Illegal: Polymorphic key `\(key.renderGeneric(withinNamespace))` is not supported when generating Swift.")
-      else if (key is Optional && !key.isAny) "PklSwift.OptionalDictionaryKey<\(key.elem.renderGeneric(withinNamespace))>"
-      else key.renderGeneric(withinNamespace))
-    "[\(renderedKey): \(elem.renderGeneric(withinNamespace))]"
+    let (
+      renderedKey =
+        if (key.isPolymorphic)
+          throw(
+            "Illegal: Polymorphic key `\(key.renderGeneric(withinNamespace))` is not supported when generating Swift."
+          )
+        else if (key is Optional && !key.isAny)
+          "PklSwift.OptionalDictionaryKey<\(key.elem.renderGeneric(withinNamespace))>"
+        else
+          key.renderGeneric(withinNamespace)
+    )
+      "[\(renderedKey): \(elem.renderGeneric(withinNamespace))]"
 
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
     let (inner = elem.renderEnumCaseName(withinNamespace))
@@ -127,11 +141,11 @@ class Optional extends Type {
 
   function renderGeneric(withinNamespace: String?) =
     let (rendered = elem.renderGeneric(withinNamespace))
-    if (rendered == "PklSwift.PklAny")
-      rendered
-    else
-      "\(rendered)?"
-  
+      if (rendered == "PklSwift.PklAny")
+        rendered
+      else
+        "\(rendered)?"
+
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
     let (inner = elem.renderEnumCaseName(withinNamespace))
     let (sep = inner.second)
@@ -157,7 +171,7 @@ class Tuple extends Type {
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
     let (inners = members.toList().map((it) -> it.renderEnumCaseName(withinNamespace)))
     let (sep = inners.firstOrNull?.second ?? "_")
-      Pair (
+      Pair(
         "Tuple\(sep)\(inners.join(sep))",
         sep + "_"
       )
@@ -178,20 +192,25 @@ class Declared extends Type {
   /// The type arguments, if any.
   typeArguments: List<Type>?
 
-  isAny = typeName == "AnyHashable"
-    && swiftModuleName == null
-    && namespaceName == null
+  isAny =
+    typeName == "AnyHashable"
+      && swiftModuleName == null
+      && namespaceName == null
 
   function renderBase(withinNamespace: String?) =
     // Always qualify imported type names so we avoid conflicts.
     let (prefix = if (this.isPolymorphic) "any " else "")
-    prefix + if (namespaceName != null && withinNamespace != this.namespaceName)
-        "\(namespaceName).\(typeName)"
-    else typeName
+      prefix
+        + if (namespaceName != null && withinNamespace != this.namespaceName)
+          "\(namespaceName).\(typeName)"
+        else
+          typeName
 
   function renderTypeArguments(withinNamespace: String?) =
-    if (typeArguments == null) ""
-    else "<" + typeArguments.map((t) -> t.render(withinNamespace)).join(", ") + ">"
+    if (typeArguments == null)
+      ""
+    else
+      "<" + typeArguments.map((t) -> t.render(withinNamespace)).join(", ") + ">"
 
   function render(withinNamespace: String?) =
     renderBase(withinNamespace) + renderTypeArguments(withinNamespace)
@@ -199,17 +218,20 @@ class Declared extends Type {
   function renderBaseGeneric(withinNamespace: String?) =
     // Always qualify imported type names so we avoid conflicts.
     let (name = if (this.isPolymorphic || isAny) "PklSwift.PklAny" else typeName)
-    if (!this.isPolymorphic && namespaceName != null && withinNamespace != this.namespaceName)
-      "\(namespaceName).\(name)"
-    else name
+      if (!this.isPolymorphic && namespaceName != null && withinNamespace != this.namespaceName)
+        "\(namespaceName).\(name)"
+      else
+        name
 
   function renderTypeArgumentsGeneric(withinNamespace: String?) =
-    if (typeArguments == null) ""
-    else "<" + typeArguments.map((t) -> t.renderGeneric(withinNamespace)).join(", ") + ">"
+    if (typeArguments == null)
+      ""
+    else
+      "<" + typeArguments.map((t) -> t.renderGeneric(withinNamespace)).join(", ") + ">"
 
   function renderGeneric(withinNamespace: String?) =
     renderBaseGeneric(withinNamespace) + renderTypeArgumentsGeneric(withinNamespace)
-  
+
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
     Pair(
       utils.normalizeName(render(withinNamespace).replaceFirst(Regex("^any "), "")),

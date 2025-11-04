@@ -29,10 +29,7 @@ function toSwiftString(str: String): String = pcfRenderer.renderValue(str)
 
 // noinspection UnresolvedElement
 function getSwiftNameAnnotation(source: reflect.Declaration): String? =
-  source
-    .annotations
-    .findOrNull((it) -> it.getClass().toString() == "pkl.swift.swift#Name")
-    ?.value
+  source.annotations.findOrNull((it) -> it.getClass().toString() == "pkl.swift.swift#Name")?.value
 
 /// Converts a Pkl declaration (class, property, typealias) into a Swift name.
 /// If a member has an explicit `@swift.Name` annotation, use it.
@@ -46,82 +43,87 @@ function getSwiftNameAnnotation(source: reflect.Declaration): String? =
 /// 3. Capitalize names so they get exported.
 function toSwiftName(source: reflect.Declaration): String =
   // Edge case: if we are generating a module class, always call it `Module`.
-  if (source is reflect.Class && source.enclosingDeclaration.moduleClass == source) "Module"
-  else getSwiftNameAnnotation(source) ?? normalizeName(source.name)
+  if (source is reflect.Class && source.enclosingDeclaration.moduleClass == source)
+    "Module"
+  else
+    getSwiftNameAnnotation(source) ?? normalizeName(source.name)
 
 function normalizeModuleName(name: String): String =
   let (normalized = normalizeName(name.replaceAll(".", "_")).toLowerCase())
     normalized
 
-keywords: List<String> = List(
-  "associatedtype",
-  "class",
-  "deinit",
-  "enum",
-  "extension",
-  "fileprivate",
-  "func",
-  "import",
-  "init",
-  "inout",
-  "internal",
-  "let",
-  "open",
-  "operator",
-  "private",
-  "precedencegroup",
-  "protocol",
-  "public",
-  "rethrows",
-  "static",
-  "struct",
-  "subscript",
-  "typealias",
-  "var",
-  "break",
-  "case" ,
-  "catch",
-  "continue",
-  "default",
-  "defer",
-  "do",
-  "else",
-  "fallthrough",
-  "for",
-  "guard",
-  "if",
-  "in",
-  "repeat",
-  "return",
-  "throw",
-  "switch",
-  "where",
-  "while",
-  "Any",
-  "as",
-  "await",
-  "catch",
-  "false",
-  "is",
-  "nil",
-  "rethrows",
-  "self",
-  "Self",
-  "super",
-  "throw",
-  "throws",
-  "true",
-  "try",
-  "Type",
-  "_"
-)
+keywords: List<String> =
+  List(
+    "associatedtype",
+    "class",
+    "deinit",
+    "enum",
+    "extension",
+    "fileprivate",
+    "func",
+    "import",
+    "init",
+    "inout",
+    "internal",
+    "let",
+    "open",
+    "operator",
+    "private",
+    "precedencegroup",
+    "protocol",
+    "public",
+    "rethrows",
+    "static",
+    "struct",
+    "subscript",
+    "typealias",
+    "var",
+    "break",
+    "case",
+    "catch",
+    "continue",
+    "default",
+    "defer",
+    "do",
+    "else",
+    "fallthrough",
+    "for",
+    "guard",
+    "if",
+    "in",
+    "repeat",
+    "return",
+    "throw",
+    "switch",
+    "where",
+    "while",
+    "Any",
+    "as",
+    "await",
+    "catch",
+    "false",
+    "is",
+    "nil",
+    "rethrows",
+    "self",
+    "Self",
+    "super",
+    "throw",
+    "throws",
+    "true",
+    "try",
+    "Type",
+    "_"
+  )
 
 function renderDocComment(docComment: String, indent: String) =
   docComment
     .split(Regex(#"\r?\n"#))
     .map((it) ->
-      if (it.trim().isBlank) "\(indent)///"
-      else "\(indent)/// \(it)"
+      if (it.trim().isBlank)
+        "\(indent)///"
+      else
+        "\(indent)/// \(it)"
     )
     .join("\n")
 
@@ -132,13 +134,15 @@ function canBeNormalizedToEnumCaseName(name: String) =
   name == "" || !name.split(Regex(#"(?u)[^\p{L}\d]"#)).isEmpty
 
 function normalizeEnumName(name: String) =
-  if (name == "") "empty"
+  if (name == "")
+    "empty"
   else
     let (normalized = normalizeName(name))
       normalized[0].toLowerCase() + normalized.drop(1)
 
 function normalizeName(name: String) =
-  if (keywords.contains(name)) "`\(name)`"
+  if (keywords.contains(name))
+    "`\(name)`"
   else
     let (parts = name.split(Regex(#"(?u)[^\p{L}\d_]"#)))
       parts.first + parts.drop(1).map((p) -> p.capitalize()).join("")

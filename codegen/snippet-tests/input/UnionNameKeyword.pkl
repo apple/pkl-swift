@@ -15,6 +15,6 @@
 // ===----------------------------------------------------------------------===//
 module UnionNameKeyword
 
-typealias Type = "one"|"two"|"three"
+typealias Type = "one" | "two" | "three"
 
 type: Type

@@ -20,6 +20,7 @@
 module pkl.swift.Generator
 
 import "pkl:reflect"
+
 import "internal/gatherer.pkl"
 import "internal/SwiftMapping.pkl"
 import "internal/SwiftNamespace.pkl"
@@ -32,7 +33,8 @@ moduleToGenerate: Module
 /// The indentation applied to rendered Swift code.
 indent: String = "    "
 
-typealias EnumMember = reflect.DeclaredType|reflect.StringLiteralType|reflect.NullableType|reflect.NothingType
+typealias EnumMember =
+  reflect.DeclaredType | reflect.StringLiteralType | reflect.NullableType | reflect.NothingType
 
 function hasDistinctEnumNames(members: List<reflect.StringLiteralType>) =
   let (names = members.map((it) -> utils.normalizeEnumName(it.value)))
@@ -41,66 +43,69 @@ function hasDistinctEnumNames(members: List<reflect.StringLiteralType>) =
 // noinspection TypeMismatch
 function isEnumLike(decl: reflect.TypeDeclaration) =
   decl is reflect.TypeAlias
-    &&
-    let (referent = decl.referent)
+    && let (referent = decl.referent)
       referent is reflect.UnionType
-      && referent.members.every((t) -> t is EnumMember)
-      &&
-        if (referent.members is List<reflect.StringLiteralType>)
+        && referent.members.every((t) -> t is EnumMember)
+        && if (referent.members is List<reflect.StringLiteralType>)
           referent.members.every((it) -> utils.canBeNormalizedToEnumCaseName(it.value))
-          && hasDistinctEnumNames(referent.members)
-        else true
+            && hasDistinctEnumNames(referent.members)
+        else
+          true
 
 // noinspection UnresolvedElement
 function getSwiftModuleName(decl: reflect.TypeDeclaration): String? =
-  decl.enclosingDeclaration
-    .annotations
+  decl.enclosingDeclaration.annotations
     .findOrNull((it) -> it.getClass().toString() == "pkl.swift.swift#Module")
     ?.name
 
 function gatherEnums(decl: List<reflect.TypeDeclaration>): List<SwiftMapping> =
   decl
     .filter((it) -> isEnumLike(it))
-    .fold(List(), (acc, it) -> acc.add(new SwiftMapping.Enum {
-      swiftModuleName = getSwiftModuleName(it)
-      source = it
-      seenMappings = acc
-    }))
+    .fold(List(), (acc, it) ->
+      acc.add(new SwiftMapping.Enum {
+        swiftModuleName = getSwiftModuleName(it)
+        source = it
+        seenMappings = acc
+      })
+    )
 
-function gatherTypeAliases(decl: List<reflect.TypeDeclaration>): Mixin<List<SwiftMapping>> =
-  (acc) ->
-    decl
-      .filter((it) -> it is reflect.TypeAlias && !isEnumLike(it))
-      .fold(acc, (accum, it) -> accum.add(new SwiftMapping.TypeAlias {
+function gatherTypeAliases(decl: List<reflect.TypeDeclaration>): Mixin<List<SwiftMapping>> = (acc) ->
+  decl
+    .filter((it) -> it is reflect.TypeAlias && !isEnumLike(it))
+    .fold(acc, (accum, it) ->
+      accum.add(new SwiftMapping.TypeAlias {
         swiftModuleName = getSwiftModuleName(it)
         source = it
         seenMappings = accum
-      }))
+      })
+    )
 
-function gatherClasses(decl: List<reflect.TypeDeclaration>): Mixin<List<SwiftMapping>> =
-  (acc) ->
-    decl
-      .filter((it) -> it is reflect.Class)
-      .fold(acc, (accum, it) -> accum.add(new SwiftMapping.Class {
+function gatherClasses(decl: List<reflect.TypeDeclaration>): Mixin<List<SwiftMapping>> = (acc) ->
+  decl
+    .filter((it) -> it is reflect.Class)
+    .fold(acc, (accum, it) ->
+      accum.add(new SwiftMapping.Class {
         swiftModuleName = getSwiftModuleName(it)
         source = it
         seenMappings = accum
-      }))
+      })
+    )
 
 local allMappings: List<SwiftMapping> =
   let (clazz = reflect.Module(moduleToGenerate).moduleClass)
   let (declarations = gatherer.gatherTypeDeclarations(clazz, List()))
     gatherEnums(declarations) |> gatherClasses(declarations) |> gatherTypeAliases(declarations)
 
-local packages = allMappings
-  .groupBy((it) -> it.namespaceName)
-  .mapValues((namespace: String, _mappings: List<SwiftMapping>) -> new SwiftNamespace {
-    namespaceName = namespace
-    `module` = _mappings.first.source.enclosingDeclaration
-    mappings = allMappings
-    moduleMappings = _mappings
-    indent = module.indent
-  })
+local packages =
+  allMappings
+    .groupBy((it) -> it.namespaceName)
+    .mapValues((namespace: String, _mappings: List<SwiftMapping>) -> new SwiftNamespace {
+      namespaceName = namespace
+      `module` = _mappings.first.source.enclosingDeclaration
+      mappings = allMappings
+      moduleMappings = _mappings
+      indent = module.indent
+    })
 
 output {
   files {
@@ -108,5 +113,6 @@ output {
       ...package.output.files!!
     }
   }
-  text = throw("Generator.pkl only produces multiple-file output. Try running again with the -m flag.")
+  text =
+    throw("Generator.pkl only produces multiple-file output. Try running again with the -m flag.")
 }

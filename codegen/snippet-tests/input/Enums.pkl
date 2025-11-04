@@ -28,10 +28,10 @@ class Monkey {
 }
 
 /// Animal is either a horse, monkey, or zebra
-typealias Animal = Horse|Zebra|Monkey
+typealias Animal = Horse | Zebra | Monkey
 
 /// Either a dictionary or an array.
-typealias DictOrArray = Mapping<String, String>|Listing<String>
+typealias DictOrArray = Mapping<String, String> | Listing<String>
 
 typealias BugBug = "bug bug" | "bugBug"
 

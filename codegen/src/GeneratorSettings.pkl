@@ -20,6 +20,7 @@
 module pkl.swift.GeneratorSettings
 
 import "pkl:reflect"
+
 import "swift.pkl"
 
 /// The set of modules to turn into Swift code.
@@ -55,8 +56,10 @@ output {
       myModuleUri.replaceFirst("file://", "").split("/").dropLast(1).join("/")
 
   local function resolvePath(path: String): String =
-    if (path.startsWith(Regex("\\w+:")) || path.startsWith("/")) path
-    else myModuleDirectory + "/" + path
+    if (path.startsWith(Regex("\\w+:")) || path.startsWith("/"))
+      path
+    else
+      myModuleDirectory + "/" + path
 
   value = (module) {
     when (module.inputs != null) {
