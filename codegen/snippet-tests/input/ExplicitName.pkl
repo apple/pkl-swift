@@ -23,8 +23,7 @@ import ".../src/swift.pkl"
 myProp: SomethingFunny
 
 @swift.Name { value = "SomethingVeryFunny" }
-class SomethingFunny {
-}
+class SomethingFunny {}
 
 @swift.Name { value = "ConfigType" }
-typealias Type = "one"|"two"
+typealias Type = "one" | "two"

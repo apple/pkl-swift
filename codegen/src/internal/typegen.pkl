@@ -19,8 +19,9 @@
 module pkl.swift.internal.typegen
 
 import "pkl:reflect"
-import "Type.pkl"
+
 import "SwiftMapping.pkl"
+import "Type.pkl"
 
 function generateType(
   type: reflect.Type,
@@ -32,25 +33,31 @@ function generateType(
   else if (type is reflect.ModuleType)
     let (moduleClass = enclosing.enclosingDeclaration.moduleClass)
       generateType(reflect.DeclaredType(moduleClass), moduleClass, seenMappings)
-  else if (type is reflect.UnionType) generateUnionType(type, seenMappings)
+  else if (type is reflect.UnionType)
+    generateUnionType(type, seenMappings)
   else if (type is reflect.NullableType)
     let (_elem = generateType(type.member, enclosing, seenMappings))
       // No doubly-nullable type
-      if (_elem is Type.Optional) _elem
-      else new Type.Optional { elem = _elem }
-  else if (type is reflect.UnknownType) anyType
-  else if (type is reflect.NothingType) neverType
-  else if (type is reflect.StringLiteralType) new Type.Declared { typeName = "String" }
-  else throw("Unsure how to generate this type: \(type)")
+      if (_elem is Type.Optional)
+        _elem
+      else
+        new Type.Optional { elem = _elem }
+  else if (type is reflect.UnknownType)
+    anyType
+  else if (type is reflect.NothingType)
+    neverType
+  else if (type is reflect.StringLiteralType)
+    new Type.Declared { typeName = "String" }
+  else
+    throw("Unsure how to generate this type: \(type)")
 
-function generateUnionType(
-  type: reflect.UnionType,
-  seenMappings: List<SwiftMapping>
-): Type =
+function generateUnionType(type: reflect.UnionType, seenMappings: List<SwiftMapping>): Type =
   let (mappedType = seenMappings.findOrNull((c) -> c.source == type))
     if (mappedType != null)
       mappedType.type
-    else if (type.members.every((it) -> it is reflect.StringLiteralType || it == reflect.stringType))
+    else if (
+      type.members.every((it) -> it is reflect.StringLiteralType || it == reflect.stringType)
+    )
       new Type.Declared { typeName = "String" }
     else
       anyType
@@ -63,12 +70,13 @@ function generateDeclaredType(
   let (referent = type.referent)
   let (reflectee = type.referent.reflectee)
   let (mapped = seenMappings.findOrNull((it) -> it.source == referent))
-    mapped?.type ??
-      mappedTypes.getOrNull(reflectee) ??
-        mappedHigherOrderTypes.getOrNull(reflectee)?.apply(type, enclosing, seenMappings) ??
-          if (referent is reflect.TypeAlias)
-            generateType(referent.referent, enclosing, seenMappings)
-          else throw("Cannot generate type \(type.referent.name) as Swift.")
+    mapped?.type
+      ?? mappedTypes.getOrNull(reflectee)
+      ?? mappedHigherOrderTypes.getOrNull(reflectee)?.apply(type, enclosing, seenMappings)
+      ?? if (referent is reflect.TypeAlias)
+        generateType(referent.referent, enclosing, seenMappings)
+      else
+        throw("Cannot generate type \(type.referent.name) as Swift.")
 
 local function builtInType(typ: String): Type.Declared = new { typeName = typ }
 
@@ -76,17 +84,17 @@ anyType: Type.Optional = new { elem = builtInType("AnyHashable") }
 
 local neverType: Type.Declared = builtInType("Never")
 
-mappedTypes: Mapping<Class|TypeAlias, Type> = new {
+mappedTypes: Mapping<Class | TypeAlias, Type> = new {
   [Int] = new Type.Declared { typeName = "Int"; isNumeric = true }
-  [Int8] = new Type.Declared { typeName = "Int8"; isNumeric = true  }
-  [Int16] = new Type.Declared { typeName = "Int16"; isNumeric = true  }
-  [Int32] = new Type.Declared { typeName = "Int32"; isNumeric = true  }
-  [UInt] = new Type.Declared { typeName = "UInt"; isNumeric = true  }
-  [UInt8] = new Type.Declared { typeName = "UInt8"; isNumeric = true  }
-  [UInt16] = new Type.Declared { typeName = "UInt16"; isNumeric = true  }
-  [UInt32] = new Type.Declared { typeName = "UInt32"; isNumeric = true  }
-  [Number] = new Type.Declared { typeName = "Float64"; isNumeric = true  }
-  [Float] = new Type.Declared { typeName = "Float64"; isNumeric = true  }
+  [Int8] = new Type.Declared { typeName = "Int8"; isNumeric = true }
+  [Int16] = new Type.Declared { typeName = "Int16"; isNumeric = true }
+  [Int32] = new Type.Declared { typeName = "Int32"; isNumeric = true }
+  [UInt] = new Type.Declared { typeName = "UInt"; isNumeric = true }
+  [UInt8] = new Type.Declared { typeName = "UInt8"; isNumeric = true }
+  [UInt16] = new Type.Declared { typeName = "UInt16"; isNumeric = true }
+  [UInt32] = new Type.Declared { typeName = "UInt32"; isNumeric = true }
+  [Number] = new Type.Declared { typeName = "Float64"; isNumeric = true }
+  [Float] = new Type.Declared { typeName = "Float64"; isNumeric = true }
   [String] = new Type.Declared { typeName = "String" }
   [Boolean] = new Type.Declared { typeName = "Bool" }
   [Null] = new Type.Declared { typeName = "Optional"; typeArguments = List(neverType) }
@@ -127,38 +135,47 @@ mappedTypes: Mapping<Class|TypeAlias, Type> = new {
   }
 }
 
-mappedHigherOrderTypes: Mapping<Class|TypeAlias, (reflect.DeclaredType, reflect.TypeDeclaration, List<SwiftMapping>) -> Type> = new {
+mappedHigherOrderTypes: Mapping<
+  Class | TypeAlias,
+  (reflect.DeclaredType, reflect.TypeDeclaration, List<SwiftMapping>) -> Type
+> = new {
   [List] = this[Listing]
   [Listing] = (type, enclosing, seenMappings) ->
-      let (typeArg = type.typeArguments.getOrNull(0))
-        new Type.Array {
-          elem =
-            if (typeArg == null) anyType
-            else generateType(typeArg, enclosing, seenMappings)
-          pklTypeName = type.referent.name
-        }
-  [Map] = this[Mapping]
-  [Mapping] = (type, enclosing, seenMappings) -> new Type.Dictionary {
-    local typeArgKey = type.typeArguments.getOrNull(0)
-    key =
-      if (typeArgKey == null) anyType
-      else generateType(typeArgKey, enclosing, seenMappings)
-
-    local typeArgValue = type.typeArguments.getOrNull(1)
-    elem =
-      if (typeArgValue == null) anyType
-      else generateType(typeArgValue, enclosing, seenMappings)
-    pklTypeName = type.referent.name
-  }
-  [Set] = (type, enclosing, seenMappings) -> new Type.Declared {
-        local typeArg = type.typeArguments.getOrNull(0)
-        typeName = "Set"
-        typeArguments = List(
+    let (typeArg = type.typeArguments.getOrNull(0))
+      new Type.Array {
+        elem =
           if (typeArg == null)
             anyType
           else
             generateType(typeArg, enclosing, seenMappings)
-        )
+        pklTypeName = type.referent.name
       }
-}
+  [Map] = this[Mapping]
+  [Mapping] = (type, enclosing, seenMappings) -> new Type.Dictionary {
+    local typeArgKey = type.typeArguments.getOrNull(0)
+    key =
+      if (typeArgKey == null)
+        anyType
+      else
+        generateType(typeArgKey, enclosing, seenMappings)
 
+    local typeArgValue = type.typeArguments.getOrNull(1)
+    elem =
+      if (typeArgValue == null)
+        anyType
+      else
+        generateType(typeArgValue, enclosing, seenMappings)
+    pklTypeName = type.referent.name
+  }
+  [Set] = (type, enclosing, seenMappings) -> new Type.Declared {
+    local typeArg = type.typeArguments.getOrNull(0)
+    typeName = "Set"
+    typeArguments =
+      List(
+        if (typeArg == null)
+          anyType
+        else
+          generateType(typeArg, enclosing, seenMappings)
+      )
+  }
+}

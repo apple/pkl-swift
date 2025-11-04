@@ -18,11 +18,12 @@
 module pkl.swift.internal.SwiftNamespace
 
 import "pkl:reflect"
+
 import "ClassGen.pkl"
 import "EnumGen.pkl"
-import "TypeAliasGen.pkl"
-import "SwiftMapping.pkl"
 import "Gen.pkl"
+import "SwiftMapping.pkl"
+import "TypeAliasGen.pkl"
 import "utils.pkl"
 
 `module`: reflect.Module
@@ -42,20 +43,29 @@ namespaceName: String
 indent: String
 
 local function describeLocation(src: reflect.TypeDeclaration) =
-  let (memberType =
-    if (src is reflect.Class && src.enclosingDeclaration.moduleClass == src) "module"
-    else if (src is reflect.Class) "class"
-    else "typealias"
+  let (
+    memberType =
+      if (src is reflect.Class && src.enclosingDeclaration.moduleClass == src)
+        "module"
+      else if (src is reflect.Class)
+        "class"
+      else
+        "typealias"
   )
     "* \(memberType) `\(src.reflectee)` (\(src.location.displayUri))"
 
 local function hasUniqueNames(): Boolean =
   let (names = moduleMappings.map((it) -> it.name))
-    if (names.isDistinct) true
+    if (names.isDistinct)
+      true
     else
-      let (duplicateNames = moduleMappings.filter((it) -> moduleMappings.count((m) -> m.name == it.name) > 1))
+      let (
+        duplicateNames =
+          moduleMappings.filter((it) -> moduleMappings.count((m) -> m.name == it.name) > 1)
+      )
       let (locations = duplicateNames.map((it) -> describeLocation(it.source)).join("\n"))
-        throw("""
+        throw(
+          """
           Conflict: multiple Pkl declarations compute to Swift name `\(duplicateNames.first.name)`.
 
           To resolve this conflict, add a `@swift.Name` annotation to any of the following declarations:
@@ -68,35 +78,37 @@ local function hasUniqueNames(): Boolean =
           @swift.Name { value = "CrabCakes" }
           class Crab_Cakes
           ```
-          """)
+          """
+        )
 
-local generated: List<Gen>(hasUniqueNames()) = moduleMappings.map((it) ->
-  if (it is SwiftMapping.Class)
-    new ClassGen {
-      indent = module.indent
-      mappings = module.mappings
-      mapping = it
-      namespaceName = it.namespaceName
-    }
-  else if (it is SwiftMapping.Enum)
-    new EnumGen {
-      indent = module.indent
-      mappings = module.mappings
-      mapping = it
-      namespaceName = it.namespaceName
-    }
-  else
-    new TypeAliasGen {
-      indent = module.indent
-      mappings = module.mappings
-      mapping = it
-      namespaceName = it.namespaceName
-    }
-)
+local generated: List<Gen>(hasUniqueNames()) =
+  moduleMappings.map((it) ->
+    if (it is SwiftMapping.Class)
+      new ClassGen {
+        indent = module.indent
+        mappings = module.mappings
+        mapping = it
+        namespaceName = it.namespaceName
+      }
+    else if (it is SwiftMapping.Enum)
+      new EnumGen {
+        indent = module.indent
+        mappings = module.mappings
+        mapping = it
+        namespaceName = it.namespaceName
+      }
+    else
+      new TypeAliasGen {
+        indent = module.indent
+        mappings = module.mappings
+        mapping = it
+        namespaceName = it.namespaceName
+      })
 
 local topLevelContents = generated.mapNonNull((g) -> g.topLevelContents)
 
-local convenienceLoaders = """
+local convenienceLoaders =
+  """
   /// Load the Pkl module at the given source and evaluate it into `\(namespaceName).Module`.
   ///
   /// - Parameter source: The source of the Pkl module.
@@ -119,32 +131,33 @@ local convenienceLoaders = """
   }
   """
 
-contents = new Listing {
-  utils.renderHeaderComment(`module`)
-  """
-  import PklSwift
+contents =
+  new Listing {
+    utils.renderHeaderComment(`module`)
+    """
+    import PklSwift
 
-  public enum \(namespaceName) {}
+    public enum \(namespaceName) {}
 
-  """
-  when (topLevelContents.length > 0) {
-    topLevelContents.join("\n")
-  }
-  """
-  extension \(namespaceName) {
-  """
-  for (gen in generated) {
-    when (gen != generated.first) {
-      ""
+    """
+    when (topLevelContents.length > 0) {
+      topLevelContents.join("\n")
     }
-    module.indent + gen.contents.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
-  }
-  when (!`module`.modifiers.contains("open") && !`module`.modifiers.contains("abstract")) {
-    ""
-    module.indent + convenienceLoaders.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
-  }
-  "}"
-}.join("\n")
+    """
+    extension \(namespaceName) {
+    """
+    for (gen in generated) {
+      when (gen != generated.first) {
+        ""
+      }
+      module.indent + gen.contents.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
+    }
+    when (!`module`.modifiers.contains("open") && !`module`.modifiers.contains("abstract")) {
+      ""
+      module.indent + convenienceLoaders.replaceAll(Regex("\n(?!\n)"), "\n\(module.indent)")
+    }
+    "}"
+  }.join("\n")
 
 output {
   files {

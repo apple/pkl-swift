@@ -19,9 +19,10 @@ module pkl.swift.internal.TypeAliasGen
 
 extends "Gen.pkl"
 
-import "typegen.pkl"
-import "Type.pkl"
 import "pkl:reflect"
+
+import "Type.pkl"
+import "typegen.pkl"
 
 typealiaz: reflect.TypeAlias = mapping.source as reflect.TypeAlias
 

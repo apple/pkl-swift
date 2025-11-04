@@ -25,16 +25,16 @@ jobs:
     resource_class: xlarge
     docker:
     - image: swift:6.1-rhel-ubi9
-  test-pkl-0-29-0:
+  test-pkl-0-30-0:
     steps:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.29.0-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.29.0/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.30.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.29.0
+        name: Downloading pkl-0.30.0
     - run:
         command: |-
           mkdir -p .out/test-results/
@@ -120,13 +120,28 @@ jobs:
         command: /bin/hawkeye check --fail-if-unknown
     docker:
     - image: ghcr.io/korandoru/hawkeye
-  test-format:
+  test-format-swift:
     steps:
     - checkout
     - run:
         command: make swiftformat-lint
     docker:
     - image: swift:6.1-rhel-ubi9
+  test-format-pkl:
+    steps:
+    - checkout
+    - run:
+        command: |-
+          PKL=$(mktemp /tmp/pkl-0.30.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64" > $PKL
+          chmod +x $PKL
+          echo "export PKL_EXEC=$PKL" >> $BASH_ENV
+        name: Downloading pkl-0.30.0
+    - run:
+        command: make pkl-format-lint
+        name: Check Formatting
+    docker:
+    - image: cimg/base:2024.01
   pkl-gen-swift-macos:
     steps:
     - checkout
@@ -180,11 +195,11 @@ jobs:
     - checkout
     - run:
         command: |-
-          PKL=$(mktemp /tmp/pkl-0.29.0-XXXXXX)
-          curl -L "https://github.com/apple/pkl/releases/download/0.29.0/pkl-linux-amd64" > $PKL
+          PKL=$(mktemp /tmp/pkl-0.30.0-XXXXXX)
+          curl -L "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64" > $PKL
           chmod +x $PKL
           echo "export PKL_EXEC=$PKL" >> $BASH_ENV
-        name: Downloading pkl-0.29.0
+        name: Downloading pkl-0.30.0
     - run:
         command: $PKL_EXEC project package --skip-publish-check --output-path out/pkl-package/ codegen/src/
     - persist_to_workspace:
@@ -265,7 +280,7 @@ workflows:
     - test-pkl-0-25-3:
         requires:
         - hold
-    - test-pkl-0-29-0:
+    - test-pkl-0-30-0:
         requires:
         - hold
     - test-ios-simulator:
@@ -283,7 +298,10 @@ workflows:
     - test-license-headers:
         requires:
         - hold
-    - test-format:
+    - test-format-swift:
+        requires:
+        - hold
+    - test-format-pkl:
         requires:
         - hold
     when:
@@ -293,13 +311,14 @@ workflows:
   main:
     jobs:
     - test-pkl-0-25-3
-    - test-pkl-0-29-0
+    - test-pkl-0-30-0
     - test-ios-simulator
     - test-watchos-simulator
     - test-tvos-simulator
     - test-mac-catalyst
     - test-license-headers
-    - test-format
+    - test-format-swift
+    - test-format-pkl
     when:
       equal:
       - main
@@ -312,7 +331,7 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
-    - test-pkl-0-29-0:
+    - test-pkl-0-30-0:
         filters:
           branches:
             ignore: /.*/
@@ -348,7 +367,13 @@ workflows:
             ignore: /.*/
           tags:
             only: /^v?\d+\.\d+\.\d+$/
-    - test-format:
+    - test-format-swift:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v?\d+\.\d+\.\d+$/
+    - test-format-pkl:
         filters:
           branches:
             ignore: /.*/
@@ -357,13 +382,14 @@ workflows:
     - pkl-package:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-29-0
+        - test-pkl-0-30-0
         - test-ios-simulator
         - test-watchos-simulator
         - test-tvos-simulator
         - test-mac-catalyst
         - test-license-headers
-        - test-format
+        - test-format-swift
+        - test-format-pkl
         filters:
           branches:
             ignore: /.*/
@@ -372,13 +398,14 @@ workflows:
     - pkl-gen-swift-macos:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-29-0
+        - test-pkl-0-30-0
         - test-ios-simulator
         - test-watchos-simulator
         - test-tvos-simulator
         - test-mac-catalyst
         - test-license-headers
-        - test-format
+        - test-format-swift
+        - test-format-pkl
         filters:
           branches:
             ignore: /.*/
@@ -387,13 +414,14 @@ workflows:
     - pkl-gen-swift-linux-amd64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-29-0
+        - test-pkl-0-30-0
         - test-ios-simulator
         - test-watchos-simulator
         - test-tvos-simulator
         - test-mac-catalyst
         - test-license-headers
-        - test-format
+        - test-format-swift
+        - test-format-pkl
         filters:
           branches:
             ignore: /.*/
@@ -402,13 +430,14 @@ workflows:
     - pkl-gen-swift-linux-aarch64:
         requires:
         - test-pkl-0-25-3
-        - test-pkl-0-29-0
+        - test-pkl-0-30-0
         - test-ios-simulator
         - test-watchos-simulator
         - test-tvos-simulator
         - test-mac-catalyst
         - test-license-headers
-        - test-format
+        - test-format-swift
+        - test-format-pkl
         filters:
           branches:
             ignore: /.*/

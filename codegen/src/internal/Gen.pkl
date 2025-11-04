@@ -42,20 +42,20 @@ function renderInnerHash(type: Type, rpt: Int, name: String, isDictKey: Boolean)
   if (type is Type.Array)
     """
     \(module.indent.repeat(rpt))for x in \(name) {
-    \(renderInnerHash(type.elem, rpt+1, "x", false))
+    \(renderInnerHash(type.elem, rpt + 1, "x", false))
     \(module.indent.repeat(rpt))}
     """
   else if (type is Type.Dictionary)
     """
     \(module.indent.repeat(rpt))for (k, v) in \(name) {
-    \(renderInnerHash(type.key, rpt+1, "k", type.key is Type.Optional))
-    \(renderInnerHash(type.elem, rpt+1, "v", false))
+    \(renderInnerHash(type.key, rpt + 1, "k", type.key is Type.Optional))
+    \(renderInnerHash(type.elem, rpt + 1, "v", false))
     \(module.indent.repeat(rpt))}
     """
   else if (type is Type.Optional && !isDictKey)
     """
     \(module.indent.repeat(rpt))if let \(name)\(if (isDictKey) " = \(name).key" else "") {
-    \(renderInnerHash(type.elem, rpt+1, name, false))
+    \(renderInnerHash(type.elem, rpt + 1, name, false))
     \(module.indent.repeat(rpt))}
     """
   else

@@ -31,27 +31,33 @@ facts {
     utils.toSwiftString("foo") == #""foo""#
     utils.toSwiftString("你好") == #""你好""#
     utils.toSwiftString(#"pkl:"name""#) == ##"#"pkl:"name""#"##
-    utils.toSwiftString("""
+    utils.toSwiftString(
+      """
       my multiline
 
       string
-      """) == #"""
+      """
+    )
+      == #"""
+      """
+        my multiline
+        
+        string
         """
-          my multiline
-          
-          string
-          """
-        """#
-    utils.toSwiftString("""
+      """#
+    utils.toSwiftString(
+      """
       multiline string
 
       with `backticks`
-      """) == #"""
+      """
+    )
+      == #"""
+      """
+        multiline string
+        
+        with `backticks`
         """
-          multiline string
-          
-          with `backticks`
-          """
-        """#
+      """#
   }
 }

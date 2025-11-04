@@ -106,7 +106,7 @@ class FixturesTest: XCTestCase {
             fooClass = Class(moduleUri: "", name: "")
             barTypeAlias = TypeAlias(moduleUri: "", name: "")
         } else {
-            let inputModuleURI = URL(filePath: inputPath).absoluteString
+            let inputModuleURI = URL(filePath: inputPath).standardizedFileURL.absoluteString.replacing("file:///", with: "file:/")
             stringClass = Class(moduleUri: "pkl:base", name: "String")
             baseModuleClass = Class(moduleUri: "pkl:base", name: "ModuleClass")
             uint8TypeAlias = TypeAlias(moduleUri: "pkl:base", name: "UInt8")

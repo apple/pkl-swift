@@ -156,121 +156,117 @@ nestMaps: NestMaps
 sameResultType: SameResultType
 
 typealias SameResultType =
-  * Listing<String>
-  | List<String>
-  | Mapping<String, String>
-  | Map<String, String>
+  *Listing<String> | List<String> | Mapping<String, String> | Map<String, String>
 
 typealias NestListings =
-  * Listing<lib1.Being>
-  | Listing<lib1.Being>?
-  | Listing<lib1.Being?>
-  | Listing<lib1.Being?>?
-  | Listing<Listing>
-  | Listing<Listing>?
-  | Listing<Listing?>
-  | Listing<Listing?>?
-  // these don't work right now for swift typesystem reasons
-  // | Listing<Listing<lib1.Being>>
-  // | Listing<Listing<lib1.Being>>?
-  // | Listing<Listing<lib1.Being>?>
-  // | Listing<Listing<lib1.Being>?>?
-  // | Listing<Listing<lib1.Being?>>
-  // | Listing<Listing<lib1.Being?>>?
-  // | Listing<Listing<lib1.Being?>?>
-  // | Listing<Listing<lib1.Being?>?>?
+  *Listing<lib1.Being>
+    | Listing<lib1.Being>?
+    | Listing<lib1.Being?>
+    | Listing<lib1.Being?>?
+    | Listing<Listing>
+    | Listing<Listing>?
+    | Listing<Listing?>
+    | Listing<Listing?>?
+// these don't work right now for swift typesystem reasons
+// | Listing<Listing<lib1.Being>>
+// | Listing<Listing<lib1.Being>>?
+// | Listing<Listing<lib1.Being>?>
+// | Listing<Listing<lib1.Being>?>?
+// | Listing<Listing<lib1.Being?>>
+// | Listing<Listing<lib1.Being?>>?
+// | Listing<Listing<lib1.Being?>?>
+// | Listing<Listing<lib1.Being?>?>?
 
 typealias NestMappings =
-  * Mapping<String?, lib1.Being>
-  | Mapping<String?, lib1.Being>?
-  | Mapping<String?, lib1.Being?>
-  | Mapping<String?, lib1.Being?>?
-  | Mapping<String?, Mapping>
-  | Mapping<String?, Mapping>?
-  | Mapping<String?, Mapping?>
-  | Mapping<String?, Mapping?>?
-  // these don't work right now for swift typesystem reasons
-  // | Mapping<String?, Mapping<String?, lib1.Being>>
-  // | Mapping<String?, Mapping<String?, lib1.Being>>?
-  // | Mapping<String?, Mapping<String?, lib1.Being>?>
-  // | Mapping<String?, Mapping<String?, lib1.Being>?>?
-  // | Mapping<String?, Mapping<String?, lib1.Being?>>
-  // | Mapping<String?, Mapping<String?, lib1.Being?>>?
-  // | Mapping<String?, Mapping<String?, lib1.Being?>?>
-  // | Mapping<String?, Mapping<String?, lib1.Being?>?>?
-  | Mapping<ObjectKey?, lib1.Being>
-  | Mapping<ObjectKey?, lib1.Being>?
-  | Mapping<ObjectKey?, lib1.Being?>
-  | Mapping<ObjectKey?, lib1.Being?>?
-  | Mapping<ObjectKey?, Mapping>
-  | Mapping<ObjectKey?, Mapping>?
-  | Mapping<ObjectKey?, Mapping?>
-  | Mapping<ObjectKey?, Mapping?>?
-  // these don't work right now for swift typesystem reasons
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>>
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>>?
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>?>
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>?>?
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>>
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>>?
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>?>
-  // | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>?>?
+  *Mapping<String?, lib1.Being>
+    | Mapping<String?, lib1.Being>?
+    | Mapping<String?, lib1.Being?>
+    | Mapping<String?, lib1.Being?>?
+    | Mapping<String?, Mapping>
+    | Mapping<String?, Mapping>?
+    | Mapping<String?, Mapping?>
+    | Mapping<String?, Mapping?>?
+    // these don't work right now for swift typesystem reasons
+    // | Mapping<String?, Mapping<String?, lib1.Being>>
+    // | Mapping<String?, Mapping<String?, lib1.Being>>?
+    // | Mapping<String?, Mapping<String?, lib1.Being>?>
+    // | Mapping<String?, Mapping<String?, lib1.Being>?>?
+    // | Mapping<String?, Mapping<String?, lib1.Being?>>
+    // | Mapping<String?, Mapping<String?, lib1.Being?>>?
+    // | Mapping<String?, Mapping<String?, lib1.Being?>?>
+    // | Mapping<String?, Mapping<String?, lib1.Being?>?>?
+    | Mapping<ObjectKey?, lib1.Being>
+    | Mapping<ObjectKey?, lib1.Being>?
+    | Mapping<ObjectKey?, lib1.Being?>
+    | Mapping<ObjectKey?, lib1.Being?>?
+    | Mapping<ObjectKey?, Mapping>
+    | Mapping<ObjectKey?, Mapping>?
+    | Mapping<ObjectKey?, Mapping?>
+    | Mapping<ObjectKey?, Mapping?>?
+// these don't work right now for swift typesystem reasons
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>>
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>>?
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>?>
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being>?>?
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>>
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>>?
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>?>
+// | Mapping<ObjectKey?, Mapping<ObjectKey?, lib1.Being?>?>?
 
 typealias NestLists =
-  * List<lib1.Being>
-  | List<lib1.Being>?
-  | List<lib1.Being?>
-  | List<lib1.Being?>?
-  | List<List>
-  | List<List>?
-  | List<List?>
-  | List<List?>?
-  // these don't work right now for swift typesystem reasons
-  // | List<List<lib1.Being>>
-  // | List<List<lib1.Being>>?
-  // | List<List<lib1.Being>?>
-  // | List<List<lib1.Being>?>?
-  // | List<List<lib1.Being?>>
-  // | List<List<lib1.Being?>>?
-  // | List<List<lib1.Being?>?>
-  // | List<List<lib1.Being?>?>?
+  *List<lib1.Being>
+    | List<lib1.Being>?
+    | List<lib1.Being?>
+    | List<lib1.Being?>?
+    | List<List>
+    | List<List>?
+    | List<List?>
+    | List<List?>?
+// these don't work right now for swift typesystem reasons
+// | List<List<lib1.Being>>
+// | List<List<lib1.Being>>?
+// | List<List<lib1.Being>?>
+// | List<List<lib1.Being>?>?
+// | List<List<lib1.Being?>>
+// | List<List<lib1.Being?>>?
+// | List<List<lib1.Being?>?>
+// | List<List<lib1.Being?>?>?
 
 typealias NestMaps =
-  * Map<String?, lib1.Being>
-  | Map<String?, lib1.Being>?
-  | Map<String?, lib1.Being?>
-  | Map<String?, lib1.Being?>?
-  | Map<String?, Map>
-  | Map<String?, Map>?
-  | Map<String?, Map?>
-  | Map<String?, Map?>?
-  // these don't work right now for swift typesystem reasons
-  // | Map<String?, Map<String?, lib1.Being>>
-  // | Map<String?, Map<String?, lib1.Being>>?
-  // | Map<String?, Map<String?, lib1.Being>?>
-  // | Map<String?, Map<String?, lib1.Being>?>?
-  // | Map<String?, Map<String?, lib1.Being?>>
-  // | Map<String?, Map<String?, lib1.Being?>>?
-  // | Map<String?, Map<String?, lib1.Being?>?>
-  // | Map<String?, Map<String?, lib1.Being?>?>?
-  | Map<ObjectKey?, lib1.Being>
-  | Map<ObjectKey?, lib1.Being>?
-  | Map<ObjectKey?, lib1.Being?>
-  | Map<ObjectKey?, lib1.Being?>?
-  | Map<ObjectKey?, Map>
-  | Map<ObjectKey?, Map>?
-  | Map<ObjectKey?, Map?>
-  | Map<ObjectKey?, Map?>?
-  // these don't work right now for swift typesystem reasons
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>>
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>>?
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>?>
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>?>?
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>>
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>>?
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>
-  // | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>?
-
+  *Map<String?, lib1.Being>
+    | Map<String?, lib1.Being>?
+    | Map<String?, lib1.Being?>
+    | Map<String?, lib1.Being?>?
+    | Map<String?, Map>
+    | Map<String?, Map>?
+    | Map<String?, Map?>
+    | Map<String?, Map?>?
+    // these don't work right now for swift typesystem reasons
+    // | Map<String?, Map<String?, lib1.Being>>
+    // | Map<String?, Map<String?, lib1.Being>>?
+    // | Map<String?, Map<String?, lib1.Being>?>
+    // | Map<String?, Map<String?, lib1.Being>?>?
+    // | Map<String?, Map<String?, lib1.Being?>>
+    // | Map<String?, Map<String?, lib1.Being?>>?
+    // | Map<String?, Map<String?, lib1.Being?>?>
+    // | Map<String?, Map<String?, lib1.Being?>?>?
+    | Map<ObjectKey?, lib1.Being>
+    | Map<ObjectKey?, lib1.Being>?
+    | Map<ObjectKey?, lib1.Being?>
+    | Map<ObjectKey?, lib1.Being?>?
+    | Map<ObjectKey?, Map>
+    | Map<ObjectKey?, Map>?
+    | Map<ObjectKey?, Map?>
+    | Map<ObjectKey?, Map?>?
+// these don't work right now for swift typesystem reasons
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>>
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>>?
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>?>
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being>?>?
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>>
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>>?
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>
+// | Map<ObjectKey?, Map<ObjectKey?, lib1.Being?>?>?
 
 // these cases ensure that non-polymorphic synthesized ==, hash, and init implementations work correctly
 class Foo {
@@ -282,7 +278,6 @@ foosListing: Listing<Foo> = new {
   new { name = "baz" }
   new { name = "quz"; bars { "a"; "b" } }
 }
-
 
 foosMapping: Mapping<String, Foo> = new {
   ["hello"] { name = "baz" }

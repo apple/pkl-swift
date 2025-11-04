@@ -1,4 +1,3 @@
 typealias ReferencedAlias = String
 
-class ThisClassShouldAlsoGenerate {
-}
+class ThisClassShouldAlsoGenerate {}

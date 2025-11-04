@@ -15,4 +15,4 @@
 // ===----------------------------------------------------------------------===//
 module lib2
 
-typealias Cities = "London"|"San Francisco"|"Los Angeles"
+typealias Cities = "London" | "San Francisco" | "Los Angeles"

@@ -123,4 +123,10 @@ swiftformat-lint:
 license-format: .build/tools/hawkeye
 	.build/tools/hawkeye format
 
-format: swiftformat license-format
+pkl-format:
+	$(PKL_EXEC) format --grammar-version 1 --write .
+
+pkl-format-lint:
+	$(PKL_EXEC) format --grammar-version 1 --diff-name-only .
+
+format: swiftformat license-format pkl-format

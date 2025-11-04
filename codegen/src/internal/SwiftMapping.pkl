@@ -17,9 +17,10 @@
 @Unlisted
 abstract module pkl.swift.internal.SwiftMapping
 
+import "pkl:reflect"
+
 import "SwiftMapping.pkl"
 import "Type.pkl"
-import "pkl:reflect"
 import "utils.pkl"
 
 /// The Swift module name, e.g. `AppConfig`
@@ -49,10 +50,13 @@ source: reflect.TypeDeclaration
 type: Type
 
 /// The set of names already seen prior to creating mappings for this module.
-existingNames: List<String> = seenMappings.flatMap((it) ->
-  if (it.swiftModuleName == module.swiftModuleName) it.names
-  else List()
-)
+existingNames: List<String> =
+  seenMappings.flatMap((it) ->
+    if (it.swiftModuleName == module.swiftModuleName)
+      it.names
+    else
+      List()
+  )
 
 class TypeAlias extends SwiftMapping {
   local self = this
@@ -86,17 +90,17 @@ class Enum extends SwiftMapping {
     namespaceName = self.namespaceName
     swiftModuleName = self.swiftModuleName
   }
-//
-//   /// The member constituents of this enum
-//   members: List<EnumMember> =
-//     union.members
-//       .filter((it) -> !(it is reflect.NothingType))
-//       .fold(List(), (acc: List<EnumMember>, mem) ->
-//         acc.add(new EnumMember {
-//           pklName = (mem as reflect.StringLiteralType).value
-//           swiftName = utils.normalizeEnumName(pklName)
-//         })
-//       )
+  //
+  //   /// The member constituents of this enum
+  //   members: List<EnumMember> =
+  //     union.members
+  //       .filter((it) -> !(it is reflect.NothingType))
+  //       .fold(List(), (acc: List<EnumMember>, mem) ->
+  //         acc.add(new EnumMember {
+  //           pklName = (mem as reflect.StringLiteralType).value
+  //           swiftName = utils.normalizeEnumName(pklName)
+  //         })
+  //       )
 }
 
 class Class extends SwiftMapping {
@@ -122,12 +126,14 @@ class Class extends SwiftMapping {
           isPolymorphic = true
         }
       }
-    else null
+    else
+      null
 
   struct: Struct? =
-    if (clazz.modifiers.contains("abstract")) null
+    if (clazz.modifiers.contains("abstract"))
+      null
     else
-      let (structName =  if (protocol == null) name else "\(name)Impl")
+      let (structName = if (protocol == null) name else "\(name)Impl")
         new Struct {
           name = structName
           clazz = self.clazz
