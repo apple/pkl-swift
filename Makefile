@@ -100,9 +100,11 @@ $(PKL_GEN_SWIFT_RELEASE): $(SWIFT_INPUTS)
 		--configuration release
 endif
 
+.PHONY: pkl-package
 pkl-package:
 	$(PKL_EXEC) project package codegen/src/
 
+.PHONY: pkl-gen-swift-release
 pkl-gen-swift-release: $(PKL_GEN_SWIFT_RELEASE)
 
 .PHONY: pkl-gen-swift-release-output
@@ -114,19 +116,25 @@ circleci-config:
 	$(PKL_EXEC) eval .circleci/config.pkl -o .circleci/config.yml
 	git diff --exit-code
 
+.PHONY: swiftformat
 swiftformat:
 	swift package plugin --allow-writing-to-package-directory swiftformat .
 
+.PHONY: swiftformat-lint
 swiftformat-lint:
 	swift package plugin --allow-writing-to-package-directory swiftformat --lint .
 
+.PHONY: license-format
 license-format: .build/tools/hawkeye
 	.build/tools/hawkeye format
 
+.PHONY: pkl-format
 pkl-format:
 	$(PKL_EXEC) format --grammar-version 1 --write .
 
+.PHONY: pkl-format-lint
 pkl-format-lint:
 	$(PKL_EXEC) format --grammar-version 1 --diff-name-only .
 
+.PHONY: format
 format: swiftformat license-format pkl-format
