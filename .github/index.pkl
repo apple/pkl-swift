@@ -1,0 +1,330 @@
+//===----------------------------------------------------------------------===//
+// Copyright © 2025 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//===----------------------------------------------------------------------===//
+
+amends "@pkl.impl.ghactions/PklCI.pkl"
+
+import "pkl:semver"
+
+import "@gha/actions/Artifact.pkl"
+import "@gha/actions/Common.pkl"
+import "@gha/actions/Setup.pkl"
+import "@gha/Context.pkl"
+import "@gha/Workflow.pkl"
+import "@pkl.impl.ghactions/helpers.pkl"
+import "@pkl.impl.ghactions/jobs/HawkeyeCheck.pkl"
+import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
+
+local swiftImage = "swift:6.1-rhel-ubi9"
+local xcodeVersion = "26.1"
+local pklCurrent: String(semver.isValid(this)) = "0.30.0"
+local pklDistributions: Listing<String(semver.isValid(this))> = new {
+  "0.25.3"
+  pklCurrent
+}
+
+local typealias Platform =
+  "iOS Simulator" | "watchOS Simulator" | "tvOS Simulator" | "visionOS Simulator" | "Mac Catalyst"
+
+local class SimulatorRuntime {
+  name: String
+
+  platform: Platform
+
+  fixed platformId: String = platform.toLowerCase().replaceAll(" ", "-")
+
+  fixed sdk: String =
+    Map(
+      "iOS Simulator", "iphonesimulator",
+      "watchOS Simulator", "watchsimulator",
+      "tvOS Simulator", "appletvsimulator",
+      "visionOS Simulator", "xrsimulator",
+      "Mac Catalyst", "macosx"
+    )[platform]
+
+  hidden destination: String = "platform=\(platform),name=\(name)"
+
+  settings: Mapping<String, Any> = new {
+    ["ONLY_ACTIVE_ARCH"] = "YES"
+    ["CODE_SIGNING_REQUIRED"] = "NO"
+    ["CODE_SIGNING_ALLOWED"] = "YES"
+    ["COMPILER_INDEX_STORE_ENABLE"] = "NO"
+  }
+
+  flags: Listing<String> = new {
+    "-sdk \(sdk)"
+    "-destination '\(destination)'"
+    for (k, v in settings) {
+      "\(k)=\(v)"
+    }
+  }
+}
+
+local simulators: Mapping<Platform, SimulatorRuntime> = new {
+  default { key -> platform = key }
+  ["iOS Simulator"] {
+    name = "iPhone 17"
+  }
+  ["watchOS Simulator"] {
+    name = "Apple Watch Series 11 (42mm)"
+  }
+  ["tvOS Simulator"] {
+    name = "Apple TV 4K (3rd generation)"
+  }
+  // ["visionOS Simulator"] {
+  //   name = "Apple Vision Pro"
+  // }
+  ["Mac Catalyst"] {
+    destination = "platform=macOS,variant=Mac Catalyst,arch=\(settings["ARCH"])"
+    settings {
+      ["ARCH"] = "arm64"
+      ["VALID_ARCHS"] = this["ARCH"]
+      ["SUPPORTS_MACCATALYST"] = "YES"
+      ["TARGETED_DEVICE_FAMILY"] = 2
+      ["CODE_SIGN_IDENTITY"] = "-"
+      ["CODE_SIGNING_REQUIRED"] = "NO"
+      ["CODE_SIGNING_ALLOWED"] = "NO"
+    }
+  }
+}
+
+local buildArtifactsName = "pkl-swift-build-artifacts"
+
+testReports {
+  junit {
+    ".out/test-results/**/*.xml"
+  }
+  excludeJobs {
+    Regex("test-format-.*")
+    Regex("deploy-.*")
+    Regex("build-.*")
+  }
+}
+
+triggerDocsBuild = "release"
+triggerPackageDocsBuild = "release"
+
+prb {
+  jobs {
+    for (distribution in pklDistributions) {
+      ["test-pkl-\(distribution.replaceAll(".", "-"))"] {
+        `runs-on` = "ubuntu-latest"
+        name = "container:Test Pkl \(distribution):\(swiftImage)"
+        steps {
+          new Common.Checkout {}
+          new SetupPkl { version = distribution }.step
+          new {
+            name = "swift test"
+            run =
+              """
+              mkdir -p .out/test-results/
+              swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
+              """
+          }
+          when (distribution == pklCurrent) {
+            // needed inside the container for git to work due to mount ownership oddness
+            new { run = "git config --global --add safe.directory $(pwd)" }
+            new { run = "make test-snippets" }
+            new { run = "make test-pkl" }
+            new { run = "make generate-fixtures" }
+          }
+        }
+      }
+    }
+    for (simulator in simulators) {
+      ["test-sim-\(simulator.platformId)"] {
+        `runs-on` = new Listing { "self-hosted"; "macos" }
+        `if` = "github.repository_owner == 'apple'"
+        env {
+          ["XCODE_VERSION"] = xcodeVersion
+          ["DEVELOPER_DIR"] = "/Applications/Xcode_\(xcodeVersion).app"
+        }
+        steps {
+          new Common.Checkout {}
+          new {
+            uses = "ruby/setup-ruby@v1"
+            with {
+              ["ruby-version"] = "3.4"
+            }
+          }
+          new { run = "gem install xcpretty" }
+          new {
+            name = "xcodebuild test"
+            run =
+              #"""
+              xcodebuild -scheme pkl-swift-Package \#(simulator.flags.join(" ")) test \
+                | xcpretty --report junit --output .out/test-results/test-sim-\#(simulator.platformId).xml
+              """#
+          }
+        }
+      }
+    }
+    ["test-format-license-headers"] = new HawkeyeCheck {}.job
+    ["test-format-swift"] {
+      `runs-on` = "ubuntu-latest"
+      name = "container:test-format-swift:\(swiftImage)"
+      steps {
+        new Common.Checkout {}
+        new { run = "make swiftformat-lint" }
+      }
+    }
+    ["test-format-pkl"] {
+      `runs-on` = "ubuntu-latest"
+      steps {
+        new Common.Checkout {}
+        new SetupPkl { version = pklCurrent }.step
+        new { run = "make pkl-format-lint" }
+      }
+    }
+  }
+}
+
+build = main
+releaseBranch = main
+main = (prb) {
+  jobs {
+    for (key in prb.jobs.keys) {
+      when (key.startsWith("test-sim-")) {
+        [key] {
+        // TODO: use lower priority runners for on-push macOS jobs
+        // `runs-on` { "nightly" }
+        }
+      }
+    }
+  }
+}
+
+local testJobs = prb.jobs.keys.filter((it) -> it.startsWith("test-")).toListing()
+
+release = (prb) {
+  jobs {
+    ["build-pkl-package"] {
+      `runs-on` = "ubuntu-latest"
+      needs = testJobs
+      steps {
+        new Common.Checkout {}
+        new SetupPkl { version = pklCurrent }.step
+        new { run = "pkl project package --output-path out/pkl-package/ codegen/src/" }
+        new Artifact.Upload {
+          with {
+            name = "\(buildArtifactsName)-pkl-package"
+            path = "out"
+          }
+        }
+      }
+    }
+    ["build-pkl-gen-swift-macos"] {
+      `runs-on` = new Listing { "self-hosted"; "macos" }
+      `if` = "github.repository_owner == 'apple'"
+      needs = testJobs
+      env {
+        ["XCODE_VERSION"] = xcodeVersion
+        ["DEVELOPER_DIR"] = "/Applications/Xcode_\(xcodeVersion).app"
+      }
+      steps {
+        new Common.Checkout {}
+        new {
+          run =
+            """
+            make pkl-gen-swift-release
+            mkdir -p out/pkl-gen-swift/
+            cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
+            """
+        }
+        new Artifact.Upload {
+          with {
+            name = "\(buildArtifactsName)-pkl-gen-swift-macos"
+            path = "out"
+          }
+        }
+      }
+    }
+    for (arch in List("aarch64", "amd64")) {
+      ["build-pkl-gen-swift-linux-\(arch)"] {
+        `runs-on` = if (arch == "aarch64") "ubuntu-24.04-arm" else "ubuntu-latest"
+        needs = testJobs
+        name = "container:Build pkl-gen-swift linux/\(arch):\(swiftImage)"
+        steps {
+          new Common.Checkout {}
+          new {
+            run =
+              """
+              make pkl-gen-swift-release
+              mkdir -p out/pkl-gen-swift/
+              cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-\(arch).bin
+              """
+          }
+          new Artifact.Upload {
+            with {
+              name = "\(buildArtifactsName)-pkl-gen-swift-linux-\(arch)"
+              path = "out"
+            }
+          }
+        }
+      }
+    }
+    ["deploy-github-release"] {
+      `runs-on` = "ubuntu-latest"
+      needs {
+        "build-pkl-package"
+        "build-pkl-gen-swift-macos"
+        "build-pkl-gen-swift-linux-aarch64"
+        "build-pkl-gen-swift-linux-amd64"
+      }
+      steps {
+        new Common.Checkout {}
+        new Artifact.Download {
+          with {
+            name = "\(buildArtifactsName)-*"
+            path = "out"
+          }
+        }
+        new {
+          env {
+            ["GH_TOKEN"] = Context.github.token
+            ["GH_REPO"] = Context.github.repository
+          }
+          run =
+            #"""
+            EXPECTED_VERSION=$(cat VERSION.txt)
+
+            if [ "${EXPECTED_VERSION}" != "\#(Context.github.refName)" ]; then
+              echo "Mismatching versions!"
+              echo "VERSION.txt has ${EXPECTED_VERSION}"
+              echo "Git tag is \#(Context.github.refName)"
+              echo "Update VERSION.txt to match the tag, and re-tag."
+              exit 1
+            fi
+
+            echo "Creating release for Pkl package"
+            gh release create "pkl.swift@\#(Context.github.refName)" \
+              --title "pkl.swift@\#(Context.github.refName)" \
+              --target "\#(Context.github.sha)" \
+              --notes "This holds the release assets for the pkl.swift Pkl package." \
+              out/pkl-package/*
+
+            echo "Creating release for Swift library"
+            gh release create "\#(Context.github.refName)" \
+              --title "\#(Context.github.refName)" \
+              --target "\#(Context.github.sha)" \
+              --verify-tag \
+              --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-\#(Context.github.refName)" \
+              out/pkl-gen-swift/*
+            """#
+        }
+      }
+    }
+  }
+}
