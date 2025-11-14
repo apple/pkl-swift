@@ -88,11 +88,14 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+    - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
     - name: xcodebuild test
+      env:
+        LC_CTYPE: en_US.UTF-8
       run: |-
         xcodebuild -scheme pkl-swift-Package -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
           | xcpretty --report junit --output .out/test-results/test-sim-ios-simulator.xml
@@ -113,11 +116,14 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+    - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
     - name: xcodebuild test
+      env:
+        LC_CTYPE: en_US.UTF-8
       run: |-
         xcodebuild -scheme pkl-swift-Package -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
           | xcpretty --report junit --output .out/test-results/test-sim-watchos-simulator.xml
@@ -138,11 +144,14 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+    - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
     - name: xcodebuild test
+      env:
+        LC_CTYPE: en_US.UTF-8
       run: |-
         xcodebuild -scheme pkl-swift-Package -sdk appletvsimulator -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES COMPILER_INDEX_STORE_ENABLE=NO test \
           | xcpretty --report junit --output .out/test-results/test-sim-tvos-simulator.xml
@@ -163,11 +172,14 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+    - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
     - name: xcodebuild test
+      env:
+        LC_CTYPE: en_US.UTF-8
       run: |-
         xcodebuild -scheme pkl-swift-Package -sdk macosx -destination 'platform=macOS,variant=Mac Catalyst,arch=arm64' ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO ARCH=arm64 VALID_ARCHS=arm64 SUPPORTS_MACCATALYST=YES TARGETED_DEVICE_FAMILY=2 CODE_SIGN_IDENTITY=- test \
           | xcpretty --report junit --output .out/test-results/test-sim-mac-catalyst.xml
