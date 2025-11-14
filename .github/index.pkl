@@ -153,6 +153,7 @@ prb {
         }
         steps {
           new Common.Checkout {}
+          new { run = "brew install gmp libyaml" }
           new {
             uses = "ruby/setup-ruby@v1"
             with {
@@ -162,6 +163,10 @@ prb {
           new { run = "gem install xcpretty" }
           new {
             name = "xcodebuild test"
+            env {
+              // needed for xcpretty: https://github.com/xcpretty/xcpretty/issues/73
+              ["LC_CTYPE"] = "en_US.UTF-8"
+            }
             run =
               #"""
               xcodebuild -scheme pkl-swift-Package \#(simulator.flags.join(" ")) test \
