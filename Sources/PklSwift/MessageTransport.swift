@@ -127,6 +127,8 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     var process: Process?
     let pklCommand: [String]?
 
+    private let processTerminationGroup = DispatchGroup()
+
     override var running: Bool { self.process?.isRunning == true }
 
     override convenience init() {
@@ -153,6 +155,10 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         self.process!.standardInput = self.writer
         let debugArguments = arguments
         debug("Spawning command \(pklCommand[0]) with arguments \(debugArguments)")
+        self.processTerminationGroup.enter()
+        self.process?.terminationHandler = { [processTerminationGroup] _ in
+            processTerminationGroup.leave()
+        }
         try self.process!.run()
     }
 
@@ -186,7 +192,7 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         #else
         self.process?.terminate()
         #endif
-        self.process!.waitUntilExit()
+        self.processTerminationGroup.wait()
         self.process = nil
     }
 
