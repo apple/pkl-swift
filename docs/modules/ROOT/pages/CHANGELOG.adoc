@@ -1,5 +1,26 @@
 = Changelog
 
+[[release-0.7.1]]
+== 0.7.1 (2025-11-20)
+
+=== Fixes
+
+* Fix issue where the `pkl server` subprocess can hang (https://github.com/apple/pkl-swift/pull/86[#86]).
+* Fix incorrect code generation for enum types in Swift 6 (https://github.com/apple/pkl-swift/pull/87[#87]).
+
+=== Miscellaneous
+
+* Tidy up phony targets in Makefile (https://github.com/apple/pkl-swift/pull/83[#83]).
+* Switch CI to GitHub Actions (https://github.com/apple/pkl-swift/pull/84[#84], https://github.com/apple/pkl-swift/pull/85[#85]).
+
+=== Contributors ❤️
+
+Thank you to all our contributors!
+
+* https://github.com/bioball[@bioball]
+* https://github.com/HT154[@HT154]
+* https://github.com/johnliedtke[@johnliedtke]
+
 [[release-0.7.0]]
 == 0.7.0 (2025-11-05)
 
@@ -43,7 +64,7 @@ Thank you to all our contributors!
 * Adds support for Swift 6 (https://github.com/apple/pkl-swift/pull/61[#61], https://github.com/apple/pkl-swift/pull/68[#68]).
 * Adds support for decoding `Class` and `TypeAlias` values (https://github.com/apple/pkl-swift/pull/64[#64]).
 
-=== Breaking Changes 
+=== Breaking Changes
 
 * The code generation of optional keys has changed. A `Mapping` or `Map` with an optional key will be represented as `OptionalDictionaryKey<T>` in Swift. For example, `Mapping<String?, String>` becomes `[OptionalDictionaryKey<String>: String]` in Swift (https://github.com/apple/pkl-swift/pull/66[#66]).
 +
