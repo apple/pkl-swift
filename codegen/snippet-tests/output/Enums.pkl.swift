@@ -18,7 +18,7 @@ extension Enums {
         case zebra(Zebra)
         case monkey(Monkey)
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -45,7 +45,7 @@ extension Enums {
         case mappingStringString([String: String])
         case listingString([String])
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -70,7 +70,7 @@ extension Enums {
         case string(String)
         case string(String)
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -96,7 +96,7 @@ extension Enums {
         case optionalHorse(Horse?)
         case zebra(Zebra)
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {

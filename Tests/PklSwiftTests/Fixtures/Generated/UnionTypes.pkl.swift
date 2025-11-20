@@ -16,7 +16,7 @@ extension UnionTypes {
         case grape(Grape)
         case apple(Apple)
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -49,7 +49,7 @@ extension UnionTypes {
         case zebra(Zebra)
         case donkey(Donkey)
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -84,7 +84,7 @@ extension UnionTypes {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -119,12 +119,12 @@ extension UnionTypes {
         case int(Int)
         case float64(Float64)
 
-        private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> IntOrFloat? {
+        private static func decodeNumeric(from decoder: any Decoder, _ container: any SingleValueDecodingContainer) -> IntOrFloat? {
             return (try? .int(container.decode(Int.self)))
                 ?? (try? .float64(container.decode(Float64.self)))
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let decoded = IntOrFloat.decodeNumeric(from: decoder, container)
             if decoded != nil {
@@ -163,7 +163,7 @@ extension UnionTypes {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -200,14 +200,14 @@ extension UnionTypes {
         case int32(Int32)
         case int(Int)
 
-        private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> Numbers? {
+        private static func decodeNumeric(from decoder: any Decoder, _ container: any SingleValueDecodingContainer) -> Numbers? {
             return (try? .int8(container.decode(Int8.self)))
                 ?? (try? .int16(container.decode(Int16.self)))
                 ?? (try? .int32(container.decode(Int32.self)))
                 ?? (try? .int(container.decode(Int.self)))
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let decoded = Numbers.decodeNumeric(from: decoder, container)
             if decoded != nil {
