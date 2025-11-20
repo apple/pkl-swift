@@ -21,7 +21,7 @@ package {
   baseUri = "package://pkg.pkl-lang.org/pkl-swift/\(name)"
   packageZipUrl =
     "https://github.com/apple/pkl-swift/releases/download/\(name)@\(version)/\(name)@\(version).zip"
-  version = read("../../VERSION.txt").text
+  version = read("../../VERSION.txt").text.trim()
   authors {
     "The Pkl Authors <pkl-oss@group.apple.com>"
   }
