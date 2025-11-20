@@ -120,7 +120,7 @@ local throwTypeMismatch =
 
 local initMethod =
   new Listing {
-    "\(module.indent)public init(from decoder: Decoder) throws {"
+    "\(module.indent)public init(from decoder: any Decoder) throws {"
     "\(module.indent.repeat(2))let container = try decoder.singleValueContainer()"
     when (!enumNumericMembers.isEmpty) {
       "\(module.indent.repeat(2))let decoded = \(module.mapping.name).decodeNumeric(from: decoder, container)"
@@ -190,7 +190,7 @@ local synthesizedHash =
 
 local decodeNumeric =
   new Listing {
-    "\(module.indent)private static func decodeNumeric(from decoder: Decoder, _ container: any SingleValueDecodingContainer) -> \(module.mapping.name)? {"
+    "\(module.indent)private static func decodeNumeric(from decoder: any Decoder, _ container: any SingleValueDecodingContainer) -> \(module.mapping.name)? {"
     when (enumNumericMembers.length == 1) {
       local member = enumNumericMembers.first
       "\(module.indent.repeat(2))return try? .\(member.name)(container.decode(\(member.renderedType).self))"
