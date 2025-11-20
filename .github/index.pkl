@@ -20,10 +20,7 @@ import "pkl:semver"
 
 import "@gha/actions/Artifact.pkl"
 import "@gha/actions/Common.pkl"
-import "@gha/actions/Setup.pkl"
 import "@gha/Context.pkl"
-import "@gha/Workflow.pkl"
-import "@pkl.impl.ghactions/helpers.pkl"
 import "@pkl.impl.ghactions/jobs/HawkeyeCheck.pkl"
 import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
 
@@ -292,7 +289,8 @@ release = (prb) {
         new Common.Checkout {}
         new Artifact.Download {
           with {
-            name = "\(buildArtifactsName)-*"
+            pattern = "\(buildArtifactsName)-*"
+            `merge-multiple` = true
             path = "out"
           }
         }
