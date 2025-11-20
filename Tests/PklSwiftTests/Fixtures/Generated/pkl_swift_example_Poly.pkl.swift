@@ -41,7 +41,7 @@ extension pkl_swift_example_Poly {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -183,7 +183,7 @@ extension pkl_swift_example_Poly {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -349,7 +349,7 @@ extension pkl_swift_example_Poly {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -627,7 +627,7 @@ extension pkl_swift_example_Poly {
             }
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
@@ -854,7 +854,7 @@ extension pkl_swift_example_Poly {
         case mappingStringString([String: String])
         case mapStringString([String: String])
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try container.decode(PklSwift.PklAny.self).value
             switch value?.base {
