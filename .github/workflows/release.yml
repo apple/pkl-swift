@@ -342,6 +342,8 @@ jobs:
     - build-pkl-gen-swift-macos
     - build-pkl-gen-swift-linux-aarch64
     - build-pkl-gen-swift-linux-amd64
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
