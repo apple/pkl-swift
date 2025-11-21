@@ -285,6 +285,9 @@ release = (prb) {
         "build-pkl-gen-swift-linux-aarch64"
         "build-pkl-gen-swift-linux-amd64"
       }
+      permissions {
+        contents = "write"
+      }
       steps {
         new Common.Checkout {}
         new Artifact.Download {
