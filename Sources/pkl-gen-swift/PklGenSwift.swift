@@ -19,7 +19,7 @@ import Foundation
 import PklSwift
 import SystemPackage
 
-let VERSION = String(decoding: Data(PackageResources.VERSION_txt), as: UTF8.self)
+let VERSION = String(decoding: Data(PackageResources.VERSION_txt), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
 
 struct ConsoleOutputStream: TextOutputStream {
     mutating func write(_ string: String) {
