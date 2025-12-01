@@ -1,5 +1,18 @@
 = Changelog
 
+[[release-0.7.2]]
+== 0.7.2 (2025-12-01)
+
+=== Fixes
+
+* Fix malformed package URI caused by trailing newline in VERSION.txt (https://github.com/apple/pkl-swift/pull/92[#92]).
+
+=== Contributors
+
+Thank you to all our contributors!
+
+* https://github.com/johnliedtke[@johnliedtke]
+
 [[release-0.7.1]]
 == 0.7.1 (2025-11-20)
 
