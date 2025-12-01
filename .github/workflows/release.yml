@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Setup Pkl
       id: setup-pkl
       env:
@@ -50,6 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Setup Pkl
       id: setup-pkl
       env:
@@ -90,6 +94,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
@@ -117,6 +123,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
@@ -144,6 +152,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
@@ -171,6 +181,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: brew install gmp libyaml
     - uses: ruby/setup-ruby@v1
       with:
@@ -194,6 +206,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
       with:
+        persist-credentials: false
         fetch-depth: 0
     - run: hawkeye check --config licenserc.toml --fail-if-unknown
     container:
@@ -203,6 +216,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: make swiftformat-lint
     container:
       image: swift:6.1-rhel-ubi9
@@ -210,6 +225,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Setup Pkl
       id: setup-pkl
       env:
@@ -239,6 +256,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - name: Setup Pkl
       id: setup-pkl
       env:
@@ -278,6 +297,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: |-
         make pkl-gen-swift-release
         mkdir -p out/pkl-gen-swift/
@@ -301,6 +322,8 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: |-
         make pkl-gen-swift-release
         mkdir -p out/pkl-gen-swift/
@@ -326,6 +349,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - run: |-
         make pkl-gen-swift-release
         mkdir -p out/pkl-gen-swift/
@@ -347,6 +372,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        persist-credentials: false
     - uses: actions/download-artifact@v6
       with:
         path: out
