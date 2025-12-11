@@ -1,6 +1,4 @@
-# Do not modify!
-# This file was generated from a template using https://github.com/StefMa/pkl-gha
-
+# Generated from Workflow.pkl. DO NOT EDIT.
 name: Pull Request
 'on':
   pull_request: {}
@@ -14,7 +12,7 @@ jobs:
     name: Test Pkl 0.25.3
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
@@ -37,7 +35,7 @@ jobs:
         swift test -vv --parallel --num-workers 1 --xunit-output .out/test-results/xunit.xml -Xswiftc -warnings-as-errors
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-pkl-0-25-3
         path: .out/test-results/**/*.xml
@@ -48,7 +46,7 @@ jobs:
     name: Test Pkl 0.30.0
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
@@ -75,7 +73,7 @@ jobs:
     - run: make generate-fixtures
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-pkl-0-30-0
         path: .out/test-results/**/*.xml
@@ -91,11 +89,11 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@d697be2f83c6234b20877c3b5eac7a7f342f0d0c # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -107,7 +105,7 @@ jobs:
           | xcpretty --report junit --output .out/test-results/test-sim-ios-simulator.xml
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-sim-ios-simulator
         path: .out/test-results/**/*.xml
@@ -121,11 +119,11 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@d697be2f83c6234b20877c3b5eac7a7f342f0d0c # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -137,7 +135,7 @@ jobs:
           | xcpretty --report junit --output .out/test-results/test-sim-watchos-simulator.xml
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-sim-watchos-simulator
         path: .out/test-results/**/*.xml
@@ -151,11 +149,11 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@d697be2f83c6234b20877c3b5eac7a7f342f0d0c # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -167,7 +165,7 @@ jobs:
           | xcpretty --report junit --output .out/test-results/test-sim-tvos-simulator.xml
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-sim-tvos-simulator
         path: .out/test-results/**/*.xml
@@ -181,11 +179,11 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@d697be2f83c6234b20877c3b5eac7a7f342f0d0c # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -197,7 +195,7 @@ jobs:
           | xcpretty --report junit --output .out/test-results/test-sim-mac-catalyst.xml
     - name: Upload Test Result XML
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-xml-test-sim-mac-catalyst
         path: .out/test-results/**/*.xml
@@ -206,7 +204,7 @@ jobs:
     name: hawkeye-check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
         fetch-depth: 0
@@ -217,7 +215,7 @@ jobs:
     name: test-format-swift
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - run: make swiftformat-lint
@@ -226,7 +224,7 @@ jobs:
   test-format-pkl:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
@@ -249,14 +247,14 @@ jobs:
     steps:
     - name: Upload event file
       if: '!cancelled()'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-results-event-file
         path: ${{ github.event_path }}
   check-pkl-github-actions:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
