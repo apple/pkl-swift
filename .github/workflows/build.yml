@@ -96,7 +96,7 @@ jobs:
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@4c24fa5ec04b2e79eb40571b1cee2a0d2b705771 # v1
+    - uses: ruby/setup-ruby@d5f787ce339eb0767271bc01d922e85644c2c8ab # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -125,7 +125,7 @@ jobs:
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@4c24fa5ec04b2e79eb40571b1cee2a0d2b705771 # v1
+    - uses: ruby/setup-ruby@d5f787ce339eb0767271bc01d922e85644c2c8ab # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -154,7 +154,7 @@ jobs:
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@4c24fa5ec04b2e79eb40571b1cee2a0d2b705771 # v1
+    - uses: ruby/setup-ruby@d5f787ce339eb0767271bc01d922e85644c2c8ab # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
@@ -183,7 +183,7 @@ jobs:
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
-    - uses: ruby/setup-ruby@4c24fa5ec04b2e79eb40571b1cee2a0d2b705771 # v1
+    - uses: ruby/setup-ruby@d5f787ce339eb0767271bc01d922e85644c2c8ab # v1
       with:
         ruby-version: '3.4'
     - run: gem install xcpretty
