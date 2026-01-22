@@ -16,7 +16,7 @@ jobs:
     name: Test Pkl 0.25.3
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
@@ -49,7 +49,7 @@ jobs:
     name: Test Pkl 0.30.0
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
@@ -91,7 +91,7 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
@@ -120,7 +120,7 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
@@ -149,7 +149,7 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
@@ -178,7 +178,7 @@ jobs:
       XCODE_VERSION: '26.1'
       DEVELOPER_DIR: /Applications/Xcode_26.1.app
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - run: brew install gmp libyaml
@@ -202,7 +202,7 @@ jobs:
     name: hawkeye-check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
         fetch-depth: 0
@@ -213,7 +213,7 @@ jobs:
     name: test-format-swift
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - run: make swiftformat-lint
@@ -222,7 +222,7 @@ jobs:
   test-format-pkl:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         persist-credentials: false
     - name: Setup Pkl
