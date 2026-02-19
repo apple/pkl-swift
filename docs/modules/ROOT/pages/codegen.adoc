@@ -7,7 +7,7 @@ Pkl code may turn into Swift code by way of code generation.
 Code generation is done through the `@pkl.swift/gen.pkl` tool.
 For usage instructions, consult the xref:ROOT:quickstart.adoc#codegen[codegen] section of the quickstart.
 
-Once installed, Swift types may be generated from Pkl:
+Swift code may be generated from Pkl:
 
 [source,bash]
 ----

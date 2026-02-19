@@ -25,7 +25,7 @@ import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
 
 local swiftImage = "swift:6.1-rhel-ubi9"
 local xcodeVersion = "26.1"
-local pklCurrent: String(semver.isValid(this)) = "0.30.0"
+local pklCurrent: String(semver.isValid(this)) = "0.31.0"
 local pklDistributions: Listing<String(semver.isValid(this))> = new {
   "0.25.3"
   pklCurrent
