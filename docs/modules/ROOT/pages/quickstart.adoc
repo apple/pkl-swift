@@ -1,9 +1,3 @@
-include::ROOT:partial$component-attributes.adoc[]
-:uri-jpkl: https://pkl-lang.org/main/current/pkl-cli/index.html#java-executable
-:uri-pkl-gen-swift-macos: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-macos.bin
-:uri-pkl-gen-swift-linux-aarch64: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-linux-aarch64.bin
-:uri-pkl-gen-swift-linux-amd64: https://github.com/apple/pkl-swift/releases/download/{pkl-swift-version}/pkl-gen-swift-linux-amd64.bin
-
 = Quickstart
 
 These steps will get you up and going with using Pkl and Swift.
@@ -18,7 +12,7 @@ Add the pkl-swift library as a dependency to your project's `Package.swift`:
 ----
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/apple/pkl-swift", from: "{pkl-swift-version}")
+        .package(url: "https://github.com/apple/pkl-swift", from: "{version}")
     ],
     targets: [
         .executableTarget(
@@ -52,35 +46,30 @@ port: UInt16
 == 3. Generate Swift source code
 
 With a schema defined, generate Swift source code for it.
-
-Code generation is done via the `pkl-gen-swift` CLI. To install, download it from GitHub.
-
-On macOS:
-
-[source,bash]
-[subs="+attributes"]
-----
-curl -L {uri-pkl-gen-swift-macos} -o pkl-gen-swift
-
-chmod +x pkl-gen-swift
-----
-
-The binary is published for macOS, and for Linux for aarch64 and amd64 architectures.
-
-* macOS Universal Binary: {uri-pkl-gen-swift-macos}
-* linux/aarch64: {uri-pkl-gen-swift-linux-aarch64}
-* linux/amd64: {uri-pkl-gen-swift-linux-amd64}
+Code generation is done via the `gen.pkl` CLI tool inside the `pkl.swift` package.
 
 In our example, Swift sources can be generated using the following command:
 
 [source,bash]
 ----
-pkl-gen-swift pkl/AppConfig.pkl -o Sources/MyApplication/Generated/
+pkl run package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{version}#/gen.pkl pkl/AppConfig.pkl -o Sources/MyApplication/Generated/
+----
+
+If using xref:main:language-reference:index.adoc#projects[a `PklProject`] to manage the `pkl.swift` dependency, the tool's URI may be replaced with dependency notation:
+
+[source,bash]
+----
+pkl run @pkl.swift/gen.pkl pkl/AppConfig.pkl -o Sources/MyApplication/Generated/
 ----
 
 This will create a file called `AppConfig.pkl.swift` inside the `Sources/MyApplication/Generated` directory.
 
-For more details on how to control code generation, consult `pkl-gen-swift --help`.
+For more details on how to control code generation, consult the CLI help:
+
+[source,bash]
+----
+pkl run @pkl.swift/gen.pkl --help
+----
 
 == 4. Evaluate Pkl configuration data in Swift
 

@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import "swift.pkl"
 ///
 /// A module's dependencies are also included in code generation.
 /// Therefore, in most cases, it is only necessary to provide the entrypoint for code generation.
-inputs: Listing<String>?
+inputs: Listing<Module>?
 
 /// The output path to write generated files into.
 ///
@@ -40,6 +40,10 @@ dryRun: Boolean?
 /// The Generator.pkl script to use for code generation.
 ///
 /// This is an internal setting that's meant for development purposes.
+@Deprecated {
+  since = "0.8.0"
+  message = "This setting has no effect."
+}
 generateScript: String?
 
 /// The project directory to control dependency and evaluator settings during codegen.
@@ -48,6 +52,11 @@ generateScript: String?
 /// Relative paths are resolved against the enclosing directory.
 ///
 /// Paths must use `/` as the path separator.
+@Deprecated {
+  since = "0.8.0"
+  message =
+    "This setting has no effect. The project dir is determined based on CWD or --project-dir on the CLI."
+}
 projectDir: String?
 
 output {
@@ -62,18 +71,8 @@ output {
       myModuleDirectory + "/" + path
 
   value = (module) {
-    when (module.inputs != null) {
-      inputs = new {
-        for (input in module.inputs!!) {
-          resolvePath(input)
-        }
-      }
-    }
     when (module.outputPath != null) {
       outputPath = resolvePath(module.outputPath!!)
-    }
-    when (module.projectDir != null) {
-      projectDir = resolvePath(module.projectDir!!)
     }
   }
 }
