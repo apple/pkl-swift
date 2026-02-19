@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -131,9 +131,9 @@ extension TypeRegistry {
     }
 
     static func _registerTypes(_ types: [any PklRegisteredType.Type]) {
-        _sharedLock.withLock {
+        self._sharedLock.withLock {
             precondition(
-                _shared == nil,
+                self._shared == nil,
                 "registerPklTypes(_:) must be called before any Pkl modules are loaded"
             )
             var registry = TypeRegistry()
@@ -142,7 +142,7 @@ extension TypeRegistry {
                     try t.init(from: decoder)
                 }
             }
-            _shared = registry
+            self._shared = registry
         }
     }
 }
