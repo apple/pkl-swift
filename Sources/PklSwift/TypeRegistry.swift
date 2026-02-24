@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,9 +124,49 @@ extension TypeRegistry {
             if let _shared {
                 return _shared
             } else {
-                // first tine we're accessing so we need to initialize it
+                // first time we're accessing so we need to initialize it
                 return TypeRegistry._initializeShared()
             }
         }
     }
+
+    static func _registerTypes(_ types: [any PklRegisteredType.Type]) {
+        self._sharedLock.withLock {
+            precondition(
+                self._shared == nil,
+                "registerPklTypes(_:) must be called before any Pkl modules are loaded"
+            )
+            var registry = TypeRegistry()
+            for t in types {
+                registry.register(identifier: t.registeredIdentifier) { decoder in
+                    try t.init(from: decoder)
+                }
+            }
+            self._shared = registry
+        }
+    }
+}
+
+/// Explicitly registers a set of ``PklRegisteredType`` conformers, bypassing
+/// the automatic O(N) type discovery that scans all Swift types in the binary.
+///
+/// In large binaries, the default type discovery must iterate all Swift types
+/// linked into the process to find ``PklRegisteredType`` conformers. For
+/// binaries with thousands of types, this can add several seconds of latency on
+/// the first Pkl module load.
+///
+/// Call this once, before any `loadFrom` call:
+///
+/// ```swift
+/// registerPklTypes([
+///     MyModule.ModuleImpl.self,
+///     AnotherModule.Module.self,
+/// ])
+/// ```
+///
+/// - Parameter types: All ``PklRegisteredType`` conformers your app will decode.
+///   Any Pkl type not included here will result in a decoding error if encountered.
+/// - Precondition: Must be called before any Pkl module is loaded.
+public func registerPklTypes(_ types: [any PklRegisteredType.Type]) {
+    TypeRegistry._registerTypes(types)
 }
