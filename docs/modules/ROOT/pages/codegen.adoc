@@ -1,18 +1,17 @@
-include::ROOT:partial$component-attributes.adoc[]
-
 = Code generation
 
 Pkl code may turn into Swift code by way of code generation.
 
 == Running code generation
 
-Code generation is done through the `pkl-gen-swift` binary. For installation instructions, consult the xref:ROOT:quickstart.adoc#codegen[codegen] section of the quickstart.
+Code generation is done through the `@pkl.swift/gen.pkl` tool.
+For usage instructions, consult the xref:ROOT:quickstart.adoc#codegen[codegen] section of the quickstart.
 
-Once installed, Swift may be generated from Pkl:
+Swift code may be generated from Pkl:
 
 [source,bash]
 ----
-pkl-gen-swift pkl/AppConfig.pkl -o Sources/MyProject/Generated/
+pkl run @pkl.swift/gen.pkl pkl/AppConfig.pkl -o Sources/MyProject/Generated/
 ----
 
 == How Pkl is turned into Swift
@@ -175,7 +174,7 @@ For example:
 [source,pkl]
 [subs="+attributes"]
 ----
-import "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{pkl-swift-version}#/swift.pkl"
+import "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{version}#/swift.pkl"
 
 @swift.Name { value = "MyCoolApplication" }
 class My_Application

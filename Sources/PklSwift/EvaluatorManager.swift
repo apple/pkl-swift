@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -400,6 +400,7 @@ let pklVersion0_27 = SemanticVersion("0.27.0")!
 let pklVersion0_28 = SemanticVersion("0.28.0")!
 let pklVersion0_29 = SemanticVersion("0.29.0")!
 let pklVersion0_30 = SemanticVersion("0.30.0")!
+let pklVersion0_31 = SemanticVersion("0.31.0")!
 
 let supportedPklVersions = [
     pklVersion0_25,
@@ -408,4 +409,5 @@ let supportedPklVersions = [
     pklVersion0_28,
     pklVersion0_29,
     pklVersion0_30,
+    pklVersion0_31,
 ]

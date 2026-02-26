@@ -1,0 +1,89 @@
+//===----------------------------------------------------------------------===//
+// Copyright © 2026 Apple Inc. and the Pkl project authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//===----------------------------------------------------------------------===//
+
+@ModuleInfo { minPklVersion = "0.31.0" }
+module pkl.swift.gen
+
+extends "pkl:Command"
+
+import "pkl:platform"
+
+import "Generator.pkl"
+import "GeneratorSettings.pkl"
+
+options: Options
+
+local const pwd =
+  if (platform.current.operatingSystem == "Windows")
+    read("env:PWD").replaceAll("\\", "/")
+  else
+    read("env:PWD")
+
+class Options {
+  /// The output directory to write generated sources into. (default: .out)
+  @Flag { shortName = "o"; completionCandidates = "paths" }
+  `output-path`: String?
+
+  /// Print the names of the files that will be generated, but don't write any files.
+  @BooleanFlag
+  `dry-run`: Boolean?
+
+  /// The generator-settings.pkl file to use. (default: ./generator-settings.pkl if present)
+  @Flag {
+    convert = (it) -> new Import { uri = it }
+    transformAll = (values) ->
+      values.firstOrNull
+        ?? if (read?("\(pwd)/generator-settings.pkl") != null)
+          new Import { uri = "./generator-settings.pkl" }
+        else
+          new GeneratorSettings {}
+    completionCandidates = "paths"
+  }
+  `generator-settings`: GeneratorSettings
+
+  /// The Pkl modules to generate as Swift.
+  @Argument {
+    convert = (it) -> new Import { uri = it }
+    completionCandidates = "paths"
+  }
+  pklInputModules: Listing<Module>?
+}
+
+local effectiveGeneratorSettings: GeneratorSettings = (options.`generator-settings`.output.value) {
+  inputs = options.pklInputModules ?? super.inputs ?? new Listing {}
+  outputPath = options.`output-path` ?? super.outputPath ?? ".out"
+  dryRun = options.`dry-run` ?? super.dryRun ?? false
+}
+
+// inputs can overlap if they import the same files, so use List#toMap() instead of building a Mapping
+local rawOutputFiles: Listing<Pair<String, FileOutput>> = new {
+  for (input in effectiveGeneratorSettings.inputs!!) {
+    for (path, file in new Generator { moduleToGenerate = input }.output.files!!) {
+      Pair("\(effectiveGeneratorSettings.outputPath!!)/\(path)", file)
+    }
+  }
+}
+
+local outputFiles: Map<String, FileOutput> =
+  rawOutputFiles.toList().toMap((it) -> it.key, (it) -> it.value)
+
+output {
+  when (effectiveGeneratorSettings.dryRun!!) {
+    text = "Running in dry-run mode\n" + outputFiles.keys.join("\n")
+  } else {
+    files = outputFiles.toMapping()
+  }
+}

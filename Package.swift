@@ -1,6 +1,6 @@
 // swift-tools-version: 6.0
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,14 +35,9 @@ let package = Package(
             name: "PklSwift",
             targets: ["PklSwift"]
         ),
-        .executable(
-            name: "pkl-gen-swift",
-            targets: ["pkl-gen-swift"]
-        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.3"),
         .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
         // to enable `swift package generate-documentation --target PklSwift`
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
@@ -64,15 +59,6 @@ let package = Package(
             dependencies: [
                 .product(name: "SystemPackage", package: "swift-system"),
             ],
-            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
-        ),
-        .executableTarget(
-            name: "pkl-gen-swift",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                "PklSwift",
-            ],
-            resources: [.embedInCode("Resources/VERSION.txt")],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .executableTarget(

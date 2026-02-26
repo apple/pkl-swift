@@ -12,7 +12,6 @@ includes = [
 ]
 
 excludes = [
-    "Sources/pkl-gen-swift/Generated",
     "Tests/PklSwiftTests/Fixtures",
     "codegen/snippet-tests",
     "doc",

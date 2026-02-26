@@ -45,8 +45,8 @@ jobs:
         path: .out/test-results/**/*.xml
     container:
       image: swift:6.1-rhel-ubi9
-  test-pkl-0-30-0:
-    name: Test Pkl 0.30.0
+  test-pkl-0-31-0:
+    name: Test Pkl 0.31.0
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -55,9 +55,9 @@ jobs:
     - name: Setup Pkl
       id: setup-pkl
       env:
-        PKL_VERSION: 0.30.0
+        PKL_VERSION: 0.31.0
         PKL_FILENAME: pkl
-        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64
+        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.31.0/pkl-linux-amd64
       shell: bash
       run: |-
         DIR="$(mktemp -d /tmp/pkl-$PKL_VERSION-XXXXXX)"
@@ -78,7 +78,7 @@ jobs:
       if: '!cancelled()'
       uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
-        name: test-results-xml-test-pkl-0-30-0
+        name: test-results-xml-test-pkl-0-31-0
         path: .out/test-results/**/*.xml
     container:
       image: swift:6.1-rhel-ubi9
@@ -230,9 +230,9 @@ jobs:
     - name: Setup Pkl
       id: setup-pkl
       env:
-        PKL_VERSION: 0.30.0
+        PKL_VERSION: 0.31.0
         PKL_FILENAME: pkl
-        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64
+        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.31.0/pkl-linux-amd64
       shell: bash
       run: |-
         DIR="$(mktemp -d /tmp/pkl-$PKL_VERSION-XXXXXX)"
@@ -245,7 +245,7 @@ jobs:
   build-pkl-package:
     needs:
     - test-pkl-0-25-3
-    - test-pkl-0-30-0
+    - test-pkl-0-31-0
     - test-sim-ios-simulator
     - test-sim-watchos-simulator
     - test-sim-tvos-simulator
@@ -261,9 +261,9 @@ jobs:
     - name: Setup Pkl
       id: setup-pkl
       env:
-        PKL_VERSION: 0.30.0
+        PKL_VERSION: 0.31.0
         PKL_FILENAME: pkl
-        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64
+        PKL_DOWNLOAD_URL: https://github.com/apple/pkl/releases/download/0.31.0/pkl-linux-amd64
       shell: bash
       run: |-
         DIR="$(mktemp -d /tmp/pkl-$PKL_VERSION-XXXXXX)"
@@ -277,92 +277,9 @@ jobs:
       with:
         name: pkl-swift-build-artifacts-pkl-package
         path: out
-  build-pkl-gen-swift-macos:
-    if: github.repository_owner == 'apple'
-    needs:
-    - test-pkl-0-25-3
-    - test-pkl-0-30-0
-    - test-sim-ios-simulator
-    - test-sim-watchos-simulator
-    - test-sim-tvos-simulator
-    - test-sim-mac-catalyst
-    - test-format-license-headers
-    - test-format-swift
-    - test-format-pkl
-    runs-on:
-    - self-hosted
-    - macos
-    env:
-      XCODE_VERSION: '26.1'
-      DEVELOPER_DIR: /Applications/Xcode_26.1.app
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
-    - run: |-
-        make pkl-gen-swift-release
-        mkdir -p out/pkl-gen-swift/
-        cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-macos.bin
-    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-      with:
-        name: pkl-swift-build-artifacts-pkl-gen-swift-macos
-        path: out
-  build-pkl-gen-swift-linux-aarch64:
-    name: container:Build pkl-gen-swift linux/aarch64:swift:6.1-rhel-ubi9
-    needs:
-    - test-pkl-0-25-3
-    - test-pkl-0-30-0
-    - test-sim-ios-simulator
-    - test-sim-watchos-simulator
-    - test-sim-tvos-simulator
-    - test-sim-mac-catalyst
-    - test-format-license-headers
-    - test-format-swift
-    - test-format-pkl
-    runs-on: ubuntu-24.04-arm
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
-    - run: |-
-        make pkl-gen-swift-release
-        mkdir -p out/pkl-gen-swift/
-        cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-aarch64.bin
-    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-      with:
-        name: pkl-swift-build-artifacts-pkl-gen-swift-linux-aarch64
-        path: out
-  build-pkl-gen-swift-linux-amd64:
-    name: container:Build pkl-gen-swift linux/amd64:swift:6.1-rhel-ubi9
-    needs:
-    - test-pkl-0-25-3
-    - test-pkl-0-30-0
-    - test-sim-ios-simulator
-    - test-sim-watchos-simulator
-    - test-sim-tvos-simulator
-    - test-sim-mac-catalyst
-    - test-format-license-headers
-    - test-format-swift
-    - test-format-pkl
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
-    - run: |-
-        make pkl-gen-swift-release
-        mkdir -p out/pkl-gen-swift/
-        cp $(make pkl-gen-swift-release-output) out/pkl-gen-swift/pkl-gen-swift-linux-amd64.bin
-    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-      with:
-        name: pkl-swift-build-artifacts-pkl-gen-swift-linux-amd64
-        path: out
   deploy-github-release:
     needs:
     - build-pkl-package
-    - build-pkl-gen-swift-macos
-    - build-pkl-gen-swift-linux-aarch64
-    - build-pkl-gen-swift-linux-amd64
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -401,13 +318,12 @@ jobs:
           --title "${{ github.ref_name }}" \
           --target "${{ github.sha }}" \
           --verify-tag \
-          --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${{ github.ref_name }}" \
-          out/pkl-gen-swift/*
+          --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${{ github.ref_name }}"
   publish-test-results:
     if: '!cancelled()'
     needs:
     - test-pkl-0-25-3
-    - test-pkl-0-30-0
+    - test-pkl-0-31-0
     - test-sim-ios-simulator
     - test-sim-watchos-simulator
     - test-sim-tvos-simulator
@@ -429,7 +345,7 @@ jobs:
     if: github.repository_owner == 'apple'
     needs:
     - test-pkl-0-25-3
-    - test-pkl-0-30-0
+    - test-pkl-0-31-0
     - test-sim-ios-simulator
     - test-sim-watchos-simulator
     - test-sim-tvos-simulator
@@ -438,9 +354,6 @@ jobs:
     - test-format-swift
     - test-format-pkl
     - build-pkl-package
-    - build-pkl-gen-swift-macos
-    - build-pkl-gen-swift-linux-aarch64
-    - build-pkl-gen-swift-linux-amd64
     - deploy-github-release
     - publish-test-results
     runs-on: ubuntu-latest
