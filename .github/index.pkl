@@ -217,6 +217,9 @@ main = (prb) {
 
 local testJobs = prb.jobs.keys.filter((it) -> it.startsWith("test-")).toListing()
 
+releaseIgnoreTags {
+  "pkl.swift@**"
+}
 release = (prb) {
   jobs {
     ["build-pkl-package"] {
@@ -253,6 +256,7 @@ release = (prb) {
         }
         new {
           env {
+            ["VERSION"] = context.github.refName
             ["GH_TOKEN"] = context.github.token
             ["GH_REPO"] = context.github.repository
           }
@@ -260,27 +264,26 @@ release = (prb) {
             #"""
             EXPECTED_VERSION=$(cat VERSION.txt)
 
-            if [ "${EXPECTED_VERSION}" != "\#(context.github.refName)" ]; then
+            if [ "${EXPECTED_VERSION}" != "${VERSION}" ]; then
               echo "Mismatching versions!"
               echo "VERSION.txt has ${EXPECTED_VERSION}"
-              echo "Git tag is \#(context.github.refName)"
+              echo "Git tag is ${VERSION}"
               echo "Update VERSION.txt to match the tag, and re-tag."
               exit 1
             fi
 
             echo "Creating release for Pkl package"
-            gh release create "pkl.swift@\#(context.github.refName)" \
-              --title "pkl.swift@\#(context.github.refName)" \
-              --target "\#(context.github.sha)" \
+            gh release create "pkl.swift@${VERSION}" \
+              --title "pkl.swift@${VERSION}" \
+              --verify-tag \
               --notes "This holds the release assets for the pkl.swift Pkl package." \
               out/pkl-package/*
 
             echo "Creating release for Swift library"
-            gh release create "\#(context.github.refName)" \
-              --title "\#(context.github.refName)" \
-              --target "\#(context.github.sha)" \
+            gh release create "${VERSION}" \
+              --title "${VERSION}" \
               --verify-tag \
-              --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-\#(context.github.refName)"
+              --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${VERSION}"
             """#
         }
       }

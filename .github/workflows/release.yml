@@ -4,8 +4,8 @@ name: Release
   push:
     branches-ignore:
     - '**'
-    tags:
-    - '**'
+    tags-ignore:
+    - pkl.swift@**
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -293,32 +293,32 @@ jobs:
         pattern: pkl-swift-build-artifacts-*
         merge-multiple: true
     - env:
+        VERSION: ${{ github.ref_name }}
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
       run: |-
         EXPECTED_VERSION=$(cat VERSION.txt)
 
-        if [ "${EXPECTED_VERSION}" != "${{ github.ref_name }}" ]; then
+        if [ "${EXPECTED_VERSION}" != "${VERSION}" ]; then
           echo "Mismatching versions!"
           echo "VERSION.txt has ${EXPECTED_VERSION}"
-          echo "Git tag is ${{ github.ref_name }}"
+          echo "Git tag is ${VERSION}"
           echo "Update VERSION.txt to match the tag, and re-tag."
           exit 1
         fi
 
         echo "Creating release for Pkl package"
-        gh release create "pkl.swift@${{ github.ref_name }}" \
-          --title "pkl.swift@${{ github.ref_name }}" \
-          --target "${{ github.sha }}" \
+        gh release create "pkl.swift@${VERSION}" \
+          --title "pkl.swift@${VERSION}" \
+          --verify-tag \
           --notes "This holds the release assets for the pkl.swift Pkl package." \
           out/pkl-package/*
 
         echo "Creating release for Swift library"
-        gh release create "${{ github.ref_name }}" \
-          --title "${{ github.ref_name }}" \
-          --target "${{ github.sha }}" \
+        gh release create "${VERSION}" \
+          --title "${VERSION}" \
           --verify-tag \
-          --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${{ github.ref_name }}"
+          --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${VERSION}"
   publish-test-results:
     if: '!cancelled()'
     needs:
