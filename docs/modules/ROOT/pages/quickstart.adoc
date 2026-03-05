@@ -7,8 +7,7 @@ These steps will get you up and going with using Pkl and Swift.
 Add the pkl-swift library as a dependency to your project's `Package.swift`:
 
 .Package.swift
-[source,swift]
-[subs="+attributes"]
+[source,swift,subs="+attributes"]
 ----
 let package = Package(
     dependencies: [
@@ -50,7 +49,7 @@ Code generation is done via the `gen.pkl` CLI tool inside the `pkl.swift` packag
 
 In our example, Swift sources can be generated using the following command:
 
-[source,bash]
+[source,bash,subs="+attributes"]
 ----
 pkl run package://pkg.pkl-lang.org/pkl-swift/pkl.swift@{version}#/gen.pkl pkl/AppConfig.pkl -o Sources/MyApplication/Generated/
 ----
