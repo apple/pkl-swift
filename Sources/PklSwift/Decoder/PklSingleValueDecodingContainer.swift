@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
     func decode(_: Double.Type) throws -> Double {
         switch self.value {
         case .float(let value): return Double(value)
+        case .int(let value): return Double(value) // handle `x: Number = <Int>`
         default:
             throw DecodingError.typeMismatch(
                 Double.self,
@@ -78,6 +79,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
     func decode(_: Float.Type) throws -> Float {
         switch self.value {
         case .float(let value): return Float(value)
+        case .int(let value): return Float(value) // handle `x: Number = <Int>`
         default:
             throw DecodingError.typeMismatch(
                 Float.self,
