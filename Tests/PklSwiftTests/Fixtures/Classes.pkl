@@ -16,11 +16,12 @@
 module Classes
 
 animals: Listing<Animal> = new {
-  new { name = "Uni" }
-  new { name = "Wally" }
-  new { name = "Mouse" }
+  new { name = "Uni"; age = 1 }
+  new { name = "Wally"; age = 1.5 }
+  new { name = "Mouse"; age = 2.0 }
 }
 
 class Animal {
   name: String
+  age: Number
 }
