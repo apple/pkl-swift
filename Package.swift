@@ -82,7 +82,6 @@ let package = Package(
                 "Fixtures/Collections2.pkl",
                 "Fixtures/Poly.pkl",
                 "Fixtures/ApiTypes.pkl",
-                "Fixtures/Collections2.pkl",
                 "Fixtures/UnusedClass.pkl",
                 "Fixtures/Imports/UnusedClassDefs.pkl",
             ],
