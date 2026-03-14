@@ -181,7 +181,7 @@ public struct Evaluator: Sendable {
     ///   - source: The module to be evaluated
     ///   - expression: The expression to be evaluated within the module. If `nil`, evaluates the whole module.
     /// - Returns: The evaluated result, in binary form.
-    /// - Throws: ``PklError``, if an error occured during evaluation
+    /// - Throws: ``PklError``, if an error occurred during evaluation
     public func evaluateExpressionRaw(source: ModuleSource, expression: String?) async throws
         -> [UInt8] {
         let request = EvaluateRequest(
