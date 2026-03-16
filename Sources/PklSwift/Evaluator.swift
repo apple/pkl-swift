@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -181,7 +181,7 @@ public struct Evaluator: Sendable {
     ///   - source: The module to be evaluated
     ///   - expression: The expression to be evaluated within the module. If `nil`, evaluates the whole module.
     /// - Returns: The evaluated result, in binary form.
-    /// - Throws: ``PklError``, if an error occured during evaluation
+    /// - Throws: ``PklError``, if an error occurred during evaluation
     public func evaluateExpressionRaw(source: ModuleSource, expression: String?) async throws
         -> [UInt8] {
         let request = EvaluateRequest(
