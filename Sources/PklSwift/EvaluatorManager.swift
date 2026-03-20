@@ -397,10 +397,12 @@ enum PklBugError: Error {
 let pklVersion0_25 = SemanticVersion("0.25.0")!
 let pklVersion0_26 = SemanticVersion("0.26.0")!
 let pklVersion0_27 = SemanticVersion("0.27.0")!
+let pklVersion0_27_2 = SemanticVersion("0.27.2")!
 let pklVersion0_28 = SemanticVersion("0.28.0")!
 let pklVersion0_29 = SemanticVersion("0.29.0")!
 let pklVersion0_30 = SemanticVersion("0.30.0")!
 let pklVersion0_31 = SemanticVersion("0.31.0")!
+let pklVersion0_31_1 = SemanticVersion("0.31.1")!
 
 let supportedPklVersions = [
     pklVersion0_25,

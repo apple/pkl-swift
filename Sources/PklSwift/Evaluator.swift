@@ -222,13 +222,11 @@ public struct Evaluator: Sendable {
             return
         }
         do {
-            let result = try await reader.read(url: request.uri)
-            response.contents = result
-            try await self.manager.tell(response)
+            response.contents = try await reader.read(url: request.uri)
         } catch {
             response.error = "\(error)"
-            try await self.manager.tell(response)
         }
+        try await self.manager.tell(response)
     }
 
     func handleReadResourceRequest(request: ReadResourceRequest) async throws {
@@ -244,13 +242,11 @@ public struct Evaluator: Sendable {
             return
         }
         do {
-            let result = try await reader.read(url: request.uri)
-            response.contents = result
-            try await self.manager.tell(response)
+            response.contents = try await reader.read(url: request.uri)
         } catch {
             response.error = "\(error)"
-            try await self.manager.tell(response)
         }
+        try await self.manager.tell(response)
     }
 
     func handleListModulesRequest(request: ListModulesRequest) async throws {
@@ -266,13 +262,11 @@ public struct Evaluator: Sendable {
             return
         }
         do {
-            let elems = try await reader.listElements(uri: request.uri)
-            response.pathElements = elems.map { $0.toMessage() }
-            try await self.manager.tell(response)
+            response.pathElements = try await reader.listElements(uri: request.uri).map { $0.toMessage() }
         } catch {
             response.error = "\(error)"
-            try await self.manager.tell(response)
         }
+        try await self.manager.tell(response)
     }
 
     func handleListResourcesRequest(request: ListResourcesRequest) async throws {
@@ -288,13 +282,11 @@ public struct Evaluator: Sendable {
             return
         }
         do {
-            let elems = try await reader.listElements(uri: request.uri)
-            response.pathElements = elems.map { $0.toMessage() }
-            try await self.manager.tell(response)
+            response.pathElements = try await reader.listElements(uri: request.uri).map { $0.toMessage() }
         } catch {
             response.error = "\(error)"
-            try await self.manager.tell(response)
         }
+        try await self.manager.tell(response)
     }
 
     func handleLog(request: LogMessage) {

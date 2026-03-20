@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,11 +61,11 @@ struct VirtualResourceReader: ResourceReader {
 
     var hasHierarchicalUris: Bool
 
-    var read: @Sendable (URL) async throws -> [UInt8]
+    var read: @Sendable (URL) async throws -> [UInt8]?
 
     var listElements: @Sendable (URL) async throws -> [PathElement]
 
-    func read(url: URL) async throws -> [UInt8] {
+    func read(url: URL) async throws -> [UInt8]? {
         try await self.read(url)
     }
 
@@ -345,6 +345,27 @@ final class PklSwiftTests: XCTestCase {
         result = read("pizza:pizza").text
         """))
         XCTAssertEqual(output, #"result = "yes pizza"\#n"#)
+    }
+
+    func testCustomResourceReaderNotFound() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        guard version >= pklVersion0_27_2 else {
+            throw XCTSkip("Pkl versions prior to 0.27.2 NPE during this test.")
+        }
+
+        let reader = VirtualResourceReader(
+            scheme: "pizza",
+            isGlobbable: false,
+            hasHierarchicalUris: false,
+            read: { _ in nil },
+            listElements: { _ in [] }
+        )
+        let options = EvaluatorOptions.preconfigured.withResourceReader(reader)
+        let evaluator = try await manager.newEvaluator(options: options)
+        let output = try await evaluator.evaluateOutputText(source: .text("""
+        result = read?("pizza:pizza")?.text
+        """))
+        XCTAssertEqual(output, #"result = \#(version >= pklVersion0_31_1 ? "null" : "\"\"")\#n"#)
     }
 
     func testCustomResourceReaderWithSchemeContainingRegexControlCharacters() async throws {
