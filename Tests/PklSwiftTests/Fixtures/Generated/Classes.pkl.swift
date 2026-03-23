@@ -19,8 +19,11 @@ extension Classes {
 
         public var name: String
 
-        public init(name: String) {
+        public var age: Float64
+
+        public init(name: String, age: Float64) {
             self.name = name
+            self.age = age
         }
     }
 

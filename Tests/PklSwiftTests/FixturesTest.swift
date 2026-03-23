@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ class FixturesTest: XCTestCase {
             result,
             Classes.Module(
                 animals: [
-                    Classes.Animal(name: "Uni"),
-                    Classes.Animal(name: "Wally"),
-                    Classes.Animal(name: "Mouse"),
+                    Classes.Animal(name: "Uni", age: 1.0),
+                    Classes.Animal(name: "Wally", age: 1.5),
+                    Classes.Animal(name: "Mouse", age: 2.0),
                 ]
             )
         )
