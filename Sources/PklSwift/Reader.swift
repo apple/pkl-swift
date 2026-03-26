@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ extension ModuleReader {
 
 public protocol ResourceReader: BaseReader {
     /// Reads resources from the provided URL into a byte array.
-    func read(url: URL) async throws -> [UInt8]
+    func read(url: URL) async throws -> [UInt8]?
 }
 
 extension ResourceReader {

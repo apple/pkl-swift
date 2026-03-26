@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2025-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,12 +33,16 @@ struct FibReader: ResourceReader {
     var isGlobbable: Bool { false }
     var hasHierarchicalUris: Bool { false }
     func listElements(uri: URL) async throws -> [PathElement] { throw PklError("not implemented") }
-    func read(url: URL) async throws -> [UInt8] {
+    func read(url: URL) async throws -> [UInt8]? {
         let key = url.absoluteString.dropFirst(self.scheme.count + 1)
-        guard let n = Int(key), n > 0 else {
+        guard let n = Int(key) else {
             throw PklError("input uri must be in format fib:<positive integer>")
         }
-        return Array(String(fibonacci(n: n)).utf8)
+        switch n {
+        case ..<0: throw PklError("input uri must be in format fib:<positive integer>")
+        case 0: return nil
+        default: return Array(String(fibonacci(n: n)).utf8)
+        }
     }
 }
 
