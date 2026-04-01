@@ -41,9 +41,20 @@ extension Pipe: Reader {
 
 extension FileHandle: Reader {
     public func read(into: UnsafeMutableRawBufferPointer) throws -> Int {
-        guard let data = try read(upToCount: into.count) else { return 0 }
-        data.copyBytes(to: into)
-        return data.count
+        // Loop until all requested bytes are read or EOF.  read(upToCount:) may
+        // return fewer bytes than requested when data arrives in chunks (e.g., the
+        // JVM writes through an 8 KB BufferedOutputStream).  A short read leaves
+        // bytes in the pipe that the decoder then misinterprets as the start of the
+        // next message, desynchronising the stream and triggering the
+        // guard(arrayLength == 2) error in getMessages().
+        var totalRead = 0
+        while totalRead < into.count {
+            let slice = UnsafeMutableRawBufferPointer(rebasing: into[totalRead...])
+            guard let data = try read(upToCount: slice.count), !data.isEmpty else { break }
+            data.copyBytes(to: slice)
+            totalRead += data.count
+        }
+        return totalRead
     }
 
     public func close() throws {
@@ -100,19 +111,27 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
 
     func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
         AsyncThrowingStream { continuation in
-            Task {
+            // Run the blocking pipe-read loop on a dedicated GCD queue
+            // instead of Swift's cooperative thread pool.  Each
+            // EvaluatorManager keeps its read loop alive for the lifetime
+            // of the pkl server process; blocking a cooperative-pool
+            // thread for that long starves other tasks.
+            let queue = DispatchQueue(label: "pkl-swift.message-reader")
+            queue.async {
                 while self.running {
                     do {
-                        let arrayLength = try decoder.decodeArrayLength()
-                        assert(arrayLength == 2)
-                        let code = try decoder.decode(as: MessageType.self)
-                        let message = try decodeMessage(code)
+                        let arrayLength = try self.decoder.decodeArrayLength()
+                        guard arrayLength == 2 else {
+                            throw PklBugError.invalidMessageCode(
+                                "Expected 2-element message array, got \(arrayLength)")
+                        }
+                        let code = try self.decoder.decode(as: MessageType.self)
+                        let message = try self.decodeMessage(code)
                         debug("Received message: \(message)")
                         continuation.yield(message)
                     } catch {
-                        if self.running {
-                            continuation.finish(throwing: error)
-                        }
+                        continuation.finish(throwing: error)
+                        return
                     }
                 }
                 continuation.finish()
