@@ -125,6 +125,13 @@ public actor EvaluatorManager {
             } catch {
                 await self.closeError(error: error)
             }
+            // If the loop ended without throwing (e.g. the transport's
+            // `running` flag went false before a read error was raised),
+            // make sure we still fail any pending requests.  closeError is
+            // idempotent — the isClosed guard makes this a no-op when
+            // close() was already called.
+            await self.closeError(
+                error: PklError("pkl server process exited unexpectedly"))
         }
     }
 
@@ -163,21 +170,34 @@ public actor EvaluatorManager {
             switch message {
             case let message as ServerResponseMessage:
                 guard let handler = inFlightRequests.removeValue(forKey: message.requestId) else {
-                    // if the handler doesn't exist, this means that ``closeError`` was called, which interrupts all
-                    // asks.
-                    return
+                    // No handler: ``closeError`` already resumed all in-flight continuations,
+                    // or Pkl sent a late response for an already-cancelled request.
+                    // Skip and keep processing — returning here would stop the message loop.
+                    continue
                 }
                 handler.resume(returning: message)
             case let message as ReadModuleRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
                     throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                try await evaluator.handleReadModuleRequest(request: message)
+                Task {
+                    do {
+                        try await evaluator.handleReadModuleRequest(request: message)
+                    } catch {
+                        await self.closeError(error: error)
+                    }
+                }
             case let message as ReadResourceRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
                     throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                try await evaluator.handleReadResourceRequest(request: message)
+                Task {
+                    do {
+                        try await evaluator.handleReadResourceRequest(request: message)
+                    } catch {
+                        await self.closeError(error: error)
+                    }
+                }
             case let message as LogMessage:
                 guard let evaluator = evaluators[message.evaluatorId] else {
                     throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
@@ -187,12 +207,24 @@ public actor EvaluatorManager {
                 guard let evaluator = evaluators[message.evaluatorId] else {
                     throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                try await evaluator.handleListModulesRequest(request: message)
+                Task {
+                    do {
+                        try await evaluator.handleListModulesRequest(request: message)
+                    } catch {
+                        await self.closeError(error: error)
+                    }
+                }
             case let message as ListResourcesRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
                     throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                try await evaluator.handleListResourcesRequest(request: message)
+                Task {
+                    do {
+                        try await evaluator.handleListResourcesRequest(request: message)
+                    } catch {
+                        await self.closeError(error: error)
+                    }
+                }
             default:
                 throw PklBugError.unknownMessage("Got request for unknown message: \(message)")
             }
@@ -322,6 +354,12 @@ public actor EvaluatorManager {
     }
 
     private func closeError(error: Error) async {
+        // Guard against re-entry: ``close()`` sets ``isClosed = true`` synchronously
+        // before its first suspension point, so any subsequent handler Task that calls
+        // ``closeError`` sees the flag and returns immediately, stopping the cascade.
+        guard !self.isClosed else { return }
+        let msg = "[pkl-swift] closeError triggered: \(error) (in-flight: \(self.inFlightRequests.count), evaluators: \(self.evaluators.count))\n"
+        FileHandle.standardError.write(msg.data(using: .utf8)!)
         for (id, req) in self.inFlightRequests {
             self.inFlightRequests.removeValue(forKey: id)
             req.resume(throwing: error)
@@ -330,24 +368,17 @@ public actor EvaluatorManager {
     }
 
     /// Closes the evaluator manager, and closes any evaluators that have spawned.
+    ///
+    /// Terminates the pkl server process directly without sending individual
+    /// ``CloseEvaluatorRequest`` messages.  Sending close requests here races
+    /// with in-flight handler Tasks: if a ``ReadModuleResponse`` arrives at the
+    /// pkl process *after* the corresponding evaluator was closed, the pkl
+    /// binary treats it as a protocol error ("unknown request ID") and exits.
+    /// Since the process is about to be terminated anyway, individual close
+    /// requests provide no benefit.
     public func close() async {
         self.isClosed = true
-
-        let evaluatorIDsToClose = Array(self.evaluators.keys)
-
-        await withTaskGroup(of: Void.self) { group in
-            for evaluatorID in evaluatorIDsToClose {
-                group.addTask { [weak self] in
-                    guard let self else { return }
-                    do {
-                        try await self.closeEvaluator(evaluatorID)
-                    } catch {
-                        debug("Warning: Failed to close evaluator \(evaluatorID): \(error)")
-                    }
-                }
-            }
-        }
-
+        self.evaluators.removeAll()
         self.transport.close()
     }
 
