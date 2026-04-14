@@ -41,18 +41,20 @@ extension Pipe: Reader {
 
 extension FileHandle: Reader {
     public func read(into: UnsafeMutableRawBufferPointer) throws -> Int {
-        // Loop until all requested bytes are read or EOF.  read(upToCount:) may
-        // return fewer bytes than requested when data arrives in chunks (e.g., the
-        // JVM writes through an 8 KB BufferedOutputStream).  A short read leaves
-        // bytes in the pipe that the decoder then misinterprets as the start of the
-        // next message, desynchronising the stream and triggering the
-        // guard(arrayLength == 2) error in getMessages().
+        // Read directly into the caller's buffer via POSIX read() to avoid
+        // the per-call NSConcreteData allocation from NSFileHandle.read(upToCount:).
+        // Loop until all requested bytes are read or EOF — short reads are
+        // normal on pipes (e.g., the JVM writes through an 8 KB BufferedOutputStream).
+        guard let base = into.baseAddress else { return 0 }
+        let fd = fileDescriptor
         var totalRead = 0
         while totalRead < into.count {
-            let slice = UnsafeMutableRawBufferPointer(rebasing: into[totalRead...])
-            guard let data = try read(upToCount: slice.count), !data.isEmpty else { break }
-            data.copyBytes(to: slice)
-            totalRead += data.count
+            let n = Foundation.read(fd, base + totalRead, into.count - totalRead)
+            if n < 0 {
+                throw POSIXError(.init(rawValue: errno) ?? .EIO)
+            }
+            if n == 0 { break }
+            totalRead += n
         }
         return totalRead
     }
