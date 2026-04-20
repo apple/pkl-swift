@@ -277,6 +277,7 @@ extension EvaluatorOptions {
         options.rootDir = evaluatorSettings.rootDir ?? self.rootDir
         if let http = evaluatorSettings.http {
             options.http = .init()
+            options.http!.caCertificates = http.caCertificates ?? self.http?.caCertificates
             if let proxy = http.proxy {
                 options.http!.proxy = .init()
                 options.http!.proxy!.noProxy = proxy.noProxy ?? self.http?.proxy?.noProxy
