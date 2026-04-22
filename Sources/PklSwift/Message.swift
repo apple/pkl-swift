@@ -98,7 +98,7 @@ extension MessageType {
         case is ListResourcesRequest:
             return MessageType.LIST_RESOURCES_REQUEST
         case is ListResourcesResponse:
-            return MessageType.LIST_MODULES_RESPONSE
+            return MessageType.LIST_RESOURCES_RESPONSE
         case is ListModulesRequest:
             return MessageType.LIST_MODULES_REQUEST
         case is ListModulesResponse:
