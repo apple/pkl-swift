@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ extension MessageType {
         case is ListResourcesRequest:
             return MessageType.LIST_RESOURCES_REQUEST
         case is ListResourcesResponse:
-            return MessageType.LIST_MODULES_RESPONSE
+            return MessageType.LIST_RESOURCES_RESPONSE
         case is ListModulesRequest:
             return MessageType.LIST_MODULES_REQUEST
         case is ListModulesResponse:
