@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2025-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import XCTest
 class ExternalReaderClientTest: XCTestCase {
     func testE2E() async throws {
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
-        guard version >= pklVersion0_27 else {
+        guard version >= pklVersion0_27_2 else {
             throw XCTSkip("External readers require Pkl 0.27 or later.")
         }
 
@@ -48,6 +48,40 @@ class ExternalReaderClientTest: XCTestCase {
         fibErrA = "I/O error reading resource `fib:%20`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
         fibErrB = "I/O error reading resource `fib:abc`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
         fibErrC = "I/O error reading resource `fib:-10`. IOException: PklError(message: \\"input uri must be in format fib:<positive integer>\\")"
+        """
+
+        let opts = EvaluatorOptions(
+            allowedModules: ["file:", "repl:text"],
+            allowedResources: ["fib:", "prop:"],
+            externalResourceReaders: [
+                "fib": ExternalReader(executable: "./.build/debug/test-external-reader"),
+            ]
+        )
+
+        try await withEvaluator(options: opts) { evaluator in
+            let result = try await evaluator.evaluateOutputText(source: .url(testFile))
+            XCTAssertEqual(result.trimmingCharacters(in: .whitespacesAndNewlines), expectedResult.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
+    }
+
+    func testNotFound() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        guard version >= pklVersion0_27_2 else {
+            throw XCTSkip("External readers require Pkl 0.27 or later.")
+        }
+
+        let tempDir = try tempDir()
+        let testFile = tempDir.appendingPathComponent("test.pkl")
+        try #"""
+        import "pkl:test"
+
+        fibNullable0 = read?("fib:0")?.text
+        fibErrNotFound = test.catchOrNull(() -> read("fib:0").text)
+        """#.write(to: testFile, atomically: true, encoding: .utf8)
+
+        let expectedResult = """
+        fibNullable0 = \(version >= pklVersion0_31_1 ? "null" : "\"\"")
+        fibErrNotFound = \(version >= pklVersion0_31_1 ? "\"Cannot find resource `fib:0`.\"" : "null")
         """
 
         let opts = EvaluatorOptions(

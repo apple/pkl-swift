@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2025-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,13 +129,11 @@ public actor ExternalReaderClient {
             return
         }
         do {
-            let result = try await reader.read(url: request.uri)
-            response.contents = result
-            try self.transport.send(response)
+            response.contents = try await reader.read(url: request.uri)
         } catch {
             response.error = "\(error)"
-            try self.transport.send(response)
         }
+        try self.transport.send(response)
     }
 
     func handleReadResourceRequest(request: ReadResourceRequest) async throws {
@@ -152,13 +150,11 @@ public actor ExternalReaderClient {
             return
         }
         do {
-            let result = try await reader.read(url: request.uri)
-            response.contents = result
-            try self.transport.send(response)
+            response.contents = try await reader.read(url: request.uri)
         } catch {
             response.error = "\(error)"
-            try self.transport.send(response)
         }
+        try self.transport.send(response)
     }
 
     func handleListModulesRequest(request: ListModulesRequest) async throws {
@@ -174,13 +170,11 @@ public actor ExternalReaderClient {
             return
         }
         do {
-            let elems = try await reader.listElements(uri: request.uri)
-            response.pathElements = elems.map { $0.toMessage() }
-            try self.transport.send(response)
+            response.pathElements = try await reader.listElements(uri: request.uri).map { $0.toMessage() }
         } catch {
             response.error = "\(error)"
-            try self.transport.send(response)
         }
+        try self.transport.send(response)
     }
 
     func handleListResourcesRequest(request: ListResourcesRequest) async throws {
@@ -197,12 +191,10 @@ public actor ExternalReaderClient {
             return
         }
         do {
-            let elems = try await reader.listElements(uri: request.uri)
-            response.pathElements = elems.map { $0.toMessage() }
-            try self.transport.send(response)
+            response.pathElements = try await reader.listElements(uri: request.uri).map { $0.toMessage() }
         } catch {
             response.error = "\(error)"
-            try self.transport.send(response)
         }
+        try self.transport.send(response)
     }
 }
