@@ -29,4 +29,4 @@ jobs:
     - name: dawidd6/action-download-artifact@v11
       uses: dawidd6/action-download-artifact@ac66b43f0e6a346234dd65d4d0c8fbb31cb316e5 # v11
     - name: ruby/setup-ruby@v1
-      uses: ruby/setup-ruby@7372622e62b60b3cb750dcd2b9e32c247ffec26a # v1
+      uses: ruby/setup-ruby@0cb964fd540e0a24c900370abf38a33466142735 # v1
