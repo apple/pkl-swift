@@ -220,6 +220,7 @@ local testJobs = prb.jobs.keys.filter((it) -> it.startsWith("test-")).toListing(
 releaseIgnoreTags {
   "pkl.swift@**"
 }
+
 release = (prb) {
   jobs {
     ["build-pkl-package"] {
@@ -287,6 +288,30 @@ release = (prb) {
             """#
         }
       }
+    }
+  }
+}
+
+dependabot {
+  updates {
+    new {
+      `package-ecosystem` = "swift"
+      directory = "/"
+      cooldown {
+        `default-days` = 7
+      }
+      schedule {
+        interval = "weekly"
+      }
+    }
+  }
+}
+
+codeql {
+  scans {
+    new {
+      language = "swift"
+      buildMode = "autobuild"
     }
   }
 }
