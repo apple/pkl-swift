@@ -17,7 +17,7 @@
 import Foundation
 import XCTest
 
-@testable import MessagePack
+@testable import PklMessagePack
 @testable import PklSwift
 
 /// Tests for pipe partial-read handling in ``MessageTransport``.

@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import MessagePack
+import PklMessagePack
 
 // Example usage:
 // import PklSwift

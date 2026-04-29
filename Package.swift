@@ -28,8 +28,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "MessagePack",
-            targets: ["MessagePack"]
+            name: "PklMessagePack",
+            targets: ["PklMessagePack"]
         ),
         .library(
             name: "PklSwift",
@@ -47,7 +47,7 @@ let package = Package(
     targets: [
         .target(
             name: "PklSwift",
-            dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"],
+            dependencies: ["PklMessagePack", "PklSwiftInternals", "SemanticVersion"],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
         ),
         .target(
@@ -55,7 +55,7 @@ let package = Package(
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .target(
-            name: "MessagePack",
+            name: "PklMessagePack",
             dependencies: [
                 .product(name: "SystemPackage", package: "swift-system"),
             ],
@@ -88,9 +88,9 @@ let package = Package(
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .testTarget(
-            name: "MessagePackTests",
+            name: "PklMessagePackTests",
             dependencies: [
-                "MessagePack",
+                "PklMessagePack",
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),

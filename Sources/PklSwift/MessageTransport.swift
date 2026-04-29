@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import MessagePack
+import PklMessagePack
 import SemanticVersion
 
 protocol MessageTransport: Sendable {

@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import MessagePack
+import PklMessagePack
 
 protocol Message: Codable, Sendable {}
 

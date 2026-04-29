@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import MessagePack
+import PklMessagePack
 import SemanticVersion
 #if os(Windows)
 import WinSDK.System
