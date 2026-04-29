@@ -220,6 +220,7 @@ local testJobs = prb.jobs.keys.filter((it) -> it.startsWith("test-")).toListing(
 releaseIgnoreTags {
   "pkl.swift@**"
 }
+
 release = (prb) {
   jobs {
     ["build-pkl-package"] {
@@ -285,6 +286,44 @@ release = (prb) {
               --verify-tag \
               --notes "Release notes: https://pkl-lang.org/swift/current/CHANGELOG.html#release-${VERSION}"
             """#
+        }
+      }
+    }
+  }
+}
+
+dependabot {
+  updates {
+    new {
+      `package-ecosystem` = "swift"
+      directory = "/"
+      cooldown {
+        `default-days` = 7
+      }
+      schedule {
+        interval = "weekly"
+      }
+    }
+  }
+}
+
+codeql {
+  scans {
+    new {
+      language = "swift"
+      buildMode = "autobuild"
+    }
+  }
+}
+
+workflows {
+  ["workflows/codeql.yml"] {
+    jobs {
+      ["analyze-swift"] {
+        `if` = "github.repository_owner == 'apple'"
+        `runs-on` {
+          "self-hosted"
+          "macos"
         }
       }
     }

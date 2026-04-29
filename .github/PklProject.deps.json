@@ -3,16 +3,16 @@
   "resolvedDependencies": {
     "package://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1.3.1",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1.6.0",
       "checksums": {
-        "sha256": "fd515da685ea126678c3ec684e84a4f992d43481cc1d75cb866cd55775f675f9"
+        "sha256": "10e27d63df4a4520d8a9375962406ca5ffe74f396bd3cb1c19b1f8358505010a"
       }
     },
     "package://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1.5.0",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1.7.1",
       "checksums": {
-        "sha256": "2c1e0d9efcd65b3c3207bf535c325ebc0ec2ab169187b324c4bb70821cac0e51"
+        "sha256": "93cdf1bdd3e7f6c1c83f49791b8c02fbee9ac2e721d299cad6c15d142fd5d762"
       }
     },
     "package://pkg.pkl-lang.org/pkl-pantry/pkl.experimental.deepToTyped@1": {
@@ -24,16 +24,16 @@
     },
     "package://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1.0.3",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1.1.3",
       "checksums": {
-        "sha256": "d368900942efb88ed51a98f9614748b06c74ba43423f045fcd6dedb5dbdc0bea"
+        "sha256": "521feb6f5ff12075ebad0758799fe7ec2675d231a0e0f5456694c8d4822a8171"
       }
     },
     "package://pkg.pkl-lang.org/pkl-pantry/com.github.dependabot@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.dependabot@1.0.0",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.dependabot@1.0.4",
       "checksums": {
-        "sha256": "02ef6f25bfca5b1d095db73ea15de79d2d2c6832ebcab61e6aba90554382abcb"
+        "sha256": "c7391119f946d7761d0ca0cc358ed8fe2bdfc691411087ccac89637bd96fec4a"
       }
     }
   }
