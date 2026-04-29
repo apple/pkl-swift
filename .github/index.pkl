@@ -315,3 +315,17 @@ codeql {
     }
   }
 }
+
+workflows {
+  ["workflows/codeql.yml"] {
+    jobs {
+      ["analyze-swift"] {
+        `if` = "github.repository_owner == 'apple'"
+        `runs-on` {
+          "self-hosted"
+          "macos"
+        }
+      }
+    }
+  }
+}
