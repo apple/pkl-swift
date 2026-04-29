@@ -35,6 +35,10 @@ let package = Package(
             name: "PklSwift",
             targets: ["PklSwift"]
         ),
+        .library(
+            name: "PklSwiftContrib",
+            targets: ["PklSwiftContrib"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
@@ -49,6 +53,11 @@ let package = Package(
             name: "PklSwift",
             dependencies: ["MessagePack", "PklSwiftInternals", "SemanticVersion"],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
+        ),
+        .target(
+            name: "PklSwiftContrib",
+            dependencies: ["PklSwift"],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
         .target(
             name: "PklSwiftInternals",
@@ -84,6 +93,14 @@ let package = Package(
                 "Fixtures/ApiTypes.pkl",
                 "Fixtures/UnusedClass.pkl",
                 "Fixtures/Imports/UnusedClassDefs.pkl",
+            ],
+            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
+        ),
+        .testTarget(
+            name: "PklSwiftContribTests",
+            dependencies: [
+                "PklSwift",
+                "PklSwiftContrib",
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
