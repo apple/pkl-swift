@@ -14,7 +14,7 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import MessagePack
+import PklMessagePack
 import PklSwiftInternals
 
 /// Marker protocol that all generated Pkl types should conform to.

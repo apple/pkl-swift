@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-@testable import MessagePack
+@testable import PklMessagePack
 @testable import PklSwift
 import SemanticVersion
 import XCTest

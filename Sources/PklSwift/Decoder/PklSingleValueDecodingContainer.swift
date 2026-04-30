@@ -14,7 +14,7 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import MessagePack
+import PklMessagePack
 
 class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
     private let value: MessagePackValue
