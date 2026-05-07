@@ -17,7 +17,7 @@
 import Foundation
 
 extension _MessagePackEncoder {
-    final class KeyedContainer<Key> where Key: CodingKey {
+    final class KeyedContainer<Key: CodingKey> {
         private var storage: [AnyCodingKey: _MessagePackEncodingContainer] = [:]
 
         var codingPath: [CodingKey]
@@ -62,8 +62,8 @@ extension _MessagePackEncoder.KeyedContainer: KeyedEncodingContainerProtocol {
         return container
     }
 
-    func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key)
-        -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy keyType: NestedKey.Type, forKey key: Key)
+        -> KeyedEncodingContainer<NestedKey> {
         let container = _MessagePackEncoder.KeyedContainer<NestedKey>(
             codingPath: self.nestedCodingPath(forKey: key), userInfo: self.userInfo
         )

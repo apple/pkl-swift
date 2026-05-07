@@ -27,8 +27,7 @@ final class _MessagePackDecoder: Decoder {
         self.value = value
     }
 
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key>
-        where Key: CodingKey {
+    func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
         switch self.value {
         case .map(let map):
             let container = _MessagePackDecoder.KeyedContainer<Key>(
@@ -88,7 +87,7 @@ protocol MessagePackDecodingContainer: AnyObject {
 }
 
 extension MessagePackValue {
-    func decodeInto<T>(_ typ: T.Type) throws -> T where T: Decodable {
+    func decodeInto<T: Decodable>(_ typ: T.Type) throws -> T {
         let decoder = _MessagePackDecoder(value: self)
         switch typ {
         case is Data.Type:

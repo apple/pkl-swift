@@ -193,7 +193,7 @@ extension MessagePackValue {
 }
 
 extension _MessagePackDecoder {
-    final class KeyedContainer<Key> where Key: CodingKey {
+    final class KeyedContainer<Key: CodingKey> {
         var value: [(MessagePackValue, MessagePackValue)]
         var index: Int
         var codingPath: [CodingKey]
@@ -248,10 +248,9 @@ extension _MessagePackDecoder.KeyedContainer: KeyedDecodingContainerProtocol {
     }
 
     var allEntries: [KeyMessagePackValueEntry] {
-        let keys = self.value.compactMap { kv in
+        self.value.compactMap { kv in
             Key(stringValue: kv.0.stringValue).map { KeyMessagePackValueEntry(key: $0, value: kv.1) }
         }
-        return keys
     }
 
     func contains(_ key: Key) -> Bool {
@@ -267,7 +266,7 @@ extension _MessagePackDecoder.KeyedContainer: KeyedDecodingContainerProtocol {
         }
     }
 
-    func decode<T>(_ typ: T.Type, forKey key: Key) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_ typ: T.Type, forKey key: Key) throws -> T {
         defer {
             index += 1
         }
@@ -305,8 +304,8 @@ extension _MessagePackDecoder.KeyedContainer: KeyedDecodingContainerProtocol {
         }
     }
 
-    func nestedContainer<NestedKey>(keyedBy nestedKeyType: NestedKey.Type, forKey key: Key) throws
-        -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy nestedKeyType: NestedKey.Type, forKey key: Key) throws
+        -> KeyedDecodingContainer<NestedKey> {
         try checkCanDecodeValue(forKey: key)
 
         guard let msgPackValue = strMap[key.stringValue] else {

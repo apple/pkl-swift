@@ -20,3 +20,4 @@
 
 --disable spaceAroundOperators
 --disable wrapMultilineStatementBraces
+--disable noForceUnwrapInTests

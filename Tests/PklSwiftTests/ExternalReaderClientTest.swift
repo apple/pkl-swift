@@ -14,10 +14,9 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
+@testable import PklSwift
 import SemanticVersion
 import XCTest
-
-@testable import PklSwift
 
 #if os(macOS) || os(Linux) || os(Windows)
 class ExternalReaderClientTest: XCTestCase {

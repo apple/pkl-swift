@@ -66,7 +66,7 @@ extension _MessagePackDecoder {
             self.value.count
         }
 
-        // var value: [(MessagePackValue, MessagePackValue)]
+        /// var value: [(MessagePackValue, MessagePackValue)]
         var value: [MessagePackValue] // flattened
 
         var currentIndex: Int = 0
@@ -97,7 +97,7 @@ extension _MessagePackDecoder.MapUnkeyedContainer: UnkeyedDecodingContainer {
         fatalError("Not implemented: \(#function)")
     }
 
-    func decode<T>(_ typ: T.Type) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_ typ: T.Type) throws -> T {
         defer {
             currentIndex += 1
         }
@@ -110,7 +110,7 @@ extension _MessagePackDecoder.MapUnkeyedContainer: UnkeyedDecodingContainer {
         fatalError("Not implemented: \(#function)")
     }
 
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> {
         fatalError("Not implemented: \(#function)")
     }
 

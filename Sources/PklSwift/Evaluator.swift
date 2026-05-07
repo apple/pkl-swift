@@ -97,8 +97,7 @@ public struct Evaluator: Sendable {
     ///   - type: The type to decode the result as.
     /// - Returns: A value of type `type`.
     /// - Throws: ``PklError`` if an error occurs during evaluation, ``DecodingError`` if an the result could not be decoded into ``type``.
-    public func evaluateModule<T>(source: ModuleSource, as type: T.Type) async throws -> T
-        where T: Decodable {
+    public func evaluateModule<T: Decodable>(source: ModuleSource, as type: T.Type) async throws -> T {
         try await self.evaluateExpression(source: source, expression: nil, as: type)
     }
 
@@ -129,8 +128,7 @@ public struct Evaluator: Sendable {
     ///   - type: The type to decode the result as.
     /// - Returns: The evaluated result as type `type`.
     /// - Throws: ``PklError`` if an error occurs during evaluation, ``DecodingError`` if the result could not be decoded into ``type``.
-    public func evaluateOutputValue<T>(source: ModuleSource, asType type: T.Type) async throws -> T
-        where T: Decodable {
+    public func evaluateOutputValue<T: Decodable>(source: ModuleSource, asType type: T.Type) async throws -> T {
         try await self.evaluateExpression(source: source, expression: "output.value", as: type)
     }
 
@@ -169,8 +167,8 @@ public struct Evaluator: Sendable {
     ///   - type: The type to decode the result as.
     /// - Returns: A value of type `type`.
     /// - Throws: ``PklError`` if an error occurs during evaluation, ``DecodingError`` if the result could not be decoded into ``type``.
-    public func evaluateExpression<T>(source: ModuleSource, expression: String?, as type: T.Type)
-        async throws -> T where T: Decodable {
+    public func evaluateExpression<T: Decodable>(source: ModuleSource, expression: String?, as type: T.Type)
+        async throws -> T {
         let bytes = try await evaluateExpressionRaw(source: source, expression: expression)
         return try PklDecoder.decode(type, from: bytes)
     }
@@ -195,7 +193,8 @@ public struct Evaluator: Sendable {
         let response = try await manager.ask(request)
         guard let response = response as? EvaluateResponse else {
             throw PklBugError.invalidMessageCode(
-                "Expected EvaluateResponse, but got \(type(of: response))")
+                "Expected EvaluateResponse, but got \(type(of: response))"
+            )
         }
         if let error = response.error {
             throw PklError(error)

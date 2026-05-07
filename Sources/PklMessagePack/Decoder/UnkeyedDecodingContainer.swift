@@ -63,7 +63,7 @@ extension _MessagePackDecoder.UnkeyedContainer: UnkeyedDecodingContainer {
         }
     }
 
-    func decode<T>(_ typ: T.Type) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_ typ: T.Type) throws -> T {
         try checkCanDecodeValue()
         defer {
             currentIndex += 1
@@ -90,7 +90,7 @@ extension _MessagePackDecoder.UnkeyedContainer: UnkeyedDecodingContainer {
         }
     }
 
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> {
         try checkCanDecodeValue()
         defer { currentIndex += 1 }
 

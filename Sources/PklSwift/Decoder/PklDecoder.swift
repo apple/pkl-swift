@@ -51,7 +51,8 @@ extension PklSerializableType {
                 .init(
                     codingPath: codingPath,
                     debugDescription: "Expected at least \(min) fields but got \(fields.count)"
-                ))
+                )
+            )
         }
     }
 }
@@ -74,7 +75,8 @@ extension Decodable where Self: PklSerializableType {
                 .init(
                     codingPath: codingPath,
                     debugDescription: "Expected array but got \(decoder.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
         let code = try arr[0].decode(PklValueType.self)
         guard arr.count > 0 else {
@@ -82,11 +84,13 @@ extension Decodable where Self: PklSerializableType {
                 .init(
                     codingPath: codingPath,
                     debugDescription: "Expected non-empty array"
-                ))
+                )
+            )
         }
         guard Self.messageTag == code else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)"))
+                .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)")
+            )
         }
         self = try Self.decode(arr, codingPath: codingPath)
     }
@@ -111,12 +115,14 @@ extension PklSerializableValueUnitType {
                 .init(
                     codingPath: codingPath,
                     debugDescription: "Expected array but got \(value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
         let code = try arr[0].decode(PklValueType.self)
         guard Self.messageTag == code else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)"))
+                .init(codingPath: codingPath, debugDescription: "Cannot decode \(code) into \(Self.self)")
+            )
         }
 
         let value = try arr[1].decode(Self.ValueType.self)
@@ -128,7 +134,7 @@ extension PklSerializableValueUnitType {
 public enum PklDecoder {}
 
 extension PklDecoder {
-    public static func decode<T>(_ type: T.Type, from bytes: [UInt8]) throws -> T where T: Decodable {
+    public static func decode<T: Decodable>(_: T.Type, from bytes: [UInt8]) throws -> T {
         let reader = BufferReader(bytes)
         let value = try MessagePackDecoder(reader: reader).decodeGeneric()
         return try T(from: _PklDecoder(value: value))
@@ -138,7 +144,7 @@ extension PklDecoder {
 final class _PklDecoder: Decoder {
     var codingPath: [CodingKey] = []
 
-    // not used
+    /// not used
     var userInfo: [CodingUserInfoKey: Any] {
         get {
             [:]
@@ -155,8 +161,7 @@ final class _PklDecoder: Decoder {
         self.codingPath = codingPath
     }
 
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key>
-        where Key: CodingKey {
+    func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
         try _PklDecoder.getNestedKeyedContainer(keyedBy: type, value: self.value, codingPath: self.codingPath)
     }
 
@@ -169,7 +174,8 @@ final class _PklDecoder: Decoder {
                 .init(
                     codingPath: self.codingPath,
                     debugDescription: "Expected an array type, but got \(self.value.debugDataTypeDescription)"
-                ))
+                )
+            )
         }
     }
 
@@ -189,7 +195,8 @@ extension _PklDecoder {
                     .init(
                         codingPath: codingPath,
                         debugDescription: "Expected array with at least 2 items, type but got \(value.count)"
-                    ))
+                    )
+                )
             }
             let type = try value[0].decode(PklValueType.self)
             switch type {
@@ -231,7 +238,8 @@ extension _PklDecoder {
                     .init(
                         codingPath: codingPath,
                         debugDescription: "Expected array with at least 2 items, type but got \(value.count)"
-                    ))
+                    )
+                )
             }
             let type = try value[0].decode(PklValueType.self)
             switch type {
@@ -248,7 +256,8 @@ extension _PklDecoder {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Expected array type but got \(value[1].debugDescription)"
-                        ))
+                        )
+                    )
                 }
                 var arr: [AnyHashable?] = []
                 arr.reserveCapacity(pklArray.count)
@@ -266,7 +275,8 @@ extension _PklDecoder {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Expected map type but got \(value[1].debugDescription)"
-                        ))
+                        )
+                    )
                 }
                 var map: [AnyHashable?: AnyHashable?] = [:]
                 for (k, v) in pklMap {
@@ -293,7 +303,8 @@ extension _PklDecoder {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Expected binary type but got \(value[1].debugDescription)"
-                        ))
+                        )
+                    )
                 }
                 return PklAny(value: bytes)
             default:
@@ -301,7 +312,8 @@ extension _PklDecoder {
                     .init(
                         codingPath: codingPath,
                         debugDescription: "Unexpected type \(value[0].debugDescription)"
-                    ))
+                    )
+                )
             }
         case .bool(let b):
             return PklAny(value: b)
@@ -364,6 +376,7 @@ public struct PklAny: Decodable, Hashable {
             .init(
                 codingPath: decoder.codingPath,
                 debugDescription: "Could not decode polymorphic type"
-            ))
+            )
+        )
     }
 }

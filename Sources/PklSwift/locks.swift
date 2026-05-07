@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,34 +115,34 @@ extension LockOperations {
     }
 }
 
-// Tail allocate both the mutex and a generic value using ManagedBuffer.
-// Both the header pointer and the elements pointer are stable for
-// the class's entire lifetime.
-//
-// However, for safety reasons, we elect to place the lock in the "elements"
-// section of the buffer instead of the head. The reasoning here is subtle,
-// so buckle in.
-//
-// _As a practical matter_, the implementation of ManagedBuffer ensures that
-// the pointer to the header is stable across the lifetime of the class, and so
-// each time you call `withUnsafeMutablePointers` or `withUnsafeMutablePointerToHeader`
-// the value of the header pointer will be the same. This is because ManagedBuffer uses
-// `Builtin.addressOf` to load the value of the header, and that does ~magic~ to ensure
-// that it does not invoke any weird Swift accessors that might copy the value.
-//
-// _However_, the header is also available via the `.header` field on the ManagedBuffer.
-// This presents a problem! The reason there's an issue is that `Builtin.addressOf` and friends
-// do not interact with Swift's exclusivity model. That is, the various `with` functions do not
-// conceptually trigger a mutating access to `.header`. For elements this isn't a concern because
-// there's literally no other way to perform the access, but for `.header` it's entirely possible
-// to accidentally recursively read it.
-//
-// Our implementation is free from these issues, so we don't _really_ need to worry about it.
-// However, out of an abundance of caution, we store the Value in the header, and the LockPrimitive
-// in the trailing elements. We still don't use `.header`, but it's better to be safe than sorry,
-// and future maintainers will be happier that we were cautious.
-//
-// See also: https://github.com/apple/swift/pull/40000
+/// Tail allocate both the mutex and a generic value using ManagedBuffer.
+/// Both the header pointer and the elements pointer are stable for
+/// the class's entire lifetime.
+///
+/// However, for safety reasons, we elect to place the lock in the "elements"
+/// section of the buffer instead of the head. The reasoning here is subtle,
+/// so buckle in.
+///
+/// _As a practical matter_, the implementation of ManagedBuffer ensures that
+/// the pointer to the header is stable across the lifetime of the class, and so
+/// each time you call `withUnsafeMutablePointers` or `withUnsafeMutablePointerToHeader`
+/// the value of the header pointer will be the same. This is because ManagedBuffer uses
+/// `Builtin.addressOf` to load the value of the header, and that does ~magic~ to ensure
+/// that it does not invoke any weird Swift accessors that might copy the value.
+///
+/// _However_, the header is also available via the `.header` field on the ManagedBuffer.
+/// This presents a problem! The reason there's an issue is that `Builtin.addressOf` and friends
+/// do not interact with Swift's exclusivity model. That is, the various `with` functions do not
+/// conceptually trigger a mutating access to `.header`. For elements this isn't a concern because
+/// there's literally no other way to perform the access, but for `.header` it's entirely possible
+/// to accidentally recursively read it.
+///
+/// Our implementation is free from these issues, so we don't _really_ need to worry about it.
+/// However, out of an abundance of caution, we store the Value in the header, and the LockPrimitive
+/// in the trailing elements. We still don't use `.header`, but it's better to be safe than sorry,
+/// and future maintainers will be happier that we were cautious.
+///
+/// See also: https://github.com/apple/swift/pull/40000
 @usableFromInline
 final class LockStorage<Value>: ManagedBuffer<Value, LockPrimitive> {
     @inlinable
