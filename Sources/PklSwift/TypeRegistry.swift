@@ -119,7 +119,7 @@ extension TypeRegistry {
     static let _sharedLock: PklLock = .init()
     nonisolated(unsafe) static var _shared: TypeRegistry?
 
-    public static func get() -> TypeRegistry {
+    static func get() -> TypeRegistry {
         self._sharedLock.withLock {
             if let _shared {
                 return _shared

@@ -83,7 +83,9 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
     var encoder: MessagePackEncoder!
     var decoder: MessagePackDecoder!
 
-    var running: Bool { true }
+    var running: Bool {
+        true
+    }
 
     func send(_ message: ClientMessage) throws {
         debug("Sending message: \(message)")
@@ -125,7 +127,8 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
                         let arrayLength = try self.decoder.decodeArrayLength()
                         guard arrayLength == 2 else {
                             throw PklBugError.invalidMessageCode(
-                                "Expected 2-element message array, got \(arrayLength)")
+                                "Expected 2-element message array, got \(arrayLength)"
+                            )
                         }
                         let code = try self.decoder.decode(as: MessageType.self)
                         let message = try self.decodeMessage(code)
@@ -142,7 +145,7 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
     }
 }
 
-/// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
+// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
 #if os(macOS) || os(Linux) || os(Windows)
 public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     var process: Process?
@@ -150,7 +153,9 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
 
     private let processTerminationGroup = DispatchGroup()
 
-    override var running: Bool { self.process?.isRunning == true }
+    override var running: Bool {
+        self.process?.isRunning == true
+    }
 
     override convenience init() {
         self.init(pklCommand: nil)
@@ -225,7 +230,10 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
 #endif
 
 public class ExternalReaderMessageTransport: BaseMessageTransport, @unchecked Sendable {
-    override var running: Bool { self._running }
+    override var running: Bool {
+        self._running
+    }
+
     private var _running = true
 
     init(reader: Reader, writer: Writer) {

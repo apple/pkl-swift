@@ -59,9 +59,9 @@ extension _MessagePackEncoder.UnkeyedContainer: UnkeyedEncodingContainer {
         return container
     }
 
-    func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<
+    func nestedContainer<NestedKey: CodingKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<
         NestedKey
-    > where NestedKey: CodingKey {
+    > {
         let container = _MessagePackEncoder.KeyedContainer<NestedKey>(
             codingPath: self.nestedCodingPath, userInfo: self.userInfo
         )

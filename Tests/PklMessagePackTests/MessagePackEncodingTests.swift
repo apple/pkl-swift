@@ -14,9 +14,8 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import XCTest
-
 @testable import PklMessagePack
+import XCTest
 
 final class MessagePackEncodingTests: XCTestCase {
     var writer: BufferWriter?

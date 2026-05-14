@@ -17,7 +17,7 @@
 import Foundation
 
 extension _MessagePackDecoder {
-    final class KeyedSingleContainer<Key> where Key: CodingKey {
+    final class KeyedSingleContainer<Key: CodingKey> {
         var value: MessagePackValue
         var index: Int
         var codingPath: [CodingKey]
@@ -62,7 +62,7 @@ extension _MessagePackDecoder.KeyedSingleContainer: KeyedDecodingContainerProtoc
         self.value == MessagePackValue.nil
     }
 
-    func decode<T>(_ typ: T.Type, forKey key: Key) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_: T.Type, forKey key: Key) throws -> T {
         _ = self.value.getAs(T.self) // FIXME: make optional
 
         let context = DecodingError.Context(
@@ -75,8 +75,8 @@ extension _MessagePackDecoder.KeyedSingleContainer: KeyedDecodingContainerProtoc
         fatalError("\(#function)")
     }
 
-    func nestedContainer<NestedKey>(keyedBy nestedKeyType: NestedKey.Type, forKey key: Key) throws
-        -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy nestedKeyType: NestedKey.Type, forKey key: Key) throws
+        -> KeyedDecodingContainer<NestedKey> {
         fatalError("\(#function)")
     }
 

@@ -15,10 +15,9 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import XCTest
-
 @testable import PklMessagePack
 @testable import PklSwift
+import XCTest
 
 /// Tests for pipe partial-read handling in ``MessageTransport``.
 ///
@@ -118,14 +117,16 @@ class MessageTransportTest: XCTestCase {
         try encoder.encode(MessageType.READ_MODULE_REQUEST)
         try encoder.encode(
             ReadModuleRequest(requestId: 1, evaluatorId: 42,
-                              uri: URL(string: "file:///test.pkl")!))
+                              uri: URL(string: "file:///test.pkl")!)
+        )
 
         // Write a malformed 3-element array header.
         try encoder.encodeArrayHeader(3)
         try encoder.encode(MessageType.READ_MODULE_REQUEST)
         try encoder.encode(
             ReadModuleRequest(requestId: 2, evaluatorId: 43,
-                              uri: URL(string: "file:///test2.pkl")!))
+                              uri: URL(string: "file:///test2.pkl")!)
+        )
         try encoder.encode("extra element")
 
         let reader = BufferReader(bufWriter.bytes)
@@ -162,5 +163,7 @@ class MessageTransportTest: XCTestCase {
 /// concurrency boundaries in tests.
 private final class UnsafeSendableBox<T>: @unchecked Sendable {
     var value: T
-    init(_ value: T) { self.value = value }
+    init(_ value: T) {
+        self.value = value
+    }
 }

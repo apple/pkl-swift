@@ -45,20 +45,20 @@ protocol ServerResponseMessage: ServerMessage, ResponseMessage {}
 
 protocol ServerOneWayMessage: ServerMessage, OneWayMessage {}
 
-struct ModuleReaderSpec: Codable, Sendable {
+struct ModuleReaderSpec: Codable {
     let scheme: String
     let hasHierarchicalUris: Bool
     let isLocal: Bool
     let isGlobbable: Bool
 }
 
-struct ResourceReaderSpec: Codable, Sendable {
+struct ResourceReaderSpec: Codable {
     let scheme: String
     let hasHierarchicalUris: Bool
     let isGlobbable: Bool
 }
 
-enum MessageType: Int, Codable, Sendable {
+enum MessageType: Int, Codable {
     case CREATE_EVALUATOR_REQUEST = 0x20
     case CREATE_EVALUATOR_RESPONSE = 0x21
     case CLOSE_EVALUATOR = 0x22
@@ -123,7 +123,7 @@ extension MessageType {
     }
 }
 
-struct CreateEvaluatorRequest: ClientRequestMessage, Sendable {
+struct CreateEvaluatorRequest: ClientRequestMessage {
     var requestId: Int64 = 0
     var allowedModules: [String]?
     var allowedResources: [String]?
@@ -143,7 +143,7 @@ struct CreateEvaluatorRequest: ClientRequestMessage, Sendable {
     var traceMode: String?
 }
 
-struct ProjectOrDependency: Codable, Sendable {
+struct ProjectOrDependency: Codable {
     var packageUri: String?
     var type: String
     var projectFileUri: String?
@@ -151,78 +151,78 @@ struct ProjectOrDependency: Codable, Sendable {
     var dependencies: [String: ProjectOrDependency]?
 }
 
-struct Checksums: Codable, Hashable, Sendable {
+struct Checksums: Codable, Hashable {
     var sha256: String?
 }
 
-struct CreateEvaluatorResponse: ServerResponseMessage, Sendable {
+struct CreateEvaluatorResponse: ServerResponseMessage {
     let requestId: Int64
     let evaluatorId: Int64?
     let error: String?
 }
 
-struct ReadResourceRequest: ServerRequestMessage, Sendable {
+struct ReadResourceRequest: ServerRequestMessage {
     var requestId: Int64
     let evaluatorId: Int64
     let uri: URL
 }
 
-struct ReadResourceResponse: ClientResponseMessage, Sendable {
+struct ReadResourceResponse: ClientResponseMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var contents: [UInt8]?
     var error: String?
 }
 
-struct ReadModuleRequest: ServerRequestMessage, Sendable {
+struct ReadModuleRequest: ServerRequestMessage {
     var requestId: Int64
     let evaluatorId: Int64
     let uri: URL
 }
 
-struct ReadModuleResponse: ClientResponseMessage, Sendable {
+struct ReadModuleResponse: ClientResponseMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var contents: String?
     var error: String?
 }
 
-struct ListResourcesRequest: ServerRequestMessage, Sendable {
+struct ListResourcesRequest: ServerRequestMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var uri: URL
 }
 
-struct ListResourcesResponse: ClientResponseMessage, Sendable {
+struct ListResourcesResponse: ClientResponseMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var pathElements: [PathElementMessage]?
     var error: String?
 }
 
-struct PathElementMessage: Codable, Sendable {
+struct PathElementMessage: Codable {
     var name: String
     var isDirectory: Bool
 }
 
-struct ListModulesRequest: ServerRequestMessage, Sendable {
+struct ListModulesRequest: ServerRequestMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var uri: URL
 }
 
-struct ListModulesResponse: ClientResponseMessage, Sendable {
+struct ListModulesResponse: ClientResponseMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var pathElements: [PathElementMessage]?
     var error: String?
 }
 
-struct CloseEvaluatorRequest: ClientOneWayMessage, Sendable {
+struct CloseEvaluatorRequest: ClientOneWayMessage {
     var evaluatorId: Int64
 }
 
-struct EvaluateRequest: ClientRequestMessage, Sendable {
+struct EvaluateRequest: ClientRequestMessage {
     var requestId: Int64
     var evaluatorId: Int64
     var moduleUri: URL
@@ -230,44 +230,44 @@ struct EvaluateRequest: ClientRequestMessage, Sendable {
     var expr: String?
 }
 
-struct EvaluateResponse: ServerResponseMessage, Sendable {
+struct EvaluateResponse: ServerResponseMessage {
     let requestId: Int64
     let evaluatorId: Int64
     let result: [UInt8]?
     let error: String?
 }
 
-enum LogLevel: Int, Codable, Sendable {
+enum LogLevel: Int, Codable {
     case trace = 0
     case warn = 1
 }
 
-struct LogMessage: ServerOneWayMessage, Sendable {
+struct LogMessage: ServerOneWayMessage {
     let evaluatorId: Int64
     let level: LogLevel
     let message: String
-    // NOTE: not guaranteed to conform to URL. This might have been transformed by a stack frame transformer.
+    /// NOTE: not guaranteed to conform to URL. This might have been transformed by a stack frame transformer.
     let frameUri: String
 }
 
-struct InitializeModuleReaderRequest: ServerRequestMessage, Sendable {
+struct InitializeModuleReaderRequest: ServerRequestMessage {
     var requestId: Int64
     let scheme: String
 }
 
-struct InitializeModuleReaderResponse: ClientResponseMessage, Sendable {
+struct InitializeModuleReaderResponse: ClientResponseMessage {
     var requestId: Int64
     var spec: ModuleReaderSpec?
 }
 
-struct InitializeResourceReaderRequest: ServerRequestMessage, Sendable {
+struct InitializeResourceReaderRequest: ServerRequestMessage {
     var requestId: Int64
     let scheme: String
 }
 
-struct InitializeResourceReaderResponse: ClientResponseMessage, Sendable {
+struct InitializeResourceReaderResponse: ClientResponseMessage {
     var requestId: Int64
     var spec: ResourceReaderSpec?
 }
 
-struct CloseExternalProcess: ServerOneWayMessage, Sendable {}
+struct CloseExternalProcess: ServerOneWayMessage {}

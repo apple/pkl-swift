@@ -80,7 +80,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode<T>(_: T.Type) throws -> T where T: BinaryInteger & Decodable {
+    func decode<T: BinaryInteger & Decodable>(_: T.Type) throws -> T {
         switch value {
         case .int(let value):
             guard let value = value as? T else {
@@ -142,7 +142,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
         }
     }
 
-    func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_ type: T.Type) throws -> T {
         switch type {
         case is Data.Type:
             return try self.decode(Data.self) as! T
@@ -154,8 +154,7 @@ extension _MessagePackDecoder.SingleValueContainer: SingleValueDecodingContainer
             return try self.decode(URL.self) as! T
         default:
             let decoder = _MessagePackDecoder(value: value)
-            let value = try T(from: decoder)
-            return value
+            return try T(from: decoder)
         }
     }
 

@@ -96,7 +96,7 @@ extension _MessagePackEncoder: Encoder {
         precondition(self.container == nil)
     }
 
-    func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
+    func container<Key: CodingKey>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> {
         self.assertCanCreateContainer()
 
         let container = KeyedContainer<Key>(codingPath: self.codingPath, userInfo: self.userInfo)

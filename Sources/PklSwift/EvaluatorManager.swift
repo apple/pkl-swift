@@ -110,7 +110,7 @@ public actor EvaluatorManager {
 
     var pklVersion: String?
 
-    // note; when our C bindings are released, change `init()` based on compiler flags.
+    /// note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
         #if os(macOS) || os(Linux) || os(Windows)
         self.init(transport: ServerMessageTransport())
@@ -119,7 +119,7 @@ public actor EvaluatorManager {
         #endif
     }
 
-    // Used for testing only.
+    /// Used for testing only.
     init(transport: MessageTransport) {
         self.transport = transport
         Task {
@@ -134,7 +134,8 @@ public actor EvaluatorManager {
             // idempotent — the isClosed guard makes this a no-op when
             // close() was already called.
             await self.closeError(
-                error: PklError("pkl server process exited unexpectedly"))
+                error: PklError("pkl server process exited unexpectedly")
+            )
         }
     }
 
@@ -314,7 +315,8 @@ public actor EvaluatorManager {
         let req = options.toMessage()
         guard let response = try await ask(req) as? CreateEvaluatorResponse else {
             throw PklBugError.invalidMessageCode(
-                "Received invalid response to create evaluator request")
+                "Received invalid response to create evaluator request"
+            )
         }
         if let error = response.error {
             throw PklError(error)
@@ -334,7 +336,7 @@ public actor EvaluatorManager {
     /// Creates a new evaluator that is configured from the provided project.
     ///
     /// `options` is the base set of evaluator options.
-    //  Any `evaluatorSettings` set within the PklProject file overwrites any fields set on `options`.
+    ///  Any `evaluatorSettings` set within the PklProject file overwrites any fields set on `options`.
     ///
     /// - Parameters:
     ///   - projectBaseURI: The project base path containing the `PklProject` file.
