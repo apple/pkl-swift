@@ -33,4 +33,4 @@ jobs:
     - name: github/codeql-action/init@v4
       uses: github/codeql-action/init@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4
     - name: ruby/setup-ruby@v1
-      uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f # v1
+      uses: ruby/setup-ruby@6aaa311d81eba98ae12eaffbcb63296ace0efcde # v1
