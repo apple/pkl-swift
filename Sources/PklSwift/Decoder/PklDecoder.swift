@@ -33,6 +33,8 @@ public enum PklValueType: UInt8, Decodable, Sendable {
     case `typealias` = 0x0D
     case function = 0x0E
     case bytes = 0x0F
+    case reference = 0x20
+
     case objectMemberProperty = 0x10
     case objectMemberEntry = 0x11
     case objectMemberElement = 0x12
@@ -304,6 +306,9 @@ extension _PklDecoder {
                         ))
                 }
                 return PklAny(value: bytes)
+            case .reference:
+                let decoder = try _PklDecoder(value: propertyValue)
+                return try PklAny(value: Reference<AnyHashable?>(from: decoder))
             default:
                 throw DecodingError.dataCorrupted(
                     .init(
