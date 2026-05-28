@@ -47,7 +47,7 @@ local class SimulatorRuntime {
       "watchOS Simulator", "watchsimulator",
       "tvOS Simulator", "appletvsimulator",
       "visionOS Simulator", "xrsimulator",
-      "Mac Catalyst", "macosx"
+      "Mac Catalyst", "macosx",
     )[platform]
 
   hidden destination: String = "platform=\(platform),name=\(name)"
