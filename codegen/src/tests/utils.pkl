@@ -27,6 +27,19 @@ facts {
     utils.normalizeName("Swift111") == "Swift111"
     utils.normalizeName("snake_case") == "snake_case"
   }
+  ["normalizeEnumName"] {
+    utils.normalizeEnumName("foo") == "foo"
+    utils.normalizeEnumName("FooBar") == "fooBar"
+    utils.normalizeEnumName("San Francisco") == "sanFrancisco"
+    utils.normalizeEnumName("bugBug") == "bugBug"
+    utils.normalizeEnumName("ANDROID") == "android"
+    utils.normalizeEnumName("TEST_RUNNER") == "testRunner"
+    utils.normalizeEnumName("HTTP_STATUS_CODE") == "httpStatusCode"
+    utils.normalizeEnumName("400") == "`400`"
+    utils.normalizeEnumName("404_not_found") == "`404NotFound`"
+    utils.normalizeEnumName("") == "empty"
+    utils.normalizeEnumName("___") == "empty"
+  }
   ["toSwiftString"] {
     utils.toSwiftString("foo") == #""foo""#
     utils.toSwiftString("你好") == #""你好""#

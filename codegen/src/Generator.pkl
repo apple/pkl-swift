@@ -36,10 +36,6 @@ indent: String = "    "
 typealias EnumMember =
   reflect.DeclaredType | reflect.StringLiteralType | reflect.NullableType | reflect.NothingType
 
-function hasDistinctEnumNames(members: List<reflect.StringLiteralType>) =
-  let (names = members.map((it) -> utils.normalizeEnumName(it.value)))
-    names.isDistinct
-
 // noinspection TypeMismatch
 function isEnumLike(decl: reflect.TypeDeclaration) =
   decl is reflect.TypeAlias
@@ -47,8 +43,9 @@ function isEnumLike(decl: reflect.TypeDeclaration) =
       referent is reflect.UnionType
         && referent.members.every((t) -> t is EnumMember)
         && if (referent.members is List<reflect.StringLiteralType>)
+          // Colliding normalized names (e.g. "beetle one"/"beetle_one") are disambiguated
+          // with a numeric suffix in EnumGen, so distinct case names are no longer required here.
           referent.members.every((it) -> utils.canBeNormalizedToEnumCaseName(it.value))
-            && hasDistinctEnumNames(referent.members)
         else
           true
 

@@ -46,7 +46,7 @@ extension Classes {
         case butterfly = "butterfly"
         case beetle = #"beetle""#
         case beetleOne = "beetle one"
-        case beetle_one = "beetle_one"
+        case beetleOne2 = "beetle_one"
     }
 
     public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
