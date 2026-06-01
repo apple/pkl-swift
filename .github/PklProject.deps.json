@@ -3,16 +3,16 @@
   "resolvedDependencies": {
     "package://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1.6.0",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/com.github.actions@1.7.0",
       "checksums": {
-        "sha256": "10e27d63df4a4520d8a9375962406ca5ffe74f396bd3cb1c19b1f8358505010a"
+        "sha256": "e3461c3f8d00a6a657f9fa4f391afdab4a53a2e528862a4d8624e545cd3cb2b1"
       }
     },
     "package://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1.7.1",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-project-commons/pkl.impl.ghactions@1.8.0",
       "checksums": {
-        "sha256": "93cdf1bdd3e7f6c1c83f49791b8c02fbee9ac2e721d299cad6c15d142fd5d762"
+        "sha256": "04a5da66418b3be277476b13c2c34cd5538d9bcd11de054ba1d3116d21f95b30"
       }
     },
     "package://pkg.pkl-lang.org/pkl-pantry/pkl.experimental.deepToTyped@1": {
@@ -24,9 +24,9 @@
     },
     "package://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1": {
       "type": "remote",
-      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1.1.3",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-pantry/pkl.github.dependabotManagedActions@1.1.6",
       "checksums": {
-        "sha256": "521feb6f5ff12075ebad0758799fe7ec2675d231a0e0f5456694c8d4822a8171"
+        "sha256": "85ad51d257bad4729f0b9edecade48fcad6f55bacd0fa36106782475e912919a"
       }
     },
     "package://pkg.pkl-lang.org/pkl-pantry/com.github.dependabot@1": {
