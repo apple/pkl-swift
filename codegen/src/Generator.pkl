@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,9 +43,7 @@ function isEnumLike(decl: reflect.TypeDeclaration) =
       referent is reflect.UnionType
         && referent.members.every((t) -> t is EnumMember)
         && if (referent.members is List<reflect.StringLiteralType>)
-          // Colliding normalized names (e.g. "beetle one"/"beetle_one") are disambiguated
-          // with a numeric suffix in EnumGen, so distinct case names are no longer required here.
-          referent.members.every((it) -> utils.canBeNormalizedToEnumCaseName(it.value))
+          referent.members.every((it: reflect.StringLiteralType) -> utils.canBeNormalizedToEnumCaseName(it.value))
         else
           true
 
