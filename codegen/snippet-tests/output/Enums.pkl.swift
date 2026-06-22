@@ -65,6 +65,11 @@ extension Enums {
         }
     }
 
+    public enum BugBug: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
+        case bugBug = "bug bug"
+        case bugBug2 = "bugBug"
+    }
+
     public enum HorseOrBug: Decodable, Hashable, Sendable {
         case horse(Horse)
         case string(String)
@@ -177,8 +182,6 @@ extension Enums {
             self.tail = tail
         }
     }
-
-    public typealias BugBug = String
 
     /// Load the Pkl module at the given source and evaluate it into `Enums.Module`.
     ///

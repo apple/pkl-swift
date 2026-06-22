@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,10 +45,21 @@ local enumBaseMembers: List<EnumMember> =
     type = typegen.generateType(it, module.mapping.source, module.mappings)
   })
 
-local enumStringLiteralMembers =
-  enumBaseMembers.map((it) -> (it) {
-    name = utils.normalizeEnumName((it.pklType as reflect.StringLiteralType).value)
-  })
+/// Appends a numeric suffix to `candidate` until it no longer collides with an
+/// already-assigned case name. Two distinct Pkl string values can normalize to the
+/// same Swift identifier (e.g. "beetle one" and "beetle_one" both -> "beetleOne");
+/// suffixing keeps every case distinct so the union can still generate as an enum.
+local function uniqueEnumCaseName(candidate: String, taken: List<String>, n: Int): String =
+  let (name = if (n == 1) candidate else "\(candidate)\(n)")
+    if (taken.contains(name)) uniqueEnumCaseName(candidate, taken, n + 1) else name
+
+local enumStringLiteralMembers: List<EnumMember> =
+  enumBaseMembers.fold(List(), (acc, it) ->
+    let (baseName = utils.normalizeEnumName((it.pklType as reflect.StringLiteralType).value))
+      acc.add((it) {
+        name = uniqueEnumCaseName(baseName, acc.map((m) -> m.name), 1)
+      })
+  )
 
 local enumNormalMembers =
   enumBaseMembers.map((it) -> (it) {

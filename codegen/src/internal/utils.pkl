@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -133,12 +133,34 @@ function renderHeaderComment(`module`: reflect.Module) =
 function canBeNormalizedToEnumCaseName(name: String) =
   name == "" || !name.split(Regex(#"(?u)[^\p{L}\d]"#)).isEmpty
 
+local function isAllUpper(s: String) = s != "" && s == s.toUpperCase() && s != s.toLowerCase()
+
+local function lowerFirst(s: String) = if (s == "") s else s[0].toLowerCase() + s.drop(1)
+
+local digitRegex: Regex = Regex(#"\d"#)
+
 function normalizeEnumName(name: String) =
   if (name == "")
     "empty"
   else
-    let (normalized = normalizeName(name))
-      normalized[0].toLowerCase() + normalized.drop(1)
+    let (parts = name.split(Regex(#"(?u)[^\p{L}\d]"#)).filter((p) -> p != ""))
+    let (
+      camel =
+        if (parts.isEmpty)
+          "empty"
+        else
+          let (firstRaw = parts.first)
+          let (first = if (isAllUpper(firstRaw)) firstRaw.toLowerCase() else lowerFirst(firstRaw))
+            first
+              + parts
+                .drop(1)
+                .map((p) -> if (isAllUpper(p)) p.toLowerCase().capitalize() else p.capitalize())
+                .join("")
+    )
+      if (camel[0].matches(digitRegex) || keywords.contains(camel))
+        "`\(camel)`"
+      else
+        camel
 
 function normalizeName(name: String) =
   if (keywords.contains(name))
