@@ -43,7 +43,9 @@ function isEnumLike(decl: reflect.TypeDeclaration) =
       referent is reflect.UnionType
         && referent.members.every((t) -> t is EnumMember)
         && if (referent.members is List<reflect.StringLiteralType>)
-          referent.members.every((it: reflect.StringLiteralType) -> utils.canBeNormalizedToEnumCaseName(it.value))
+          referent.members.every((it: reflect.StringLiteralType) ->
+            utils.canBeNormalizedToEnumCaseName(it.value)
+          )
         else
           true
 
