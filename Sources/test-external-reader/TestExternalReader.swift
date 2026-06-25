@@ -23,16 +23,29 @@ struct TestExternalReader {
         let client = ExternalReaderClient(
             options: ExternalReaderClientOptions(
                 resourceReaders: [FibReader()]
-            ))
+            )
+        )
         try await client.run()
     }
 }
 
 struct FibReader: ResourceReader {
-    var scheme: String { "fib" }
-    var isGlobbable: Bool { false }
-    var hasHierarchicalUris: Bool { false }
-    func listElements(uri: URL) async throws -> [PathElement] { throw PklError("not implemented") }
+    var scheme: String {
+        "fib"
+    }
+
+    var isGlobbable: Bool {
+        false
+    }
+
+    var hasHierarchicalUris: Bool {
+        false
+    }
+
+    func listElements(uri: URL) async throws -> [PathElement] {
+        throw PklError("not implemented")
+    }
+
     func read(url: URL) async throws -> [UInt8]? {
         let key = url.absoluteString.dropFirst(self.scheme.count + 1)
         guard let n = Int(key) else {

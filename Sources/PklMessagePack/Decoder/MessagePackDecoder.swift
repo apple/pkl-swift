@@ -66,14 +66,14 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Unknown msgpack format: \(code.toHex())"
-                ))
+                )
+            )
         }
     }
 
-    public func decode<T>(as type: T.Type) throws -> T where T: Decodable {
+    public func decode<T: Decodable>(as type: T.Type) throws -> T {
         let value = try decodeGeneric()
-        let converted = try value.decodeInto(type)
-        return converted
+        return try value.decodeInto(type)
     }
 
     public func decodeBool() throws -> Bool {
@@ -83,7 +83,8 @@ public final class MessagePackDecoder {
         case .true: return true
         default:
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "Invalid code for bool: \(code.toHex())"))
+                .init(codingPath: [], debugDescription: "Invalid code for bool: \(code.toHex())")
+            )
         }
     }
 
@@ -93,7 +94,8 @@ public final class MessagePackDecoder {
             return nil
         }
         throw DecodingError.dataCorrupted(
-            .init(codingPath: [], debugDescription: "Invalid code for nil: \(code.toHex())"))
+            .init(codingPath: [], debugDescription: "Invalid code for nil: \(code.toHex())")
+        )
     }
 
     public func decodeInt() throws -> Int {
@@ -156,7 +158,8 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format for String length: \(code.toHex())"
-                ))
+                )
+            )
         }
 
         let bytes = try read(length)
@@ -195,7 +198,8 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format for date \(code.toHex())"
-                ))
+                )
+            )
         }
 
         let timeInterval = TimeInterval(seconds) + nanoseconds / Double(NSEC_PER_SEC)
@@ -217,14 +221,16 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format for binary length \(code.toHex())"
-                ))
+                )
+            )
         }
 
         let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: length, alignment: 1)
         let readCount = try reader.read(into: buffer)
         if readCount < length {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input"))
+                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input")
+            )
         }
         return Array(buffer)
     }
@@ -251,7 +257,8 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid code \(code) for array header"
-                ))
+                )
+            )
         }
     }
 
@@ -268,7 +275,8 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format \(code) for maps"
-                ))
+                )
+            )
         }
     }
 
@@ -301,7 +309,8 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format \(code) for extensions"
-                ))
+                )
+            )
         }
     }
 
@@ -312,12 +321,13 @@ public final class MessagePackDecoder {
         let readCount = try reader.read(into: buffer)
         if readCount < length {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input"))
+                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input")
+            )
         }
         return (type, Array(buffer))
     }
 
-    private func decodeFloatingPoint<T>() throws -> T where T: BinaryFloatingPoint {
+    private func decodeFloatingPoint<T: BinaryFloatingPoint>() throws -> T {
         let code = try readByte()
         let t: T?
         switch code {
@@ -333,18 +343,20 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format for floating points: \(code.toHex())"
-                ))
+                )
+            )
         }
         guard let t else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Unable to decode bytes into BinaryFloatingPoint"
-                ))
+                )
+            )
         }
         return t
     }
 
-    private func decodeBinaryInteger<T>() throws -> T where T: BinaryInteger {
+    private func decodeBinaryInteger<T: BinaryInteger>() throws -> T {
         let code = try readByte()
 
         var t: T?
@@ -374,14 +386,16 @@ public final class MessagePackDecoder {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Invalid format for int: \(code.toHex())"
-                ))
+                )
+            )
         }
 
         guard let value = t else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [], debugDescription: "Unable to decode bytes into BinaryInteger"
-                ))
+                )
+            )
         }
         return value
     }
@@ -392,7 +406,8 @@ public final class MessagePackDecoder {
         let readCount = try reader.read(into: out)
         if readCount == 0 {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input"))
+                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input")
+            )
         }
 
         return out[0]
@@ -404,12 +419,13 @@ public final class MessagePackDecoder {
         let readCount = try reader.read(into: out)
         if readCount < length {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input"))
+                DecodingError.Context(codingPath: [], debugDescription: "Unexpected end of input")
+            )
         }
         return [UInt8](out)
     }
 
-    private func read<T>(_: T.Type) throws -> T where T: FixedWidthInteger {
+    private func read<T: FixedWidthInteger>(_: T.Type) throws -> T {
         let stride = MemoryLayout<T>.stride
         let bytes = try read(stride)
         return T(bytes: bytes)
@@ -461,7 +477,7 @@ extension MessagePackValue {
 }
 
 extension MessagePackValue {
-    public func decode<T>(_: T.Type) throws -> T where T: Decodable {
+    public func decode<T: Decodable>(_: T.Type) throws -> T {
         try T(from: _MessagePackDecoder(value: self))
     }
 }

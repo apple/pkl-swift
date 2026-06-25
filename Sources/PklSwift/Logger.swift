@@ -74,11 +74,17 @@ public struct FileHandleLogger: Logger, Sendable {
 
 public enum Loggers {
     /// A logger that writes everything to stdout.
-    public static var standardOutput: Logger { FileHandleLogger(.standardOutput) }
+    public static var standardOutput: Logger {
+        FileHandleLogger(.standardOutput)
+    }
 
     /// A logger that writes everything to stderr.
-    public static var standardError: Logger { FileHandleLogger(.standardError) }
+    public static var standardError: Logger {
+        FileHandleLogger(.standardError)
+    }
 
     /// A logger that discards log messages.
-    public static var noop: Logger { NoopLogger() }
+    public static var noop: Logger {
+        NoopLogger()
+    }
 }

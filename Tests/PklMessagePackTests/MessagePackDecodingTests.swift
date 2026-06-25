@@ -14,9 +14,8 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import XCTest
-
 @testable import PklMessagePack
+import XCTest
 
 struct Person: Codable, Hashable {
     let name: String
@@ -25,7 +24,7 @@ struct Person: Codable, Hashable {
 }
 
 class MessagePackDecodingTests: XCTestCase {
-    private func decode<T>(_ type: T.Type, from bytes: [UInt8]) throws -> T where T: Decodable {
+    private func decode<T: Decodable>(_ type: T.Type, from bytes: [UInt8]) throws -> T {
         let decoder = MessagePackDecoder(reader: BufferReader(bytes))
         return try decoder.decode(as: type)
     }
@@ -221,10 +220,10 @@ class MessagePackDecodingTests: XCTestCase {
     func testDecodeDictionaryWithNonKeyString() throws {
         let writer = BufferWriter()
         let dict: [Person: Bool] = [Person(name: "Jerry", age: 11, hobby: nil): true]
-        try MessagePackEncoder(writer: writer).encode([Person(name: "Jerry", age: 11, hobby: nil): true]
-        )
+        try MessagePackEncoder(writer: writer).encode([Person(name: "Jerry", age: 11, hobby: nil): true])
         let decoded = try MessagePackDecoder(reader: BufferReader(writer.bytes)).decode(
-            as: [Person: Bool].self)
+            as: [Person: Bool].self
+        )
         XCTAssertEqual(dict, decoded)
     }
 

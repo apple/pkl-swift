@@ -30,7 +30,8 @@ extension _PklDecoder {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Expected property object member, but got \(pklType)"
-                        ))
+                        )
+                    )
                 }
                 if case .string(let propertyName) = parts[1] {
                     result[propertyName] = parts[2]
@@ -40,7 +41,8 @@ extension _PklDecoder {
                             codingPath: codingPath,
                             debugDescription:
                             "Expected second object property slot to be a string, but got \(parts[1].debugDataTypeDescription)"
-                        ))
+                        )
+                    )
                 }
             } else {
                 throw DecodingError.dataCorrupted(
@@ -48,14 +50,15 @@ extension _PklDecoder {
                         codingPath: codingPath,
                         debugDescription:
                         "Expected object member to be an array, but got \(member.debugDataTypeDescription)"
-                    ))
+                    )
+                )
             }
         }
         return result
     }
 
     /// Decoding container specifically for Typed objects.
-    class PklTypedDecodingContainer<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
+    class PklTypedDecodingContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
         let codingPath: [CodingKey]
 
         let className: String
@@ -75,7 +78,8 @@ extension _PklDecoder {
                     .init(
                         codingPath: codingPath,
                         debugDescription: "Expected 4 items in array, but found \(value.count)"
-                    ))
+                    )
+                )
             }
             self.className = try value[1].decode(String.self)
             self.enclosingModuleURI = try value[2].decode(String.self)
@@ -87,7 +91,8 @@ extension _PklDecoder {
                         codingPath: codingPath,
                         debugDescription:
                         "Expected an array of object members at slot 3, but got \(value[3].debugDataTypeDescription)"
-                    ))
+                    )
+                )
             }
             self.codingPath = codingPath
             self.properties = try deriveProperties(self.objectMembers, codingPath: codingPath)
@@ -130,8 +135,8 @@ extension _PklDecoder {
             return try T(from: decoder)
         }
 
-        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
-            -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+        func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
+            -> KeyedDecodingContainer<NestedKey> {
             guard let propertyValue = properties[key.stringValue] else {
                 throw DecodingError.dataCorruptedError(
                     forKey: key, in: self, debugDescription: "Missing key \(key)"

@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ public struct ModuleSource: Hashable, Sendable {
 
     /// The text contents of the module, if available.
     ///
-    // If `nil`, gets resolved by Pkl during evaluation time.
-    // If the scheme of the uri matches a ``ModuleReader``, it will be used to resolve the module.
+    /// If `nil`, gets resolved by Pkl during evaluation time.
+    /// If the scheme of the uri matches a ``ModuleReader``, it will be used to resolve the module.
     let text: String?
 }
 

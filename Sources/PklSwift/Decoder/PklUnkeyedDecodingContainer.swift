@@ -24,7 +24,7 @@ extension _PklDecoder {
 
         var currentIndex: Int
 
-        // either [members] or [bytes] are set
+        /// either [members] or [bytes] are set
         var members: [MessagePackValue]?
 
         var bytes: [UInt8]?
@@ -79,12 +79,12 @@ extension _PklDecoder {
             }
         }
 
-        private func decodeBytes<T>(_: T.Type, _ bytes: [UInt8]) throws -> T where T: Decodable {
+        private func decodeBytes<T: Decodable>(_: T.Type, _ bytes: [UInt8]) throws -> T {
             let value = bytes[self.currentIndex]
             return value as! T
         }
 
-        func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
+        func decode<T: Decodable>(_ type: T.Type) throws -> T {
             defer { currentIndex += 1 }
             if let bytes = self.bytes {
                 return try self.decodeBytes(type, bytes)
@@ -100,9 +100,9 @@ extension _PklDecoder {
             return try T(from: _PklDecoder(value: value))
         }
 
-        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<
+        func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<
             NestedKey
-        > where NestedKey: CodingKey {
+        > {
             if self.bytes != nil {
                 throw self.error("Cannot decode byte into \(type) because the decoded value is a byte array.")
             }

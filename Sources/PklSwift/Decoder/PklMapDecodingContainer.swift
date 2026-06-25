@@ -18,14 +18,14 @@ import PklMessagePack
 
 extension _PklDecoder {
     /// Decoding container that handles `Map` and `Mapping`.
-    class PklMapDecodingContainer<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
-        public typealias Key = Key
+    class PklMapDecodingContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
+        typealias Key = Key
 
         let entries: [(MessagePackValue, MessagePackValue)]
 
         let codingPath: [CodingKey]
 
-        public init(
+        init(
             value: [MessagePackValue],
             codingPath: [CodingKey]
         ) throws {
@@ -88,7 +88,7 @@ extension _PklDecoder {
             self.entriesKeyedByString[key.stringValue] == .nil
         }
 
-        func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
+        func decode<T: Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
             for entry in self.allEntries {
                 if entry.key.stringValue == key.stringValue { // TODO: not great, compare underlying value?
                     // special case for polymorphic types
@@ -103,8 +103,8 @@ extension _PklDecoder {
             throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
         }
 
-        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
-            -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+        func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
+            -> KeyedDecodingContainer<NestedKey> {
             guard let value = entriesKeyedByString[key.stringValue] else {
                 throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
             }
