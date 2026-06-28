@@ -451,6 +451,7 @@ let pklVersion0_29 = SemanticVersion("0.29.0")!
 let pklVersion0_30 = SemanticVersion("0.30.0")!
 let pklVersion0_31 = SemanticVersion("0.31.0")!
 let pklVersion0_31_1 = SemanticVersion("0.31.1")!
+let pklVersion0_32 = SemanticVersion("0.32.0-dev")!
 
 let supportedPklVersions = [
     pklVersion0_25,
@@ -460,4 +461,5 @@ let supportedPklVersions = [
     pklVersion0_29,
     pklVersion0_30,
     pklVersion0_31,
+    pklVersion0_32,
 ]

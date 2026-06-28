@@ -264,5 +264,38 @@ class FixturesTest: XCTestCase {
             numbers4: .int(Int.max)
         ))
     }
+
+    func testRef() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        debug("\(version < pklVersion0_32)")
+        if version < pklVersion0_32 {
+            throw XCTSkip("ref.Reference is not available")
+        }
+
+        let result = try await Ref.loadFrom(
+            evaluator: self.evaluator,
+            source: .path("\(#filePath)/../Fixtures/Ref.pkl")
+        )
+        XCTAssertEqual(result, .init(
+            res0: .init(domain: Ref.D(), data: "hi", path: []),
+            res1: .init(domain: Ref.D(), data: "hi", path: [.property("foo")]),
+            res2: .init(domain: Ref.D(), data: "hi", path: [
+                .property("bar"),
+                .subscriptKey("hi"),
+            ]),
+            res3: .init(domain: Ref.D(), data: "hi", path: [
+                .property("bar"),
+                .subscriptKey(nil),
+            ]),
+            res4: .init(domain: Ref.D(), data: "hi", path: [
+                .property("baz"),
+                .subscriptKey(Ref.MapKey(key: .string("foo"))),
+            ]),
+            res5: Reference<AnyHashable?>(domain: Ref.D(), data: "hi", path: [
+                .property("baz"),
+                .subscriptKey(Ref.MapKey(key: .int(1))),
+            ]),
+        ))
+    }
 }
 #endif

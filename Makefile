@@ -75,11 +75,11 @@ license-format: .build/tools/hawkeye
 
 .PHONY: pkl-format
 pkl-format:
-	$(PKL_EXEC) format --grammar-version 1 --write .
+	$(PKL_EXEC) format --write .
 
 .PHONY: pkl-format-lint
 pkl-format-lint:
-	$(PKL_EXEC) format --grammar-version 1 --diff-name-only .
+	$(PKL_EXEC) format --diff-name-only .
 
 .PHONY: format
 format: swiftformat license-format pkl-format

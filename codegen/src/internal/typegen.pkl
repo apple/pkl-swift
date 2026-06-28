@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 @Unlisted
 module pkl.swift.internal.typegen
 
+import "pkl:ref"
 import "pkl:reflect"
 
 import "SwiftMapping.pkl"
@@ -26,7 +27,7 @@ import "Type.pkl"
 function generateType(
   type: reflect.Type,
   enclosing: reflect.TypeDeclaration,
-  seenMappings: List<SwiftMapping>
+  seenMappings: List<SwiftMapping>,
 ): Type =
   if (type is reflect.DeclaredType)
     generateDeclaredType(type, enclosing, seenMappings)
@@ -65,7 +66,7 @@ function generateUnionType(type: reflect.UnionType, seenMappings: List<SwiftMapp
 function generateDeclaredType(
   type: reflect.DeclaredType,
   enclosing: reflect.TypeDeclaration,
-  seenMappings: List<SwiftMapping>
+  seenMappings: List<SwiftMapping>,
 ): Type =
   let (referent = type.referent)
   let (reflectee = type.referent.reflectee)
@@ -133,11 +134,15 @@ mappedTypes: Mapping<Class | TypeAlias, Type> = new {
       typeName = "UInt8"
     }
   }
+  [ref.Access] = new Type.Declared {
+    swiftModuleName = "PklSwift"
+    typeName = "ReferenceAccess"
+  }
 }
 
 mappedHigherOrderTypes: Mapping<
   Class | TypeAlias,
-  (reflect.DeclaredType, reflect.TypeDeclaration, List<SwiftMapping>) -> Type
+  (reflect.DeclaredType, reflect.TypeDeclaration, List<SwiftMapping>) -> Type,
 > = new {
   [List] = this[Listing]
   [Listing] = (type, enclosing, seenMappings) ->
@@ -175,7 +180,19 @@ mappedHigherOrderTypes: Mapping<
         if (typeArg == null)
           anyType
         else
-          generateType(typeArg, enclosing, seenMappings)
+          generateType(typeArg, enclosing, seenMappings),
+      )
+  }
+  [ref.Reference] = (type, enclosing, seenMappings) -> new Type.Declared {
+    local typeArg = type.typeArguments.getOrNull(0)
+    swiftModuleName = "PklSwift"
+    typeName = "Reference"
+    typeArguments =
+      List(
+        if (typeArg == null)
+          anyType
+        else
+          generateType(typeArg, enclosing, seenMappings),
       )
   }
 }
