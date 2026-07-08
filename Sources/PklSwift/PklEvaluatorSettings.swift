@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,6 +82,38 @@ public struct Http: Codable, Hashable, Sendable {
     ///			"https://example.com/": "https://my.other.website/"
     ///		]
     var rewrites: [String: String]?
+
+    /// HTTP headers to add to outbound requests.
+    /// Each key is a glob pattern, and each value is a mapping of header name to header value(s).
+    ///
+    /// Before an HTTP request is made, each key is matched against the request URL.
+    /// For all matches, each of their described headers are added to the request.
+    ///
+    /// To add headers to all HTTP requests, use `**` as the glob pattern.
+    var headers: [String: [String: HeaderValue]]?
+
+    public enum HeaderValue: Codable, Hashable, Sendable {
+        case value(String)
+        case values([String])
+
+        public func encode(to encoder: any Encoder) throws {
+            switch self {
+            case .value(let value):
+                try value.encode(to: encoder)
+            case .values(let values):
+                try values.encode(to: encoder)
+            }
+        }
+
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            do {
+                self = try .value(container.decode(String.self))
+            } catch DecodingError.typeMismatch(_, _) {
+                self = try .values(container.decode([String].self))
+            }
+        }
+    }
 }
 
 /// Settings that control how Pkl talks to HTTP proxies.
