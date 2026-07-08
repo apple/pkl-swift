@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ class Dictionary extends Type {
     let (sep = if (inner.second.length > innerKey.second.length) inner.second else innerKey.second)
       Pair(
         "\(pklTypeName)\(sep)\(inner.first)\(sep)\(innerKey.first)",
-        sep + "_"
+        sep + "_",
       )
 }
 
@@ -122,7 +122,7 @@ class Array extends Type {
     let (sep = inner.second)
       Pair(
         "\(pklTypeName)\(sep)\(inner.first)",
-        sep + "_"
+        sep + "_",
       )
 }
 
@@ -151,7 +151,7 @@ class Optional extends Type {
     let (sep = inner.second)
       Pair(
         "Optional\(sep)\(inner.first)",
-        sep + "_"
+        sep + "_",
       )
 }
 
@@ -173,7 +173,7 @@ class Tuple extends Type {
     let (sep = inners.firstOrNull?.second ?? "_")
       Pair(
         "Tuple\(sep)\(inners.join(sep))",
-        sep + "_"
+        sep + "_",
       )
 }
 
@@ -235,6 +235,6 @@ class Declared extends Type {
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
     Pair(
       utils.normalizeName(render(withinNamespace).replaceFirst(Regex("^any "), "")),
-      ""
+      "",
     )
 }

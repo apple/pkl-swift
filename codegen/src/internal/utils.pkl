@@ -113,7 +113,7 @@ keywords: List<String> =
     "true",
     "try",
     "Type",
-    "_"
+    "_",
   )
 
 function renderDocComment(docComment: String, indent: String) =
