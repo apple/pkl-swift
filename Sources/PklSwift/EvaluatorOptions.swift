@@ -327,6 +327,14 @@ extension EvaluatorOptions {
 
     /// Builds options with evaluator settings as well as dependencies from the input project.
     public func withProject(_ project: Project) -> EvaluatorOptions {
+        self.withProjectEvaluatorSettings(project.resolvedEvaluatorSettings)
+            .withProjectDependencies(project)
+    }
+
+    /// Behaves like `withProject`, except applies the _unresolved_ evaluator settings.
+    ///
+    /// If using Pkl 0.32 or newer, prefer using `withProject`.
+    public func withProjectLegacy(_ project: Project) -> EvaluatorOptions {
         self.withProjectEvaluatorSettings(project.evaluatorSettings)
             .withProjectDependencies(project)
     }

@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,13 +22,16 @@ public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectF
 
     let evaluatorSettings: PklEvaluatorSettings
 
+    /// Added in Pkl 0.32
+    let resolvedEvaluatorSettings: PklEvaluatorSettings
+
     let projectFileUri: String
 
     let tests: [String]
 
     let dependencies: [String: any DependencyDeclaredInProjectFile]
 
-    public static func ==(lhs: Project, rhs: Project) -> Bool {
+    public static func == (lhs: Project, rhs: Project) -> Bool {
         lhs.hashValue == rhs.hashValue
     }
 
@@ -46,18 +49,51 @@ public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectF
 
 public protocol DependencyDeclaredInProjectFile: Hashable, Decodable, Equatable, Sendable {}
 
+private let emptyEvaluatorSettings: PklEvaluatorSettings = .init(
+    externalProperties: nil,
+    env: nil,
+    allowedModules: nil,
+    allowedResources: nil,
+    noCache: nil,
+    modulePath: nil,
+    timeout: nil,
+    moduleCacheDir: nil,
+    rootDir: nil,
+    http: nil,
+    externalModuleReaders: nil,
+    externalResourceReaders: nil,
+    color: nil,
+    traceMode: nil
+)
+
 extension Project: Decodable {
     public init(from decoder: Decoder) throws {
         let dec = try decoder.container(keyedBy: PklCodingKey.self)
         let package = try dec.decode(Package?.self, forKey: PklCodingKey(stringValue: "package")!)
-        let evaluatorSettings = try dec.decode(PklEvaluatorSettings.self, forKey: PklCodingKey(stringValue: "evaluatorSettings")!)
-        let projectFileUri = try dec.decode(String.self, forKey: PklCodingKey(stringValue: "projectFileUri")!)
+        let evaluatorSettings = try dec.decode(
+            PklEvaluatorSettings.self, forKey: PklCodingKey(stringValue: "evaluatorSettings")!
+        )
+        var resolvedEvaluatorSettings: PklEvaluatorSettings
+        do {
+            resolvedEvaluatorSettings = try dec.decode(
+                PklEvaluatorSettings.self,
+                forKey: PklCodingKey(stringValue: "resolvedEvaluatorSettings")!
+            )
+        } catch DecodingError.keyNotFound {
+            resolvedEvaluatorSettings = emptyEvaluatorSettings
+        }
+        let projectFileUri = try dec.decode(
+            String.self, forKey: PklCodingKey(stringValue: "projectFileUri")!
+        )
         let tests = try dec.decode([String].self, forKey: PklCodingKey(stringValue: "tests")!)
-        let dependencies = try dec.decode([String: PklAny].self, forKey: PklCodingKey(stringValue: "dependencies")!)
-            .mapValues { $0.value as! any DependencyDeclaredInProjectFile }
+        let dependencies = try dec.decode(
+            [String: PklAny].self, forKey: PklCodingKey(stringValue: "dependencies")!
+        )
+        .mapValues { $0.value as! any DependencyDeclaredInProjectFile }
         self = .init(
             package: package,
             evaluatorSettings: evaluatorSettings,
+            resolvedEvaluatorSettings: resolvedEvaluatorSettings,
             projectFileUri: projectFileUri,
             tests: tests,
             dependencies: dependencies
@@ -67,7 +103,8 @@ extension Project: Decodable {
 
 extension Project {
     /// The Swift representation of `pkl.Project#RemoteDependency`
-    public struct RemoteDependency: PklRegisteredType, DependencyDeclaredInProjectFile, Decodable, Hashable {
+    public struct RemoteDependency: PklRegisteredType, DependencyDeclaredInProjectFile, Decodable,
+        Hashable {
         public static let registeredIdentifier: String = "pkl.Project#RemoteDependency"
 
         let uri: String
