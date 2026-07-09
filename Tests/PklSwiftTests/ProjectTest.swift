@@ -315,12 +315,11 @@ class ProjectTest: XCTestCase {
         }
         """#.write(to: pklProjectFile, atomically: true, encoding: .utf8)
         try await withEvaluator { evaluator in
-
             let project = try await evaluator.evaluateOutputValue(
                 source: .url(pklProjectFile),
                 asType: Project.self
             )
-            XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, "\(tempDir.path().dropLast())")
+            XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, "\(tempDir.path(percentEncoded: false).dropLast())")
         }
     }
 }
