@@ -1,5 +1,48 @@
 = Changelog
 
+[[release-0.9.0]]
+== 0.9.0 (2026-07-09)
+
+=== Additions
+
+* Add support for `pkl.ref#Reference` (pr:https://github.com/apple/pkl-swift/pull/156[]).
+* Add support for configuring HTTP headers (pr:https://github.com/apple/pkl-swift/pull/170[]).
+* Add support for resolved evaluator settings (pr:https://github.com/apple/pkl-swift/pull/172[]).
+
+=== Fixes
+
+* Fix decoding of `Int` values into struct fields of type `Double` (pr:https://github.com/apple/pkl-swift/pull/121[]).
+* Fix some concurrency issues in the evaluator manager (pr:https://github.com/apple/pkl-swift/pull/131[]).
+* Fix pipe partial-read de-synchronization in message transport (pr:https://github.com/apple/pkl-swift/pull/132[]).
+* Use POSIX `read()` for pipe I/O to avoid `NSConcreteData` allocation churn (pr:https://github.com/apple/pkl-swift/pull/135[]).
+* Preserve `caCertificates`` when merging HTTP settings from project evaluator settings (pr:https://github.com/apple/pkl-swift/pull/138[]).
+* Correct message type mapping for `ListResourcesResponse` (pr:https://github.com/apple/pkl-swift/pull/140[]).
+* Allow custom and external readers to produce "not found" results for nullable reads (`read?()`) (pr:https://github.com/apple/pkl-swift/pull/127[]).
+* Fix some bounds check in `PklDecoder` (pr:https://github.com/apple/pkl-swift/pull/154[]).
+* Improve enum case generation for string literal unions with uppercase and numeric elements (pr:https://github.com/apple/pkl-swift/pull/160[]).
+* Use `DecodingError.keyNotFound` error across the board when coding key is missing (pr:https://github.com/apple/pkl-swift/pull/172[]).
+
+=== Breaking Changes
+
+* The `EvaluatorOptions.withProject(_: Project)` method now applies the resolved evaluator settings (introduced in Pkl 0.32). Users that need lower versions of Pkl should use `EvaluatorOptions.withProjectLegacy(_: Project)`.
+
+=== Miscellaneous
+
+* Fix typo in quickstart guide (pr:https://github.com/apple/pkl-swift/pull/137[]).
+* Rename MessagePack module to PklMessagePack to avoid naming conflicts (pr:https://github.com/apple/pkl-swift/pull/147[]).
+
+=== Contributors ❤️
+
+* https://github.com/anirudh763[@anirudh763]
+* https://github.com/bioball[@bioball]
+* https://github.com/HT154[@HT154]
+* https://github.com/jakepetroules[@jakepetroules]
+* https://github.com/ldaley[@ldaley]
+* https://github.com/myaumura[@myaumura]
+* https://github.com/pickle-RickA[@pickle-RickA]
+* https://github.com/Sukhman-Singh007[@Sukhman-Singh007]
+
+
 [[release-0.8.2]]
 == 0.8.2 (2026-03-02)
 
