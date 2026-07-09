@@ -16,6 +16,38 @@
 
 /// The Swift representation of standard library module `pkl.EvaluatorSettings`.
 public struct PklEvaluatorSettings: Decodable, Hashable, Sendable {
+    public init(
+        externalProperties: [String: String]? = nil,
+        env: [String: String]? = nil,
+        allowedModules: [String]? = nil,
+        allowedResources: [String]? = nil,
+        noCache: Bool? = nil,
+        modulePath: [String]? = nil,
+        timeout: Duration? = nil,
+        moduleCacheDir: String? = nil,
+        rootDir: String? = nil,
+        http: Http? = nil,
+        externalModuleReaders: [String: ExternalReader]? = nil,
+        externalResourceReaders: [String: ExternalReader]? = nil,
+        color: PklEvaluatorSettingsColor? = nil,
+        traceMode: TraceMode? = nil
+    ) {
+        self.externalProperties = externalProperties
+        self.env = env
+        self.allowedModules = allowedModules
+        self.allowedResources = allowedResources
+        self.noCache = noCache
+        self.modulePath = modulePath
+        self.timeout = timeout
+        self.moduleCacheDir = moduleCacheDir
+        self.rootDir = rootDir
+        self.http = http
+        self.externalModuleReaders = externalModuleReaders
+        self.externalResourceReaders = externalResourceReaders
+        self.color = color
+        self.traceMode = traceMode
+    }
+
     let externalProperties: [String: String]?
     let env: [String: String]?
     let allowedModules: [String]?

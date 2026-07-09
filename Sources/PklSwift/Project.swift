@@ -49,22 +49,7 @@ public struct Project: PklRegisteredType, Hashable, DependencyDeclaredInProjectF
 
 public protocol DependencyDeclaredInProjectFile: Hashable, Decodable, Equatable, Sendable {}
 
-private let emptyEvaluatorSettings: PklEvaluatorSettings = .init(
-    externalProperties: nil,
-    env: nil,
-    allowedModules: nil,
-    allowedResources: nil,
-    noCache: nil,
-    modulePath: nil,
-    timeout: nil,
-    moduleCacheDir: nil,
-    rootDir: nil,
-    http: nil,
-    externalModuleReaders: nil,
-    externalResourceReaders: nil,
-    color: nil,
-    traceMode: nil
-)
+private let emptyEvaluatorSettings: PklEvaluatorSettings = .init()
 
 extension Project: Decodable {
     public init(from decoder: Decoder) throws {
