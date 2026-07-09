@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,6 +42,21 @@ class ProjectTest: XCTestCase {
 
         let file = try (PklSwift.tempDir()).appendingPathComponent("PklProject")
 
+        let httpRewritesSetting = version < pklVersion0_29 ? "" : """
+        rewrites {
+          ["https://example.com/"] = "https://example.example/"
+        }
+        """
+        let httpHeadersSetting = version < pklVersion0_32 ? "" : """
+        headers {
+          ["**"] {
+            ["x-two-values"] { "foo"; "bar" }
+          }
+          ["https://*.example.com/foo/*/bar/**"] {
+            ["x-one-value"] = "hello world"
+          }
+        }
+        """
         let httpSetting = version < pklVersion0_26 ? "" : """
         http {
           proxy {
@@ -51,6 +66,8 @@ class ProjectTest: XCTestCase {
               "foo.bar.org"
             }
           }
+          \(httpRewritesSetting)
+          \(httpHeadersSetting)
         }
         """
         let externalReaderSettings = version < pklVersion0_27 ? "" : """
@@ -77,7 +94,12 @@ class ProjectTest: XCTestCase {
         let traceModeSetting = version < pklVersion0_30 ? "" : #"traceMode = "pretty""#
         let httpExpectation = version < pklVersion0_26 ? nil : Http(
             caCertificates: nil,
-            proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"])
+            proxy: .init(address: "http://localhost:1", noProxy: ["example.com", "foo.bar.org"]),
+            rewrites: version < pklVersion0_29 ? nil : ["https://example.com/": "https://example.example/"],
+            headers: version < pklVersion0_32 ? nil : [
+                "**": ["x-two-values": .values(["foo", "bar"])],
+                "https://*.example.com/foo/*/bar/**": ["x-one-value": .value("hello world")],
+            ],
         )
         let externalModuleReadersExpectation = version < pklVersion0_27 ? nil : [
             "scheme1": ExternalReader(executable: "reader1"),
@@ -240,6 +262,21 @@ class ProjectTest: XCTestCase {
             let expectedStarling = expectedDependencies["starling"] as! Project
             XCTAssertEqual(foo, expectedFoo)
             XCTAssertEqual(starling, expectedStarling)
+
+            // test that EvaluatorOptions.withProjectEvaluatorSettings actually carries all settings through
+            let opts = EvaluatorOptions().withProjectEvaluatorSettings(project.evaluatorSettings)
+            XCTAssertEqual(opts.allowedModules, expectedSettings.allowedModules)
+            XCTAssertEqual(opts.allowedResources, expectedSettings.allowedResources)
+            XCTAssertEqual(opts.modulePaths, expectedSettings.modulePath)
+            XCTAssertEqual(opts.env, expectedSettings.env)
+            XCTAssertEqual(opts.properties, expectedSettings.externalProperties)
+            XCTAssertEqual(opts.timeout, expectedSettings.timeout!.toSwiftDuration())
+            XCTAssertEqual(opts.rootDir, expectedSettings.rootDir)
+            XCTAssertEqual(opts.cacheDir, nil) // because noCache is true
+            XCTAssertEqual(opts.http, httpExpectation)
+            XCTAssertEqual(opts.externalModuleReaders, externalModuleReadersExpectation)
+            XCTAssertEqual(opts.externalResourceReaders, externalResourceReadersExpectation)
+            XCTAssertEqual(opts.traceMode, traceMode)
         }
     }
 }

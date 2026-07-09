@@ -273,7 +273,7 @@ extension EvaluatorOptions {
         options.env = evaluatorSettings.env ?? self.env
         options.allowedModules = evaluatorSettings.allowedModules ?? self.allowedModules
         options.allowedResources = evaluatorSettings.allowedResources ?? self.allowedResources
-        options.cacheDir = evaluatorSettings.noCache != nil ? nil : (evaluatorSettings.moduleCacheDir ?? self.cacheDir)
+        options.cacheDir = (evaluatorSettings.noCache ?? false) ? nil : (evaluatorSettings.moduleCacheDir ?? self.cacheDir)
         options.rootDir = evaluatorSettings.rootDir ?? self.rootDir
         if let http = evaluatorSettings.http {
             options.http = .init()
@@ -284,10 +284,13 @@ extension EvaluatorOptions {
                 options.http!.proxy!.address = proxy.address ?? self.http?.proxy?.address
             }
             options.http!.rewrites = http.rewrites ?? self.http?.rewrites
+            options.http!.headers = http.headers ?? self.http?.headers
         }
         options.externalModuleReaders = evaluatorSettings.externalModuleReaders ?? options.externalModuleReaders
         options.externalResourceReaders = evaluatorSettings.externalResourceReaders ?? options.externalResourceReaders
         options.traceMode = evaluatorSettings.traceMode ?? options.traceMode
+        options.modulePaths = evaluatorSettings.modulePath ?? options.modulePaths
+        options.timeout = evaluatorSettings.timeout?.toSwiftDuration() ?? options.timeout
         return options
     }
 
