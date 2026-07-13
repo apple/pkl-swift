@@ -516,6 +516,7 @@ final class PklSwiftTests: XCTestCase {
             try await manager.withProjectEvaluator(projectBaseURI: project1Dir) { evalutor in
                 do {
                     _ = try await evalutor.evaluateOutputText(source: .path("/foo.pkl"))
+                    XCTFail("expected evaluation to throw")
                 } catch {
                     XCTAssertTrue(error is PklError)
                     let error = error as! PklError
