@@ -116,9 +116,7 @@ extension _PklDecoder {
 
         func decode<T: Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
             guard let propertyValue = properties[key.stringValue] else {
-                throw DecodingError.dataCorruptedError(
-                    forKey: key, in: self, debugDescription: "Missing key \(key)"
-                )
+                throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
             }
 
             // special case for polymorphic types
@@ -133,9 +131,7 @@ extension _PklDecoder {
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
             -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
             guard let propertyValue = properties[key.stringValue] else {
-                throw DecodingError.dataCorruptedError(
-                    forKey: key, in: self, debugDescription: "Missing key \(key)"
-                )
+                throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
             }
             var nestedCodingPath = self.codingPath
             nestedCodingPath.append(key)

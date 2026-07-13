@@ -248,6 +248,22 @@ class ProjectTest: XCTestCase {
                         color: nil,
                         traceMode: nil
                     ),
+                    resolvedEvaluatorSettings: .init(
+                        externalProperties: nil,
+                        env: nil,
+                        allowedModules: nil,
+                        allowedResources: nil,
+                        noCache: nil,
+                        modulePath: nil,
+                        timeout: nil,
+                        moduleCacheDir: nil,
+                        rootDir: nil,
+                        http: nil,
+                        externalModuleReaders: nil,
+                        externalResourceReaders: nil,
+                        color: nil,
+                        traceMode: nil
+                    ),
                     projectFileUri: "\(otherProjectFile)",
                     tests: [],
                     dependencies: [:]
@@ -277,6 +293,35 @@ class ProjectTest: XCTestCase {
             XCTAssertEqual(opts.externalModuleReaders, externalModuleReadersExpectation)
             XCTAssertEqual(opts.externalResourceReaders, externalResourceReadersExpectation)
             XCTAssertEqual(opts.traceMode, traceMode)
+        }
+    }
+
+    func testLoadResolvedEvaluatorSettings() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_32 {
+            throw XCTSkip("resolvedEvaluatorSettings not available")
+        }
+        let tempDir = try tempDir()
+        let pklProjectFile = tempDir.appendingPathComponent("PklProject")
+
+        try #"""
+        @ModuleInfo { minPklVersion = "0.25.0" }
+        amends "pkl:Project"
+
+        evaluatorSettings {
+          rootDir = "."
+        }
+        """#.write(to: pklProjectFile, atomically: true, encoding: .utf8)
+        try await withEvaluator { evaluator in
+            let project = try await evaluator.evaluateOutputValue(
+                source: .url(pklProjectFile),
+                asType: Project.self
+            )
+            var expectedRootDir = tempDir.path(percentEncoded: false)
+            if expectedRootDir.hasSuffix("/") {
+                expectedRootDir.removeLast()
+            }
+            XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, expectedRootDir)
         }
     }
 }

@@ -348,7 +348,13 @@ public actor EvaluatorManager {
                 source: .url(projectBaseURI.appendingPathComponent("PklProject")),
                 asType: Project.self
             )
-            return try await self.newEvaluator(options: options.withProject(project))
+            let version = try SemanticVersion(getVersion())
+            let resolvedOptions = if version! < pklVersion0_32 {
+                options.withProjectLegacy(project)
+            } else {
+                options.withProject(project)
+            }
+            return try await self.newEvaluator(options: resolvedOptions)
         }
     }
 

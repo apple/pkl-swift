@@ -496,5 +496,34 @@ final class PklSwiftTests: XCTestCase {
 //            """, output)
 //        }
 //    }
+
+    func testWithProjectEvaluatorConfiguredSettings() async throws {
+        try await withEvaluatorManager { manager in
+            let version = try await SemanticVersion(manager.getVersion())!
+            if version < pklVersion0_32 {
+                throw XCTSkip("Resolved evaluator settings require Pkl 0.32 or later.")
+            }
+
+            let project1Dir = try (tempDir()).appendingPathComponent("project1")
+            try FileManager.default.createDirectory(at: project1Dir, withIntermediateDirectories: true)
+            try """
+            amends "pkl:Project"
+
+            evaluatorSettings {
+                rootDir = "."
+            }
+            """.write(to: project1Dir.appendingPathComponent("PklProject"), atomically: true, encoding: .utf8)
+            try await manager.withProjectEvaluator(projectBaseURI: project1Dir) { evaluator in
+                do {
+                    _ = try await evaluator.evaluateOutputText(source: .path("/foo.pkl"))
+                    XCTFail("expected evaluation to throw")
+                } catch {
+                    XCTAssertTrue(error is PklError)
+                    let error = error as! PklError
+                    XCTAssertTrue(error.message.contains("Refusing to load module `file:///foo.pkl`"))
+                }
+            }
+        }
+    }
 }
 #endif
