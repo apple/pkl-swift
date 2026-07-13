@@ -513,9 +513,9 @@ final class PklSwiftTests: XCTestCase {
                 rootDir = "."
             }
             """.write(to: project1Dir.appendingPathComponent("PklProject"), atomically: true, encoding: .utf8)
-            try await manager.withProjectEvaluator(projectBaseURI: project1Dir) { evalutor in
+            try await manager.withProjectEvaluator(projectBaseURI: project1Dir) { evaluator in
                 do {
-                    _ = try await evalutor.evaluateOutputText(source: .path("/foo.pkl"))
+                    _ = try await evaluator.evaluateOutputText(source: .path("/foo.pkl"))
                     XCTFail("expected evaluation to throw")
                 } catch {
                     XCTAssertTrue(error is PklError)

@@ -303,8 +303,6 @@ class ProjectTest: XCTestCase {
         }
         let tempDir = try tempDir()
         let pklProjectFile = tempDir.appendingPathComponent("PklProject")
-        // let subDir = tempDir.appendingPathComponent("subdir")
-        // try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
 
         try #"""
         @ModuleInfo { minPklVersion = "0.25.0" }
@@ -319,7 +317,11 @@ class ProjectTest: XCTestCase {
                 source: .url(pklProjectFile),
                 asType: Project.self
             )
-            XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, "\(tempDir.path(percentEncoded: false).dropLast())")
+            var expectedRootDir = tempDir.path(percentEncoded: false)
+            if expectedRootDir.hasSuffix("/") {
+                expectedRootDir.removeLast()
+            }
+            XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, expectedRootDir)
         }
     }
 }
