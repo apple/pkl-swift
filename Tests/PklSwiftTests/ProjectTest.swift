@@ -106,19 +106,19 @@ class ProjectTest: XCTestCase {
                 "https://*.example.com/foo/*/bar/**": ["x-one-value": .value("hello world")],
             ],
         )
-        let externalModuleReadersExpectation: [String: ExternalReader] = switch version {
-        case ...pklVersion0_27: [:]
+        let externalModuleReadersExpectation: [String: ExternalReader]? = switch version {
+        case ...pklVersion0_27: nil
         case pklVersion0_27...pklVersion0_31: [
                 "scheme1": ExternalReader(executable: "reader1"),
                 "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"], workingDir: "foo"),
             ]
         default: [
                 "scheme1": ExternalReader(executable: "reader1"),
-                "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"], workingDir: "foo")
+                "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"], workingDir: "foo"),
             ]
         }
-        let externalResourceReadersExpectation: [String: ExternalReader] = switch version {
-        case ...pklVersion0_27: [:]
+        let externalResourceReadersExpectation: [String: ExternalReader]? = switch version {
+        case ...pklVersion0_27: nil
         case pklVersion0_27...pklVersion0_31: [
                 "scheme3": ExternalReader(executable: "reader3"),
                 "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"], workingDir: "foo"),
