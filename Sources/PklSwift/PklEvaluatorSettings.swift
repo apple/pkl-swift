@@ -193,6 +193,16 @@ public struct Proxy: Codable, Hashable, Sendable {
 }
 
 public struct ExternalReader: Codable, Hashable, Sendable {
+    /// The absolute path to the executable, or a simple name.
+    ///
+    /// In the case of a simple name, it is resolved off of the `PATH` environment variable.
     var executable: String
+
+    /// The command line arguments to pass to the process.
     var arguments: [String]? = nil
+
+    /// The working directory to use for the executable process.
+    ///
+    /// Added in Pkl 0.32.
+    var workingDir: String? = nil
 }
