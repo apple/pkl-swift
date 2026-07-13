@@ -70,6 +70,9 @@ class ProjectTest: XCTestCase {
           \(httpHeadersSetting)
         }
         """
+        let externalReaderWorkingDirSettings = version < pklVersion0_32 ? "" : """
+        workingDir = "foo"
+        """
         let externalReaderSettings = version < pklVersion0_27 ? "" : """
         externalModuleReaders {
           ["scheme1"] {
@@ -78,6 +81,7 @@ class ProjectTest: XCTestCase {
           ["scheme2"] {
             executable = "reader2"
             arguments { "with"; "args" }
+            \(externalReaderWorkingDirSettings)
           }
         }
         externalResourceReaders {
@@ -87,6 +91,7 @@ class ProjectTest: XCTestCase {
           ["scheme4"] {
             executable = "reader4"
             arguments { "with"; "args" }
+            \(externalReaderWorkingDirSettings)
           }
         }
         """
@@ -101,14 +106,28 @@ class ProjectTest: XCTestCase {
                 "https://*.example.com/foo/*/bar/**": ["x-one-value": .value("hello world")],
             ],
         )
-        let externalModuleReadersExpectation = version < pklVersion0_27 ? nil : [
-            "scheme1": ExternalReader(executable: "reader1"),
-            "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"]),
-        ]
-        let externalResourceReadersExpectation = version < pklVersion0_27 ? nil : [
-            "scheme3": ExternalReader(executable: "reader3"),
-            "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"]),
-        ]
+        let externalModuleReadersExpectation: [String: ExternalReader] = switch version {
+        case ...pklVersion0_27: [:]
+        case pklVersion0_27...pklVersion0_31: [
+                "scheme1": ExternalReader(executable: "reader1"),
+                "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"], workingDir: "foo"),
+            ]
+        default: [
+                "scheme1": ExternalReader(executable: "reader1"),
+                "scheme2": ExternalReader(executable: "reader2", arguments: ["with", "args"], workingDir: "foo")
+            ]
+        }
+        let externalResourceReadersExpectation: [String: ExternalReader] = switch version {
+        case ...pklVersion0_27: [:]
+        case pklVersion0_27...pklVersion0_31: [
+                "scheme3": ExternalReader(executable: "reader3"),
+                "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"], workingDir: "foo"),
+            ]
+        default: [
+                "scheme3": ExternalReader(executable: "reader3"),
+                "scheme4": ExternalReader(executable: "reader4", arguments: ["with", "args"], workingDir: "foo"),
+            ]
+        }
         let color: PklEvaluatorSettingsColor? = version < pklVersion0_27 ? nil : .always
         let traceMode: TraceMode? = version < pklVersion0_30 ? nil : .pretty
         try #"""
@@ -310,6 +329,12 @@ class ProjectTest: XCTestCase {
 
         evaluatorSettings {
           rootDir = "."
+          externalResourceReaders {
+            ["scheme1"] {
+              executable = "reader1"
+              workingDir = "foo"
+            }
+          }
         }
         """#.write(to: pklProjectFile, atomically: true, encoding: .utf8)
         try await withEvaluator { evaluator in
@@ -322,6 +347,11 @@ class ProjectTest: XCTestCase {
                 expectedRootDir.removeLast()
             }
             XCTAssertEqual(project.resolvedEvaluatorSettings.rootDir, expectedRootDir)
+            var expectedReaderDir = tempDir.appending(path: "foo").path(percentEncoded: false)
+            if expectedReaderDir.hasSuffix("/") {
+                expectedReaderDir.removeLast()
+            }
+            XCTAssertEqual(project.resolvedEvaluatorSettings.externalResourceReaders?.first?.value.workingDir, expectedReaderDir)
         }
     }
 }
