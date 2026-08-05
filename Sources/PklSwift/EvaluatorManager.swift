@@ -26,6 +26,7 @@ let PKL_EXEC_NAME="pkl.exe"
 let ENV_SEPARATOR=":"
 let PKL_EXEC_NAME="pkl"
 #endif
+
 /// Performs `action`, returns its result and then closes the manager.
 ///
 /// - Parameter action: The action to perform
@@ -87,8 +88,10 @@ func getPklCommand() throws -> [String] {
     throw PklError("Unable to find `pkl` command on PATH.")
 }
 
-/// Provides handlers for managing the lifecycles of Pkl evaluators. If binding to Pkl as a child process, an evaluator
-/// manager represents a single child process.
+/// Provides handlers for managing the lifecycles of Pkl evaluators.
+///
+/// If binding to Pkl as a child process, an evaluator manager represents a single child process.
+/// If binding to Pkl as C library, an evaluator manager represents a thread.
 ///
 /// If spawning multiple evaluators, it is much better to spawn them through the evaluator manager, rather than through
 /// ``withEvaluator(_:)``.
@@ -100,7 +103,7 @@ public actor EvaluatorManager {
     /// The created evaluators, identified by their evaluator id.
     var evaluators: [Int64: Evaluator] = [:]
 
-    /// Requests sent to Pkl,
+    /// Requests sent to Pkl
     var inFlightRequests: [Int64: CheckedContinuation<ServerResponseMessage, Error>] = [:]
 
     /// Unstructured Tasks spawned for handler callbacks (module/resource reads, etc.).
@@ -110,7 +113,11 @@ public actor EvaluatorManager {
 
     var pklVersion: String?
 
-    // note; when our C bindings are released, change `init()` based on compiler flags.
+    #if libpkl
+    public init() {
+        self.init(transport: NativeMessageTransport())
+    }
+    #else
     public init() {
         #if os(macOS) || os(Linux) || os(Windows)
         self.init(transport: ServerMessageTransport())
@@ -118,6 +125,7 @@ public actor EvaluatorManager {
         fatalError("cannot spawn pkl cli on this platform")
         #endif
     }
+    #endif
 
     // Used for testing only.
     init(transport: MessageTransport) {
@@ -138,6 +146,11 @@ public actor EvaluatorManager {
         }
     }
 
+    #if libpkl
+    func getVersion() throws -> String {
+        try LibPklClient.getVersion()
+    }
+    #else
     /// Get the semantic version as a String of the Pkl interpreter being used.
     func getVersion() throws -> String {
         #if os(macOS) || os(Linux) || os(Windows)
@@ -166,6 +179,7 @@ public actor EvaluatorManager {
         throw PklError("cannot spawn pkl cli on this platform")
         #endif
     }
+    #endif
 
     private func listenForIncomingMessages() async throws {
         for try await message in try self.transport.getMessages() {
@@ -402,7 +416,7 @@ public actor EvaluatorManager {
             }
         }
         self.evaluators.removeAll()
-        self.transport.close()
+        try! self.transport.close()
     }
 
     private func doAsk(

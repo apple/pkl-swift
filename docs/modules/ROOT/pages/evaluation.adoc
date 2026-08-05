@@ -5,7 +5,58 @@
 pkl-swift provides a rich API for evaluating Pkl files in Swift via `PklSwift.Evaluator`. It can be configured with xref:custom-readers[custom readers], have its own security settings, control
 external property inputs, and more.
 
-Evaluation occurs by spawning the `pkl` cli as a child process, and communicates via message passing.
+== Binding to Pkl
+
+There are two ways to call into Pkl.
+
+=== Spawning a child process
+
+pkl-swift can call into Pkl by spawning the `pkl` CLI as a child process.
+This binding mode requires that either the CLI be available on the machine's `PATH`,
+
+This is the default binding for pkl-swift.
+
+=== Calling into `libpkl`
+
+pkl-swift can call into Pkl's C library, https://pkl-lang.org/main/current/libpkl/index.html[libpkl].
+This means that Swift applications call into Pkl as an in-process method call.
+
+When linking to libpkl, it is possible to link either to the static library, or the dynamic library.
+
+* Linking to the static library means that libpkl will be copied into your final executable, so that your executable can be used standalone without a system dependency.
+However, this affects the binary size of your executable (libpkl is about 100MB).
+* Linking to the dynamic library means that libpkl must be installed on the host machine that runs your executable.
+
+To build against libpkl, your Swift application should add trait `libpkl` for the pkl-swift dependency.
+
+Example:
+
+.Package.swift
+[source,swift]
+----
+dependencies: [
+    .package(
+        url: "https://github.com/apple/pkl-swift",
+        from: "{version}",
+        traits: [
+            "libpkl_shared", // <1>
+        ]
+    )
+]
+----
+<1> Replace with `libpkl_static` if you wish to statically link to libpkl.
+
+When linking to libpkl, you will need to have the library available on your machine.
+pkl-swift itself does not ship with libpkl bundled.
+
+For installation, consult the https://pkl-lang.org/main/current/libpkl/index.html#installation[installation] section of the libpkl documentation.
+
+If you have installed libpkl to a non-system directory, you need to set up your `PKG_CONFIG_PATH` to point to the `lib/pkgconfig` directory of where you've placed libpkl:
+
+[source]
+----
+export PKG_CONFIG_PATH=/path/to/libpkl/lib/pkgconfig
+----
 
 == Using evaluators
 

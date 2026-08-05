@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 //===----------------------------------------------------------------------===//
 // Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
@@ -36,6 +36,24 @@ let package = Package(
             targets: ["PklSwift"]
         ),
     ],
+    traits: [
+        .trait(
+            name: "libpkl",
+            description:
+                "Make pkl-swift call into the libpkl C library, instead of spawning a child executable."
+        ),
+        .trait(
+            name: "libpkl_shared",
+            description:
+                "Make pkl-swift link to the shared libpkl library.",
+            enabledTraits: ["libpkl"]
+        ),
+        .trait(
+            name: "libpkl_static",
+            description: "Make pkl-swift link to the static libpkl library.",
+            enabledTraits: ["libpkl"]
+        ),
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
         .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
@@ -47,8 +65,17 @@ let package = Package(
     targets: [
         .target(
             name: "PklSwift",
-            dependencies: ["PklMessagePack", "PklSwiftInternals", "SemanticVersion"],
-            swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
+            dependencies: [
+                "PklMessagePack",
+                "PklSwiftInternals",
+                "SemanticVersion",
+                .targetItem(name: "CLibPklShared", condition: .when(traits: ["libpkl_shared"])),
+                .targetItem(name: "CLibPklStatic", condition: .when(traits: ["libpkl_static"])),
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("libpkl", .when(traits: ["libpkl"])),
+            ],
         ),
         .target(
             name: "PklSwiftInternals",
@@ -57,10 +84,12 @@ let package = Package(
         .target(
             name: "PklMessagePack",
             dependencies: [
-                .product(name: "SystemPackage", package: "swift-system"),
+                .product(name: "SystemPackage", package: "swift-system")
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
+        .systemLibrary(name: "CLibPklShared", pkgConfig: "libpkl"),
+        .systemLibrary(name: "CLibPklStatic", pkgConfig: "libpkl-static"),
         .executableTarget(
             name: "test-external-reader",
             dependencies: ["PklSwift"],
@@ -69,7 +98,7 @@ let package = Package(
         .testTarget(
             name: "PklSwiftTests",
             dependencies: [
-                "PklSwift",
+                "PklSwift"
             ],
             exclude: [
                 "Fixtures/Classes.pkl",
@@ -91,11 +120,11 @@ let package = Package(
         .testTarget(
             name: "PklMessagePackTests",
             dependencies: [
-                "PklMessagePack",
+                "PklMessagePack"
             ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
         ),
     ],
     swiftLanguageModes: [.v5, .v6],
-    cxxLanguageStandard: .cxx20
+    cxxLanguageStandard: .cxx20,
 )

@@ -42,7 +42,9 @@ public protocol Reader {
 
 /// Writes bytes into an internal buffer.
 public class BufferWriter: Writer, @unchecked Sendable {
-    var bytes: [UInt8] = []
+    public init() {}
+
+    public var bytes: [UInt8] = []
 
     public func write(_ buffer: UnsafeRawBufferPointer) throws {
         self.bytes.append(contentsOf: buffer)

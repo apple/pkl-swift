@@ -141,5 +141,12 @@ class EvaluatorManagerTest: XCTestCase {
             XCTAssertTrue(error is PklError)
         }
     }
+
+    func testGetVersion() async throws {
+        let manager = EvaluatorManager()
+        let version = try await manager.getVersion()
+        await manager.close()
+        XCTAssertTrue(!version.isEmpty)
+    }
 }
 #endif

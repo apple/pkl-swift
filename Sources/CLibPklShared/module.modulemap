@@ -1,0 +1,6 @@
+module CLibPklShared [system] {
+  header "shim.h"
+  link "pkl"
+
+  export *
+}

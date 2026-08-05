@@ -85,15 +85,15 @@ public actor ExternalReaderClient {
             case let message as ListResourcesRequest:
                 try await self.handleListResourcesRequest(request: message)
             case _ as CloseExternalProcess:
-                self.close()
+                try self.close()
             default:
                 throw PklBugError.unknownMessage("Got request for unknown message: \(message)")
             }
         }
     }
 
-    public func close() {
-        self.transport.close()
+    public func close() throws {
+        try self.transport.close()
     }
 
     func handleInitializeModuleReaderRequest(request: InitializeModuleReaderRequest) throws {

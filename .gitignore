@@ -19,3 +19,4 @@ out/
 
 .cicd/
 .pkl-lsp/
+.sourcekit-lsp/
