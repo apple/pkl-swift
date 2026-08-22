@@ -1,7 +1,7 @@
-additionalHeaders = ["scripts/pkl-header-style.toml"]
+[header]
+path = "scripts/license-header.txt"
 
-headerPath = "scripts/license-header.txt"
-
+[files]
 includes = [
     "*.swift",
     "*.pkl",
@@ -12,17 +12,21 @@ includes = [
 ]
 
 excludes = [
-    "Tests/PklSwiftTests/Fixtures",
-    "codegen/snippet-tests",
-    "doc",
+    # HawkEye v7 does not treat the required swift-tools-version declaration
+    # as a preamble, so keep the manifest's existing header untouched.
+    "Package.swift",
+    "Tests/PklSwiftTests/Fixtures/**",
+    "codegen/snippet-tests/**",
+    "doc/**",
 ]
 
 [git]
-attrs = 'enable'
+file_attrs = 'enable'
 ignore = 'enable'
 
-[properties]
-copyrightOwner = "Apple Inc. and the Pkl project authors"
+[props]
+copyright_owner = "Apple Inc. and the Pkl project authors"
 
-[mapping.SWIFT_STYLE]
+[[rules]]
 extensions = ["swift"]
+style_out = "line_block"

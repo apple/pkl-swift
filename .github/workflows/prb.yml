@@ -209,10 +209,11 @@ jobs:
         ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
         persist-credentials: false
         fetch-depth: 0
-    - run: git config --global --add safe.directory $(pwd)
-    - run: hawkeye check --config licenserc.toml --fail-if-unknown
-    container:
-      image: ghcr.io/korandoru/hawkeye@sha256:e0abf8dbfaeeeba1249679d662d9fb404b1dcdb041c6093ea1f7a6edb7d89319
+    - name: Install HawkEye
+      uses: taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1
+      with:
+        tool: hawkeye
+    - run: hawkeye check --config licenserc.toml
   test-format-swift:
     name: test-format-swift
     runs-on: ubuntu-latest

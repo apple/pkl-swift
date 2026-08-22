@@ -20,7 +20,6 @@ import "pkl:semver"
 
 import "@com.github.actions/catalog.pkl"
 import "@com.github.actions/context.pkl"
-import "@pkl.impl.ghactions/jobs/HawkeyeCheck.pkl"
 import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
 
 local swiftImage = "swift:6.1-rhel-ubi9"
@@ -175,7 +174,28 @@ prb {
         }
       }
     }
-    ["test-format-license-headers"] = new HawkeyeCheck {}.job
+    ["test-format-license-headers"] {
+      `runs-on` = "ubuntu-latest"
+      name = "hawkeye-check"
+      steps {
+        (catalog.`actions/checkout@v6`) {
+          with {
+            // HawkEye uses the complete exact-path history for header years.
+            `fetch-depth` = 0
+            ref =
+              "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}"
+          }
+        }
+        new {
+          name = "Install HawkEye"
+          uses = "taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1"
+          with {
+            ["tool"] = "hawkeye"
+          }
+        }
+        new { run = "hawkeye check --config licenserc.toml" }
+      }
+    }
     ["test-format-swift"] {
       `runs-on` = "ubuntu-latest"
       name = "test-format-swift"
