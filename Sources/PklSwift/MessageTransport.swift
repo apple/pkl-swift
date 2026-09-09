@@ -180,7 +180,18 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         self.process?.terminationHandler = { [processTerminationGroup] _ in
             processTerminationGroup.leave()
         }
-        try self.process!.run()
+        do {
+            try self.process!.run()
+        } catch {
+            // `run()` failed to launch the process, so its `terminationHandler`
+            // will never fire. Balance the `DispatchGroup` and drop the
+            // unlaunched process, otherwise a later `close()` would block
+            // forever on `processTerminationGroup.wait()` (and, before the
+            // guard above, terminate a task that was never launched).
+            self.processTerminationGroup.leave()
+            self.process = nil
+            throw error
+        }
     }
 
     override func send(_ message: ClientMessage) throws {
@@ -202,16 +213,22 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     }
 
     override func close() {
-        if self.process == nil {
+        guard let process = self.process else {
             return
         }
         #if os(Linux)
         // workaround: https://github.com/apple/swift-corelibs-foundation/issues/4772
-        if let process = self.process, process.isRunning {
+        if process.isRunning {
             kill(process.processIdentifier, SIGKILL)
         }
         #else
-        self.process?.terminate()
+        // Foundation's `Process.terminate()` raises `NSInvalidArgumentException`
+        // ("task not launched") when the process was never successfully launched.
+        // Guard on `isRunning` so a not-yet-launched (or already-exited) process
+        // is a no-op, matching the Linux branch above.
+        if process.isRunning {
+            process.terminate()
+        }
         #endif
         self.processTerminationGroup.wait()
         self.process = nil
