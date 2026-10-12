@@ -254,3 +254,10 @@ scripts from SwiftNIO.
     * https://www.apache.org/licenses/LICENSE-2.0
   * HOMEPAGE:
     * https://github.com/apple/swift-nio
+
+---
+
+This product contains the swift-subprocess library.
+
+https://github.com/swiftlang/swift-subprocess
+Apache 2.0 - https://github.com/swiftlang/swift-subprocess/blob/main/LICENSE.txt

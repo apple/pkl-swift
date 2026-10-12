@@ -19,7 +19,7 @@ import PklMessagePack
 import SemanticVersion
 
 // Foundation only re-exports the C library on some platforms, such as Darwin and Glibc.
-// Import it explicitly for `read`, `errno`, `kill`, and `SIGKILL`.
+// Import it explicitly for `read`, `errno`, and `fcntl`.
 // None of these are used on Windows.
 #if canImport(Darwin)
 import Darwin
@@ -29,6 +29,17 @@ import Glibc
 import Musl
 #elseif canImport(Android)
 import Android
+#endif
+
+#if canImport(Subprocess)
+import Subprocess
+
+// Match the module swift-subprocess uses for `FilePath`/`FileDescriptor`
+#if canImport(System)
+import System
+#else
+import SystemPackage
+#endif
 #endif
 
 #if !os(Windows)
@@ -48,7 +59,7 @@ protocol MessageTransport: Sendable {
     func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error>
 
     /// Close the transport.
-    func close()
+    func close() async
 }
 
 extension Pipe: Reader {
@@ -141,7 +152,7 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
         }
     }
 
-    func close() {}
+    func close() async {}
 
     func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
         AsyncThrowingStream { continuation in
@@ -175,14 +186,24 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
 }
 
 /// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
-#if os(macOS) || !canImport(Darwin)
+#if canImport(Subprocess)
+#if canImport(System)
+/// Sets the close-on-exec flag on a file descriptor.
+/// Used on Darwin, where the atomic `FileDescriptor.pipe(options: .closeOnExec)` isn't available; see the call site.
+private func setCloseOnExec(_ fd: FileDescriptor) {
+    _ = fcntl(fd.rawValue, F_SETFD, FD_CLOEXEC)
+}
+#endif
+
 public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
-    var process: Process?
     let pklCommand: [String]?
 
-    private let processTerminationGroup = DispatchGroup()
+    /// The task running the `pkl server` child for its entire lifetime.
+    /// `run(_:)` returns when the child exits; cancellation fires the teardown sequence (graceful shutdown, then SIGKILL).
+    private var runTask: Task<Void, Error>?
 
-    override var running: Bool { self.process?.isRunning == true }
+    private let _running = PklLockedValueBox(false)
+    override var running: Bool { self._running.withLockedValue { $0 } }
 
     override convenience init() {
         self.init(pklCommand: nil)
@@ -193,36 +214,57 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     }
 
     private func ensureProcessStarted() throws {
-        if self.process?.isRunning == true { return }
+        if self.running { return }
         let pklCommand = try getPklCommand()
-        self.process = Process()
-        self.process!.executableURL = URL(fileURLWithPath: pklCommand[0])
-        var arguments = Array(pklCommand.dropFirst())
-        arguments.append("server")
-        self.process!.arguments = arguments
-        self.reader = Pipe()
-        self.writer = Pipe()
+
+        // Own both pipes.
+        // The child ends go to Subprocess (`closeAfterSpawningProcess: true`), which closes them on both success and failure so we never close them ourselves.
+        //
+        // Create the pipes close-on-exec so they can't leak into an unrelated child spawned elsewhere in this process.
+        // `pipe(options:)` does this atomically but is macOS 27+ only, so on Darwin fall back to fcntl after creation.
+        #if canImport(System)
+        let stdinPipe = try FileDescriptor.pipe()
+        let stdoutPipe = try FileDescriptor.pipe()
+        for fd in [stdinPipe.readEnd, stdinPipe.writeEnd, stdoutPipe.readEnd, stdoutPipe.writeEnd] {
+            setCloseOnExec(fd)
+        }
+        #else
+        let stdinPipe = try FileDescriptor.pipe(options: .closeOnExec)
+        let stdoutPipe = try FileDescriptor.pipe(options: .closeOnExec)
+        #endif
+        self.reader = FileHandle(fileDescriptor: stdoutPipe.readEnd.rawValue, closeOnDealloc: true)
+        self.writer = FileHandle(fileDescriptor: stdinPipe.writeEnd.rawValue, closeOnDealloc: true)
         self.encoder = .init(writer: self.writer)
         self.decoder = .init(reader: self.reader)
-        self.process!.standardOutput = self.reader
-        self.process!.standardInput = self.writer
-        let debugArguments = arguments
-        debug("Spawning command \(pklCommand[0]) with arguments \(debugArguments)")
-        self.processTerminationGroup.enter()
-        self.process?.terminationHandler = { [processTerminationGroup] _ in
-            processTerminationGroup.leave()
-        }
-        do {
-            try self.process!.run()
-        } catch {
-            // `run()` failed to launch the process, so its `terminationHandler`
-            // will never fire. Balance the `DispatchGroup` and drop the
-            // unlaunched process, otherwise a later `close()` would block
-            // forever on `processTerminationGroup.wait()` (and, before the
-            // guard above, terminate a task that was never launched).
-            self.processTerminationGroup.leave()
-            self.process = nil
-            throw error
+
+        let arguments = Array(pklCommand.dropFirst()) + ["server"]
+        debug("Spawning command \(pklCommand[0]) with arguments \(arguments)")
+
+        var platformOptions = PlatformOptions()
+        // `close()` cancels the task, which runs this teardown (always ending in SIGKILL), so a child that won't exit can't hang teardown.
+        platformOptions.teardownSequence = [
+            .gracefulShutDown(allowedDurationToNextStep: .seconds(5)),
+        ]
+
+        let executablePath = FilePath(pklCommand[0])
+        let launchArguments = Arguments(arguments)
+        let childStdin = stdinPipe.readEnd
+        let childStdout = stdoutPipe.writeEnd
+        self._running.withLockedValue { $0 = true }
+        self.runTask = Task { [weak self] in
+            defer { self?._running.withLockedValue { $0 = false } }
+            do {
+                _ = try await run(
+                    .path(executablePath),
+                    arguments: launchArguments,
+                    platformOptions: platformOptions,
+                    input: .fileDescriptor(childStdin, closeAfterSpawningProcess: true),
+                    output: .fileDescriptor(childStdout, closeAfterSpawningProcess: true),
+                    error: .fileDescriptor(.standardError, closeAfterSpawningProcess: false)
+                )
+            } catch {
+                debug("pkl server process ended with error: \(error)")
+            }
         }
     }
 
@@ -244,26 +286,17 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         }
     }
 
-    override func close() {
-        guard let process = self.process else {
+    override func close() async {
+        guard let runTask = self.runTask else {
             return
         }
-        #if !canImport(Darwin) && !os(Windows)
-        // workaround: https://github.com/apple/swift-corelibs-foundation/issues/4772
-        if process.isRunning {
-            kill(process.processIdentifier, SIGKILL)
-        }
-        #else
-        // Foundation's `Process.terminate()` raises `NSInvalidArgumentException`
-        // ("task not launched") when the process was never successfully launched.
-        // Guard on `isRunning` so a not-yet-launched (or already-exited) process
-        // is a no-op, matching the branch above.
-        if process.isRunning {
-            process.terminate()
-        }
-        #endif
-        self.processTerminationGroup.wait()
-        self.process = nil
+        self._running.withLockedValue { $0 = false }
+        // Tear down the child process
+        // Await the task completion (bounded by teardown durations)
+        // The child closes its stdout write end, unblocking task completion
+        runTask.cancel()
+        _ = try? await runTask.value
+        self.runTask = nil
     }
 
     override func getMessages() throws -> AsyncThrowingStream<ServerMessage, Error> {
@@ -298,7 +331,7 @@ public class ExternalReaderMessageTransport: BaseMessageTransport, @unchecked Se
         }
     }
 
-    override func close() {
+    override func close() async {
         self._running = false
     }
 }

@@ -17,6 +17,18 @@
 import Foundation
 import PklMessagePack
 import SemanticVersion
+
+#if canImport(Subprocess)
+import Subprocess
+
+// Match the module swift-subprocess uses for `FilePath`
+#if canImport(System)
+import System
+#else
+import SystemPackage
+#endif
+#endif
+
 #if os(Windows)
 import WinSDK.System
 
@@ -112,7 +124,7 @@ public actor EvaluatorManager {
 
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
-        #if os(macOS) || !canImport(Darwin)
+        #if canImport(Subprocess)
         self.init(transport: ServerMessageTransport())
         #else
         fatalError("cannot spawn pkl cli on this platform")
@@ -139,23 +151,22 @@ public actor EvaluatorManager {
     }
 
     /// Get the semantic version as a String of the Pkl interpreter being used.
-    func getVersion() throws -> String {
-        #if os(macOS) || !canImport(Darwin)
+    func getVersion() async throws -> String {
+        #if canImport(Subprocess)
         if let pklVersion {
             return pklVersion
         }
 
         let pklCommand = try getPklCommand()
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: pklCommand[0])
-        process.arguments = Array(pklCommand.dropFirst()) + ["--version"]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        debug("Spawning command \(pklCommand[0]) with arguments \(process.arguments!)")
-        try process.run()
-        guard let outputData = try pipe.fileHandleForReading.readToEnd(),
-              let output = String(data: outputData, encoding: .utf8)?.split(separator: " "),
-              output.count > 2,
+        let arguments = Array(pklCommand.dropFirst()) + ["--version"]
+        debug("Spawning command \(pklCommand[0]) with arguments \(arguments)")
+        let result = try await run(
+            .path(FilePath(pklCommand[0])),
+            arguments: Arguments(arguments),
+            output: .string(limit: 4096)
+        )
+        let output = result.standardOutput.split(separator: " ")
+        guard output.count > 2,
               output[0] == "Pkl" else {
             throw PklError("Could not get version from Pkl binary")
         }
@@ -304,7 +315,7 @@ public actor EvaluatorManager {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
-        let version = try SemanticVersion(getVersion())!
+        let version = try await SemanticVersion(getVersion())!
         guard options.http == nil || version >= pklVersion0_26 else {
             throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }
@@ -348,7 +359,7 @@ public actor EvaluatorManager {
                 source: .url(projectBaseURI.appendingPathComponent("PklProject")),
                 asType: Project.self
             )
-            let version = try SemanticVersion(getVersion())
+            let version = try await SemanticVersion(getVersion())
             let resolvedOptions = if version! < pklVersion0_32 {
                 options.withProjectLegacy(project)
             } else {
@@ -402,7 +413,7 @@ public actor EvaluatorManager {
             }
         }
         self.evaluators.removeAll()
-        self.transport.close()
+        await self.transport.close()
     }
 
     private func doAsk(

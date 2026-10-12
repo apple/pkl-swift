@@ -23,8 +23,8 @@ import "@com.github.actions/context.pkl"
 import "@pkl.impl.ghactions/jobs/HawkeyeCheck.pkl"
 import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
 
-local swiftImage = "swift:6.1-rhel-ubi9"
-local xcodeVersion = "26.1"
+local swiftImage = "swift:6.2-rhel-ubi9"
+local xcodeVersion = "26.6"
 local pklCurrent: String(semver.isValid(this)) = "0.32.0"
 local pklDistributions: Listing<String(semver.isValid(this))> = new {
   "0.25.3"

@@ -1,5 +1,5 @@
 {
-  "originHash" : "f72a559eb250064a744b5f88d8934d8535f186451dce8360872782a7369ef002",
+  "originHash" : "16569f020e774235d1cc3357f67a96044def6fbe1946744c1a9571f8755aef4a",
   "pins" : [
     {
       "identity" : "semanticversion",
@@ -25,6 +25,15 @@
       "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
       "state" : {
         "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swift-subprocess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-subprocess",
+      "state" : {
+        "revision" : "b3937ab85dd32f6e9435914599c1519074769c1a",
         "version" : "1.0.0"
       }
     },
