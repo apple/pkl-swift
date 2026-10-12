@@ -18,7 +18,7 @@
 import SemanticVersion
 import XCTest
 
-#if os(macOS) || os(Linux) || os(Windows)
+#if os(macOS) || !canImport(Darwin)
 class FixturesTest: XCTestCase {
     var manager: EvaluatorManager!
     var evaluator: Evaluator!

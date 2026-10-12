@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import WinSDK
 import Glibc
 #elseif canImport(Musl)
 import Musl
+#elseif canImport(Android)
+import Android
 #else
 #error("The concurrency PklLock module was unable to identify your C library.")
 #endif
@@ -44,6 +46,11 @@ import Musl
 #if os(Windows)
 @usableFromInline
 typealias LockPrimitive = SRWLOCK
+#elseif os(FreeBSD)
+// On FreeBSD, `pthread_mutex_t` is a pointer to an opaque struct.
+// The pthread APIs take it (and `pthread_mutexattr_t`) as an optional pointer.
+@usableFromInline
+typealias LockPrimitive = pthread_mutex_t?
 #else
 @usableFromInline
 typealias LockPrimitive = pthread_mutex_t
@@ -65,6 +72,19 @@ extension LockOperations {
 
         #if os(Windows)
         InitializeSRWLock(mutex)
+        #elseif os(FreeBSD)
+        var attr: pthread_mutexattr_t?
+        pthread_mutexattr_init(&attr)
+
+        debugOnly {
+            // `PTHREAD_MUTEX_ERRORCHECK` is imported as a C enum on FreeBSD.
+            pthread_mutexattr_settype(&attr, .init(PTHREAD_MUTEX_ERRORCHECK.rawValue))
+        }
+
+        let err = pthread_mutex_init(mutex, &attr)
+        // The attribute object is heap-allocated on FreeBSD, so it must be freed.
+        pthread_mutexattr_destroy(&attr)
+        precondition(err == 0, "\(#function) failed in pthread_mutex with error \(err)")
         #else
         var attr = pthread_mutexattr_t()
         pthread_mutexattr_init(&attr)

@@ -112,7 +112,7 @@ public actor EvaluatorManager {
 
     // note; when our C bindings are released, change `init()` based on compiler flags.
     public init() {
-        #if os(macOS) || os(Linux) || os(Windows)
+        #if os(macOS) || !canImport(Darwin)
         self.init(transport: ServerMessageTransport())
         #else
         fatalError("cannot spawn pkl cli on this platform")
@@ -140,7 +140,7 @@ public actor EvaluatorManager {
 
     /// Get the semantic version as a String of the Pkl interpreter being used.
     func getVersion() throws -> String {
-        #if os(macOS) || os(Linux) || os(Windows)
+        #if os(macOS) || !canImport(Darwin)
         if let pklVersion {
             return pklVersion
         }

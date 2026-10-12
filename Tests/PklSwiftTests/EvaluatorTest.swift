@@ -74,7 +74,7 @@ struct VirtualResourceReader: ResourceReader {
     }
 }
 
-#if os(macOS) || os(Linux) || os(Windows)
+#if os(macOS) || !canImport(Darwin)
 final class PklSwiftTests: XCTestCase {
     var manager: EvaluatorManager!
 

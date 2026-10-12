@@ -18,6 +18,28 @@ import Foundation
 import PklMessagePack
 import SemanticVersion
 
+// Foundation only re-exports the C library on some platforms, such as Darwin and Glibc.
+// Import it explicitly for `read`, `errno`, `kill`, and `SIGKILL`.
+// None of these are used on Windows.
+#if canImport(Darwin)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#elseif canImport(Musl)
+import Musl
+#elseif canImport(Android)
+import Android
+#endif
+
+#if !os(Windows)
+/// Calls the C library's `read`.
+///
+/// This lives at file scope so that the name `read` isn't shadowed by ``FileHandle/read(into:)``.
+private func posixRead(_ fd: Int32, _ buffer: UnsafeMutableRawPointer, _ count: Int) -> Int {
+    read(fd, buffer, count)
+}
+#endif
+
 protocol MessageTransport: Sendable {
     /// Send a message to the Pkl server.
     func send(_ message: ClientMessage) throws
@@ -41,21 +63,31 @@ extension Pipe: Reader {
 
 extension FileHandle: Reader {
     public func read(into: UnsafeMutableRawBufferPointer) throws -> Int {
+        guard let base = into.baseAddress else { return 0 }
+        var totalRead = 0
+        #if os(Windows)
+        // `FileHandle.fileDescriptor` is unavailable on Windows, so use the public API.
+        // Loop until all requested bytes are read or EOF.
+        while totalRead < into.count {
+            guard let data = try self.read(upToCount: into.count - totalRead), !data.isEmpty else { break }
+            data.copyBytes(to: UnsafeMutableRawBufferPointer(start: base + totalRead, count: data.count))
+            totalRead += data.count
+        }
+        #else
         // Read directly into the caller's buffer via POSIX read() to avoid
         // the per-call NSConcreteData allocation from NSFileHandle.read(upToCount:).
         // Loop until all requested bytes are read or EOF — short reads are
         // normal on pipes (e.g., the JVM writes through an 8 KB BufferedOutputStream).
-        guard let base = into.baseAddress else { return 0 }
         let fd = fileDescriptor
-        var totalRead = 0
         while totalRead < into.count {
-            let n = Foundation.read(fd, base + totalRead, into.count - totalRead)
+            let n = posixRead(fd, base + totalRead, into.count - totalRead)
             if n < 0 {
                 throw POSIXError(.init(rawValue: errno) ?? .EIO)
             }
             if n == 0 { break }
             totalRead += n
         }
+        #endif
         return totalRead
     }
 
@@ -143,7 +175,7 @@ public class BaseMessageTransport: MessageTransport, @unchecked Sendable {
 }
 
 /// A ``MessageTransport`` that sends and receives messages by spawning Pkl as a child process.
-#if os(macOS) || os(Linux) || os(Windows)
+#if os(macOS) || !canImport(Darwin)
 public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
     var process: Process?
     let pklCommand: [String]?
@@ -216,7 +248,7 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         guard let process = self.process else {
             return
         }
-        #if os(Linux)
+        #if !canImport(Darwin) && !os(Windows)
         // workaround: https://github.com/apple/swift-corelibs-foundation/issues/4772
         if process.isRunning {
             kill(process.processIdentifier, SIGKILL)
@@ -225,7 +257,7 @@ public class ServerMessageTransport: BaseMessageTransport, @unchecked Sendable {
         // Foundation's `Process.terminate()` raises `NSInvalidArgumentException`
         // ("task not launched") when the process was never successfully launched.
         // Guard on `isRunning` so a not-yet-launched (or already-exited) process
-        // is a no-op, matching the Linux branch above.
+        // is a no-op, matching the branch above.
         if process.isRunning {
             process.terminate()
         }
