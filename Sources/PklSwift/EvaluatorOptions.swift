@@ -159,7 +159,7 @@ extension EvaluatorOptions {
     ]
 
     public static var cacheDir: String {
-        #if os(macOS) || os(Linux) || os(Windows)
+        #if os(macOS) || !canImport(Darwin)
         resolvePaths(FileManager.default.homeDirectoryForCurrentUser.path, ".pkl/cache")
         #else
         resolvePaths(URL.cachesDirectory.path, ".pkl/cache")

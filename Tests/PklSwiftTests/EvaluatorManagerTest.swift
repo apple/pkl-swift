@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class FakeMessageTransport: MessageTransport, @unchecked Sendable {
     }
 }
 
-#if os(macOS) || os(Linux) || os(Windows)
+#if os(macOS) || !canImport(Darwin)
 class EvaluatorManagerTest: XCTestCase {
     func testConcurrentEvaluatorManagers() async throws {
         let manager1 = EvaluatorManager()
