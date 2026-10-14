@@ -19,6 +19,14 @@ amends "pkl:test"
 import "../internal/utils.pkl"
 
 facts {
+  ["file URI paths"] {
+    utils.toFileUri("/tmp/plain/settings.pkl") == "file:///tmp/plain/settings.pkl"
+    utils.toFileUri("/tmp/a b%#?/settings.pkl") == "file:///tmp/a%20b%25%23%3f/settings.pkl"
+    utils.toFileUri("/tmp/你好/settings.pkl") == "file:///tmp/%e4%bd%a0%e5%a5%bd/settings.pkl"
+    utils.toFileUri("C:/a b/settings.pkl") == "file:///C:/a%20b/settings.pkl"
+    utils.toFileUri("/tmp/a\\b/settings.pkl") == "file:///tmp/a%5cb/settings.pkl"
+  }
+
   ["normalizeName"] {
     utils.normalizeName("foo") == "foo"
     utils.normalizeName("foo foo") == "fooFoo"
