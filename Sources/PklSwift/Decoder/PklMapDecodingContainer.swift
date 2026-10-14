@@ -96,8 +96,7 @@ extension _PklDecoder {
                        let value = try _PklDecoder.decodePolymorphic(entry.value, codingPath: codingPath) {
                         return value as! T
                     }
-                    let decoder = try _PklDecoder(value: entry.value)
-                    return try T(from: decoder)
+                    return try _PklDecoder.decode(T.self, from: entry.value)
                 }
             }
             throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))

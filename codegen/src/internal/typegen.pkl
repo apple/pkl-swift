@@ -74,7 +74,9 @@ function generateDeclaredType(
     mapped?.type
       ?? mappedTypes.getOrNull(reflectee)
       ?? mappedHigherOrderTypes.getOrNull(reflectee)?.apply(type, enclosing, seenMappings)
-      ?? if (referent is reflect.TypeAlias)
+      ?? if (isUrl(referent))
+        urlType
+      else if (referent is reflect.TypeAlias)
         generateType(referent.referent, enclosing, seenMappings)
       else
         throw("Cannot generate type \(type.referent.name) as Swift.")
@@ -84,6 +86,14 @@ local function builtInType(typ: String): Type.Declared = new { typeName = typ }
 anyType: Type.Optional = new { elem = builtInType("AnyHashable") }
 
 local neverType: Type.Declared = builtInType("Never")
+
+local function isUrl(decl: reflect.TypeDeclaration): Boolean =
+  decl is reflect.Class && decl.enclosingDeclaration.uri == "pkl:net" && decl.name == "Url"
+
+local urlType: Type.Declared = new {
+  swiftModuleName = "Foundation"
+  typeName = "URL"
+}
 
 mappedTypes: Mapping<Class | TypeAlias, Type> = new {
   [Int] = new Type.Declared { typeName = "Int"; isNumeric = true }

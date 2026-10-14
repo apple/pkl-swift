@@ -86,6 +86,9 @@ The below table describes how Pkl types are mapped into Swift types.
 |`Duration`
 |`PklSwift.Duration`
 
+|`net.Url` footnote:[Introduced in Pkl 0.33.]
+|`Foundation.URL`
+
 |`IntSeq`
 |Not supported
 
