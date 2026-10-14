@@ -107,6 +107,9 @@ local generated: List<Gen>(hasUniqueNames()) =
 
 local topLevelContents = generated.mapNonNull((g) -> g.topLevelContents)
 
+local imports: List<String> =
+  (List("PklSwift") + generated.flatMap((g) -> g.imports)).distinct.sort()
+
 local convenienceLoaders =
   """
   /// Load the Pkl module at the given source and evaluate it into `\(namespaceName).Module`.
@@ -135,8 +138,7 @@ contents =
   new Listing {
     utils.renderHeaderComment(`module`)
     """
-    import PklSwift
-
+    \(utils.renderImports(imports))
     public enum \(namespaceName) {}
 
     """

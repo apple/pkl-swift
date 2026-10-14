@@ -138,9 +138,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
             }
             return result as! T
         }
-        let decoder = try _PklDecoder(value: value)
-        decoder.codingPath = self.codingPath
-        return try T(from: decoder)
+        return try _PklDecoder.decode(T.self, from: self.value, codingPath: self.codingPath)
     }
 
     private func decodeBinaryInteger<T>() throws -> T where T: BinaryInteger {

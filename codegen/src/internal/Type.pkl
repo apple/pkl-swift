@@ -22,7 +22,7 @@ import "Type.pkl"
 import "utils.pkl"
 
 /// The imports required by this type.
-imports: List<String>
+imports: List<String> = List()
 
 /// True if this type is polymorphic (a protocol, not a struct)
 isPolymorphic: Boolean = false
@@ -129,6 +129,8 @@ class Array extends Type {
 class Optional extends Type {
   elem: Type
 
+  imports = elem.imports
+
   isPolymorphic = elem.isPolymorphic
 
   isAny = elem.isAny
@@ -157,6 +159,8 @@ class Optional extends Type {
 
 class Tuple extends Type {
   members: Listing<Type>
+
+  imports = members.toList().flatMap((t) -> t.imports)
 
   isPolymorphic = members.toList().any((t) -> t.isPolymorphic)
 
@@ -191,6 +195,10 @@ class Declared extends Type {
 
   /// The type arguments, if any.
   typeArguments: List<Type>?
+
+  imports =
+    (if (swiftModuleName != null) List(swiftModuleName) else List())
+      + (typeArguments?.flatMap((t) -> t.imports) ?? List())
 
   isAny =
     typeName == "AnyHashable"

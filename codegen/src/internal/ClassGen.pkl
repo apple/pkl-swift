@@ -57,7 +57,7 @@ local properties: Map<String, Property> = getProperties(clazz, mappings)
 
 local hasAnyHashable: Boolean = properties.any((_, prop) -> prop.type.isAny)
 
-local imports: List<String> =
+imports =
   properties.values
     .flatMap((f) -> f.type.imports)
     .filter((i) -> i != classInfo.swiftModuleName)
