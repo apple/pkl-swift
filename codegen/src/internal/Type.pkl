@@ -203,6 +203,8 @@ class Declared extends Type {
       prefix
         + if (namespaceName != null && withinNamespace != this.namespaceName)
           "\(namespaceName).\(typeName)"
+        else if (namespaceName == null && swiftModuleName != null)
+          "\(swiftModuleName).\(typeName)"
         else
           typeName
 
@@ -216,12 +218,10 @@ class Declared extends Type {
     renderBase(withinNamespace) + renderTypeArguments(withinNamespace)
 
   function renderBaseGeneric(withinNamespace: String?) =
-    // Always qualify imported type names so we avoid conflicts.
-    let (name = if (this.isPolymorphic || isAny) "PklSwift.PklAny" else typeName)
-      if (!this.isPolymorphic && namespaceName != null && withinNamespace != this.namespaceName)
-        "\(namespaceName).\(name)"
-      else
-        name
+    if (this.isPolymorphic || isAny)
+      "PklSwift.PklAny"
+    else
+      renderBase(withinNamespace)
 
   function renderTypeArgumentsGeneric(withinNamespace: String?) =
     if (typeArguments == null)
@@ -233,8 +233,14 @@ class Declared extends Type {
     renderBaseGeneric(withinNamespace) + renderTypeArgumentsGeneric(withinNamespace)
 
   function renderEnumCaseName(withinNamespace: String?): Pair<String, String> =
+    // Runtime type qualification must not rename existing enum cases.
+    // OptionalDictionaryKey was already qualified before runtime types were.
     Pair(
-      utils.normalizeName(render(withinNamespace).replaceFirst(Regex("^any "), "")),
+      utils.normalizeName(
+        render(withinNamespace)
+          .replaceFirst(Regex("^any "), "")
+          .replaceAll(Regex(#"\bPklSwift\.(?!OptionalDictionaryKey\b)"#), ""),
+      ),
       "",
     )
 }

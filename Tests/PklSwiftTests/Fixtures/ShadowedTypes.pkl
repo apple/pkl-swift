@@ -1,0 +1,11 @@
+module ShadowedTypes
+
+import "../../../codegen/src/swift.pkl"
+
+alias: Alias = new {}
+
+@swift.Name { value = "TypeAlias" }
+class Alias {
+  value: TypeAlias = UInt
+  values: List<TypeAlias> = List(UInt)
+}

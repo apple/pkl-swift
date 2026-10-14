@@ -78,9 +78,9 @@ extension Classes {
         public var age: Int?
 
         /// How long the bug holds its breath for
-        public var holdsBreathFor: Duration
+        public var holdsBreathFor: PklSwift.Duration
 
-        public var size: DataSize
+        public var size: PklSwift.DataSize
 
         public var kind: BugKind
 
@@ -90,24 +90,24 @@ extension Classes {
 
         public var kind4: BugKindFour
 
-        public var bagOfStuff: Object
+        public var bagOfStuff: PklSwift.Object
 
-        public var bugClass: Class
+        public var bugClass: PklSwift.Class
 
-        public var bugTypeAlias: TypeAlias
+        public var bugTypeAlias: PklSwift.TypeAlias
 
         public init(
             owner: (any Person)?,
             age: Int?,
-            holdsBreathFor: Duration,
-            size: DataSize,
+            holdsBreathFor: PklSwift.Duration,
+            size: PklSwift.DataSize,
             kind: BugKind,
             kind2: BugKindTwo,
             kind3: BugKindThree,
             kind4: BugKindFour,
-            bagOfStuff: Object,
-            bugClass: Class,
-            bugTypeAlias: TypeAlias
+            bagOfStuff: PklSwift.Object,
+            bugClass: PklSwift.Class,
+            bugTypeAlias: PklSwift.TypeAlias
         ) {
             self.owner = owner
             self.age = age
@@ -157,15 +157,15 @@ extension Classes {
             let owner = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "owner"))
                 .value as! (any Person)?
             let age = try dec.decode(Int?.self, forKey: PklCodingKey(string: "age"))
-            let holdsBreathFor = try dec.decode(Duration.self, forKey: PklCodingKey(string: "holdsBreathFor"))
-            let size = try dec.decode(DataSize.self, forKey: PklCodingKey(string: "size"))
+            let holdsBreathFor = try dec.decode(PklSwift.Duration.self, forKey: PklCodingKey(string: "holdsBreathFor"))
+            let size = try dec.decode(PklSwift.DataSize.self, forKey: PklCodingKey(string: "size"))
             let kind = try dec.decode(BugKind.self, forKey: PklCodingKey(string: "kind"))
             let kind2 = try dec.decode(BugKindTwo.self, forKey: PklCodingKey(string: "kind2"))
             let kind3 = try dec.decode(BugKindThree.self, forKey: PklCodingKey(string: "kind3"))
             let kind4 = try dec.decode(BugKindFour.self, forKey: PklCodingKey(string: "kind4"))
-            let bagOfStuff = try dec.decode(Object.self, forKey: PklCodingKey(string: "bagOfStuff"))
-            let bugClass = try dec.decode(Class.self, forKey: PklCodingKey(string: "bugClass"))
-            let bugTypeAlias = try dec.decode(TypeAlias.self, forKey: PklCodingKey(string: "bugTypeAlias"))
+            let bagOfStuff = try dec.decode(PklSwift.Object.self, forKey: PklCodingKey(string: "bagOfStuff"))
+            let bugClass = try dec.decode(PklSwift.Class.self, forKey: PklCodingKey(string: "bugClass"))
+            let bugTypeAlias = try dec.decode(PklSwift.TypeAlias.self, forKey: PklCodingKey(string: "bugTypeAlias"))
             self = Bug(owner: owner, age: age, holdsBreathFor: holdsBreathFor, size: size, kind: kind, kind2: kind2, kind3: kind3, kind4: kind4, bagOfStuff: bagOfStuff, bugClass: bugClass, bugTypeAlias: bugTypeAlias)
         }
     }

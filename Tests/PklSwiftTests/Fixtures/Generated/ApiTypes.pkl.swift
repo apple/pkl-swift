@@ -7,28 +7,28 @@ extension ApiTypes {
     public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "ApiTypes"
 
-        public var res1: Duration
+        public var res1: PklSwift.Duration
 
-        public var res2: DataSize
+        public var res2: PklSwift.DataSize
 
-        public var stringClass: Class
+        public var stringClass: PklSwift.Class
 
-        public var baseModuleClass: Class
+        public var baseModuleClass: PklSwift.Class
 
-        public var uint8TypeAlias: TypeAlias
+        public var uint8TypeAlias: PklSwift.TypeAlias
 
-        public var fooClass: Class
+        public var fooClass: PklSwift.Class
 
-        public var barTypeAlias: TypeAlias
+        public var barTypeAlias: PklSwift.TypeAlias
 
         public init(
-            res1: Duration,
-            res2: DataSize,
-            stringClass: Class,
-            baseModuleClass: Class,
-            uint8TypeAlias: TypeAlias,
-            fooClass: Class,
-            barTypeAlias: TypeAlias
+            res1: PklSwift.Duration,
+            res2: PklSwift.DataSize,
+            stringClass: PklSwift.Class,
+            baseModuleClass: PklSwift.Class,
+            uint8TypeAlias: PklSwift.TypeAlias,
+            fooClass: PklSwift.Class,
+            barTypeAlias: PklSwift.TypeAlias
         ) {
             self.res1 = res1
             self.res2 = res2

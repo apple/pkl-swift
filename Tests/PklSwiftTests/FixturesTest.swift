@@ -86,6 +86,15 @@ class FixturesTest: XCTestCase {
         )
     }
 
+    func testEvaluateShadowedTypes() async throws {
+        let result = try await ShadowedTypes.loadFrom(
+            evaluator: self.evaluator,
+            source: .path("\(#filePath)/../Fixtures/ShadowedTypes.pkl")
+        )
+        XCTAssertEqual(result.alias.value, result.alias.values.first)
+        XCTAssertEqual(result.alias.values.count, 1)
+    }
+
     func testEvaluateApiTypes() async throws {
         let inputPath = "\(#filePath)/../Fixtures/ApiTypes.pkl"
         let result = try await ApiTypes.loadFrom(

@@ -38,24 +38,24 @@ extension Ref {
     public struct Module: PklRegisteredType, Decodable, Hashable, @unchecked Sendable {
         public static let registeredIdentifier: String = "Ref"
 
-        public var res0: Reference<D>
+        public var res0: PklSwift.Reference<D>
 
-        public var res1: Reference<D>
+        public var res1: PklSwift.Reference<D>
 
-        public var res2: Reference<D>
+        public var res2: PklSwift.Reference<D>
 
-        public var res3: Reference<D>
+        public var res3: PklSwift.Reference<D>
 
-        public var res4: Reference<D>
+        public var res4: PklSwift.Reference<D>
 
         public var res5: AnyHashable?
 
         public init(
-            res0: Reference<D>,
-            res1: Reference<D>,
-            res2: Reference<D>,
-            res3: Reference<D>,
-            res4: Reference<D>,
+            res0: PklSwift.Reference<D>,
+            res1: PklSwift.Reference<D>,
+            res2: PklSwift.Reference<D>,
+            res3: PklSwift.Reference<D>,
+            res4: PklSwift.Reference<D>,
             res5: AnyHashable?
         ) {
             self.res0 = res0
@@ -68,11 +68,11 @@ extension Ref {
 
         public init(from decoder: any Decoder) throws {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
-            let res0 = try dec.decode(Reference<D>.self, forKey: PklCodingKey(string: "res0"))
-            let res1 = try dec.decode(Reference<D>.self, forKey: PklCodingKey(string: "res1"))
-            let res2 = try dec.decode(Reference<D>.self, forKey: PklCodingKey(string: "res2"))
-            let res3 = try dec.decode(Reference<D>.self, forKey: PklCodingKey(string: "res3"))
-            let res4 = try dec.decode(Reference<D>.self, forKey: PklCodingKey(string: "res4"))
+            let res0 = try dec.decode(PklSwift.Reference<D>.self, forKey: PklCodingKey(string: "res0"))
+            let res1 = try dec.decode(PklSwift.Reference<D>.self, forKey: PklCodingKey(string: "res1"))
+            let res2 = try dec.decode(PklSwift.Reference<D>.self, forKey: PklCodingKey(string: "res2"))
+            let res3 = try dec.decode(PklSwift.Reference<D>.self, forKey: PklCodingKey(string: "res3"))
+            let res4 = try dec.decode(PklSwift.Reference<D>.self, forKey: PklCodingKey(string: "res4"))
             let res5 = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "res5"))
                 .value
             self = Module(res0: res0, res1: res1, res2: res2, res3: res3, res4: res4, res5: res5)
