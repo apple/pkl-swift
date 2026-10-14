@@ -28,4 +28,6 @@ typealiaz: reflect.TypeAlias = mapping.source as reflect.TypeAlias
 
 type: Type = typegen.generateType(typealiaz.referent, typealiaz, mappings)
 
+imports = type.imports
+
 contents = "public typealias \(mapping.name) = \(type.render(namespaceName))"

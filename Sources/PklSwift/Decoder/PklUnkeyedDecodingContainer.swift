@@ -97,7 +97,7 @@ extension _PklDecoder {
                let value = try _PklDecoder.decodePolymorphic(value, codingPath: codingPath) {
                 return value as! T
             }
-            return try T(from: _PklDecoder(value: value))
+            return try _PklDecoder.decode(T.self, from: value)
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<

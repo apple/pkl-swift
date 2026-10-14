@@ -32,6 +32,9 @@ contents: String
 /// Swift source code to be put outside the extension, at the top level
 topLevelContents: String?
 
+/// The Swift modules that the generated code needs to import
+imports: List<String> = List()
+
 /// The name of the namespace
 namespaceName: String
 

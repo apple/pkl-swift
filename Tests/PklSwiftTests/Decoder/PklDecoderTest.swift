@@ -14,8 +14,10 @@
 // limitations under the License.
 //===----------------------------------------------------------------------===//
 
+import Foundation
 import XCTest
 
+@testable import PklMessagePack
 @testable import PklSwift
 
 final class PklDecoderTests: XCTestCase {
@@ -110,5 +112,89 @@ final class PklDecoderTests: XCTestCase {
         ]
         let value = try PklDecoder.decode([UInt8].self, from: bytes)
         XCTAssertEqual(value, [1, 2, 3, 255])
+    }
+
+    private func pklUrl(_ stringValue: String) -> MessagePackValue {
+        .array([
+            .int(PklValueType.object.rawValue),
+            .string("pkl.net#Url"),
+            .string("pkl:net"),
+            .array([
+                .array([.int(PklValueType.objectMemberProperty.rawValue), .string("stringValue"), .string(stringValue)]),
+            ]),
+        ])
+    }
+
+    struct Site: Decodable, Equatable {
+        let homepage: URL
+        let mirrors: [URL]
+        let backup: URL?
+        let byName: [String: URL]
+    }
+
+    func testDecodeUrl() throws {
+        let value = try _PklDecoder.decode(URL.self, from: self.pklUrl("https://example.com/a%20b?q=1#top"))
+        XCTAssertEqual(value, URL(string: "https://example.com/a%20b?q=1#top")!)
+    }
+
+    func testDecodeUrlFromString() throws {
+        let value = try _PklDecoder.decode(URL.self, from: .string("https://example.com"))
+        XCTAssertEqual(value, URL(string: "https://example.com")!)
+    }
+
+    func testDecodeUrlProperties() throws {
+        let value: MessagePackValue = .array([
+            .int(PklValueType.object.rawValue),
+            .string("Site"),
+            .string("file:///site.pkl"),
+            .array([
+                .array([.int(PklValueType.objectMemberProperty.rawValue), .string("homepage"), self.pklUrl("https://example.com")]),
+                .array([
+                    .int(PklValueType.objectMemberProperty.rawValue),
+                    .string("mirrors"),
+                    .array([.int(PklValueType.list.rawValue), .array([self.pklUrl("https://a.example.com"), .string("https://b.example.com")])]),
+                ]),
+                .array([.int(PklValueType.objectMemberProperty.rawValue), .string("backup"), .nil]),
+                .array([
+                    .int(PklValueType.objectMemberProperty.rawValue),
+                    .string("byName"),
+                    .array([.int(PklValueType.mapping.rawValue), .map([(.string("a"), self.pklUrl("https://a.example.com"))])]),
+                ]),
+            ]),
+        ])
+        let site = try _PklDecoder.decode(Site.self, from: value)
+        XCTAssertEqual(site, Site(
+            homepage: URL(string: "https://example.com")!,
+            mirrors: [URL(string: "https://a.example.com")!, URL(string: "https://b.example.com")!],
+            backup: nil,
+            byName: ["a": URL(string: "https://a.example.com")!]
+        ))
+    }
+
+    func testDecodePolymorphicUrl() throws {
+        let value = try _PklDecoder.decodePolymorphic(self.pklUrl("https://example.com"), codingPath: [])
+        XCTAssertEqual(value?.value, URL(string: "https://example.com")! as AnyHashable)
+    }
+
+    func testDecodeEmptyUrl() throws {
+        XCTAssertThrowsError(try _PklDecoder.decode(URL.self, from: self.pklUrl(""))) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("Expected dataCorrupted, but got \(error)")
+            }
+        }
+    }
+
+    func testDecodeOtherObjectIntoUrl() throws {
+        let value: MessagePackValue = .array([
+            .int(PklValueType.object.rawValue),
+            .string("Site"),
+            .string("file:///site.pkl"),
+            .array([]),
+        ])
+        XCTAssertThrowsError(try _PklDecoder.decode(URL.self, from: value)) { error in
+            guard case DecodingError.typeMismatch = error else {
+                return XCTFail("Expected typeMismatch, but got \(error)")
+            }
+        }
     }
 }
