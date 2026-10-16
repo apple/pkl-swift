@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 //===----------------------------------------------------------------------===//
 // Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
@@ -38,6 +38,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
+        .package(url: "https://github.com/swiftlang/swift-subprocess", from: "1.0.0"),
         .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
         // to enable `swift package generate-documentation --target PklSwift`
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0"),
@@ -47,7 +48,13 @@ let package = Package(
     targets: [
         .target(
             name: "PklSwift",
-            dependencies: ["PklMessagePack", "PklSwiftInternals", "SemanticVersion"],
+            dependencies: [
+                "PklMessagePack", "PklSwiftInternals", "SemanticVersion",
+                .product(
+                    name: "Subprocess", package: "swift-subprocess",
+                    condition: .when(platforms: [.macOS, .linux, .windows, .android, .custom("freebsd")])
+                ),
+            ],
             swiftSettings: [.enableUpcomingFeature("StrictConcurrency")],
         ),
         .target(

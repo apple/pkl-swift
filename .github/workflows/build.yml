@@ -46,7 +46,7 @@ jobs:
         name: test-results-xml-test-pkl-0-25-3
         path: .out/test-results/**/*.xml
     container:
-      image: swift:6.1-rhel-ubi9
+      image: swift:6.2-rhel-ubi9
   test-pkl-0-32-0:
     name: Test Pkl 0.32.0
     runs-on: ubuntu-latest
@@ -83,15 +83,15 @@ jobs:
         name: test-results-xml-test-pkl-0-32-0
         path: .out/test-results/**/*.xml
     container:
-      image: swift:6.1-rhel-ubi9
+      image: swift:6.2-rhel-ubi9
   test-sim-ios-simulator:
     if: github.repository_owner == 'apple'
     runs-on:
     - self-hosted
     - macos
     env:
-      XCODE_VERSION: '26.1'
-      DEVELOPER_DIR: /Applications/Xcode_26.1.app
+      XCODE_VERSION: '26.6'
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app
     steps:
     - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       with:
@@ -119,8 +119,8 @@ jobs:
     - self-hosted
     - macos
     env:
-      XCODE_VERSION: '26.1'
-      DEVELOPER_DIR: /Applications/Xcode_26.1.app
+      XCODE_VERSION: '26.6'
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app
     steps:
     - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       with:
@@ -148,8 +148,8 @@ jobs:
     - self-hosted
     - macos
     env:
-      XCODE_VERSION: '26.1'
-      DEVELOPER_DIR: /Applications/Xcode_26.1.app
+      XCODE_VERSION: '26.6'
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app
     steps:
     - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       with:
@@ -177,8 +177,8 @@ jobs:
     - self-hosted
     - macos
     env:
-      XCODE_VERSION: '26.1'
-      DEVELOPER_DIR: /Applications/Xcode_26.1.app
+      XCODE_VERSION: '26.6'
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app
     steps:
     - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       with:
@@ -222,7 +222,7 @@ jobs:
         persist-credentials: false
     - run: make swiftformat-lint
     container:
-      image: swift:6.1-rhel-ubi9
+      image: swift:6.2-rhel-ubi9
   test-format-pkl:
     runs-on: ubuntu-latest
     steps:
