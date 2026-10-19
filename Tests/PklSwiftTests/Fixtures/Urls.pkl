@@ -1,0 +1,29 @@
+module Urls
+
+import "pkl:net"
+
+typealias AliasedUrl = net.Url
+
+typealias UrlOrInt = net.Url | Int
+
+absolute: net.Url = net.Url("https://user@example.com:8080/a b?q=1#frag")
+
+relative: net.Url = net.Url("../foo/bar")
+
+ipv6: net.Url = net.Url("http://[::1]:8080/")
+
+zoneId: net.Url = net.Url("http://[fe80::1%25eth0]/")
+
+nullable: net.Url? = null
+
+aliased: AliasedUrl = net.Url("https://example.com/aliased")
+
+list: List<net.Url> = List(net.Url("https://a.example.com"), net.Url("https://b.example.com"))
+
+mapping: Mapping<String, net.Url> = new {
+  ["a"] = net.Url("https://a.example.com")
+}
+
+union: UrlOrInt = net.Url("https://example.com/union")
+
+any: Any = net.Url("https://example.com/any")

@@ -141,7 +141,7 @@ extension PklDecoder {
     public static func decode<T>(_ type: T.Type, from bytes: [UInt8]) throws -> T where T: Decodable {
         let reader = BufferReader(bytes)
         let value = try MessagePackDecoder(reader: reader).decodeGeneric()
-        return try T(from: _PklDecoder(value: value))
+        return try _PklDecoder.decode(T.self, from: value)
     }
 }
 
@@ -189,6 +189,13 @@ final class _PklDecoder: Decoder {
 }
 
 extension _PklDecoder {
+    static func decode<T: Decodable>(_ type: T.Type, from value: MessagePackValue, codingPath: [CodingKey] = []) throws -> T {
+        if type == URL.self {
+            return try self.decodeURL(value, codingPath: codingPath) as! T
+        }
+        return try T(from: _PklDecoder(value: value, codingPath: codingPath))
+    }
+
     static func getNestedKeyedContainer<NestedKey>(
         keyedBy type: NestedKey.Type, value: MessagePackValue, codingPath: [CodingKey]
     ) throws -> KeyedDecodingContainer<NestedKey> {
@@ -247,6 +254,9 @@ extension _PklDecoder {
             switch type {
             case .object:
                 let tag = try value[1].decode(String.self)
+                if tag == pklNetUrlIdentifier {
+                    return try PklAny(value: self.decodeURL(propertyValue, codingPath: codingPath))
+                }
                 guard TypeRegistry.get().has(identifier: tag) else {
                     return nil
                 }

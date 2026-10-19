@@ -45,6 +45,8 @@ local enumBaseMembers: List<EnumMember> =
     type = typegen.generateType(it, module.mapping.source, module.mappings)
   })
 
+imports = enumBaseMembers.flatMap((it) -> it.type.imports)
+
 /// Appends a numeric suffix to `candidate` until it no longer collides with an
 /// already-assigned case name. Two distinct Pkl string values can normalize to the
 /// same Swift identifier (e.g. "beetle one" and "beetle_one" both -> "beetleOne");

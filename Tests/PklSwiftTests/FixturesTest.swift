@@ -297,5 +297,33 @@ class FixturesTest: XCTestCase {
             ]),
         ))
     }
+
+    func testUrls() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_33 {
+            throw XCTSkip("net.Url is not available")
+        }
+
+        let result = try await Urls.loadFrom(
+            evaluator: self.evaluator,
+            source: .path("\(#filePath)/../Fixtures/Urls.pkl")
+        )
+        XCTAssertEqual(result, .init(
+            absolute: URL(string: "https://user@example.com:8080/a%20b?q=1#frag")!,
+            relative: URL(string: "../foo/bar")!,
+            ipv6: URL(string: "http://[::1]:8080/")!,
+            zoneId: URL(string: "http://[fe80::1%25eth0]/")!,
+            nullable: nil,
+            aliased: URL(string: "https://example.com/aliased")!,
+            list: [URL(string: "https://a.example.com")!, URL(string: "https://b.example.com")!],
+            mapping: ["a": URL(string: "https://a.example.com")!],
+            union: .uRL(URL(string: "https://example.com/union")!),
+            any: URL(string: "https://example.com/any")!
+        ))
+        XCTAssertEqual(result.absolute.host, "example.com")
+        XCTAssertEqual(result.absolute.port, 8080)
+        XCTAssertEqual(result.absolute.path, "/a b")
+        XCTAssertEqual(result.zoneId.host, "fe80::1%eth0")
+    }
 }
 #endif
