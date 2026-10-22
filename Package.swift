@@ -37,7 +37,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
+        .package(url: "https://github.com/apple/swift-system", from: "1.7.0"),
         .package(url: "https://github.com/swiftlang/swift-subprocess", from: "1.0.0"),
         .package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.4.0"),
         // to enable `swift package generate-documentation --target PklSwift`
