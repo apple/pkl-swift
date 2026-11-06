@@ -32,17 +32,18 @@ import SystemPackage
 #if os(Windows)
 import WinSDK.System
 
-let ENV_SEPARATOR=";"
-let PKL_EXEC_NAME="pkl.exe"
+let ENV_SEPARATOR = ";"
+let PKL_EXEC_NAME = "pkl.exe"
 #else
-let ENV_SEPARATOR=":"
-let PKL_EXEC_NAME="pkl"
+let ENV_SEPARATOR = ":"
+let PKL_EXEC_NAME = "pkl"
 #endif
 /// Performs `action`, returns its result and then closes the manager.
 ///
 /// - Parameter action: The action to perform
 /// - Returns: The result of `action`
-public func withEvaluatorManager<T: Sendable>(_ action: (EvaluatorManager) async throws -> T) async rethrows -> T {
+public func withEvaluatorManager<T: Sendable>(_ action: (EvaluatorManager) async throws -> T)
+    async rethrows -> T {
     let manager: EvaluatorManager = .init()
     var closed = false
     do {
@@ -192,53 +193,62 @@ public actor EvaluatorManager {
                 handler.resume(returning: message)
             case let message as ReadModuleRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
-                    throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
+                    throw PklBugError.invalidEvaluatorId(
+                        "Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                self.handlerTasks.append(Task {
-                    do {
-                        try await evaluator.handleReadModuleRequest(request: message)
-                    } catch {
-                        await self.closeError(error: error)
-                    }
-                })
+                self.handlerTasks.append(
+                    Task {
+                        do {
+                            try await evaluator.handleReadModuleRequest(request: message)
+                        } catch {
+                            await self.closeError(error: error)
+                        }
+                    })
             case let message as ReadResourceRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
-                    throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
+                    throw PklBugError.invalidEvaluatorId(
+                        "Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                self.handlerTasks.append(Task {
-                    do {
-                        try await evaluator.handleReadResourceRequest(request: message)
-                    } catch {
-                        await self.closeError(error: error)
-                    }
-                })
+                self.handlerTasks.append(
+                    Task {
+                        do {
+                            try await evaluator.handleReadResourceRequest(request: message)
+                        } catch {
+                            await self.closeError(error: error)
+                        }
+                    })
             case let message as LogMessage:
                 guard let evaluator = evaluators[message.evaluatorId] else {
-                    throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
+                    throw PklBugError.invalidEvaluatorId(
+                        "Received request for unknown evaluator id \(message.evaluatorId)")
                 }
                 evaluator.handleLog(request: message)
             case let message as ListModulesRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
-                    throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
+                    throw PklBugError.invalidEvaluatorId(
+                        "Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                self.handlerTasks.append(Task {
-                    do {
-                        try await evaluator.handleListModulesRequest(request: message)
-                    } catch {
-                        await self.closeError(error: error)
-                    }
-                })
+                self.handlerTasks.append(
+                    Task {
+                        do {
+                            try await evaluator.handleListModulesRequest(request: message)
+                        } catch {
+                            await self.closeError(error: error)
+                        }
+                    })
             case let message as ListResourcesRequest:
                 guard let evaluator = evaluators[message.evaluatorId] else {
-                    throw PklBugError.invalidEvaluatorId("Received request for unknown evaluator id \(message.evaluatorId)")
+                    throw PklBugError.invalidEvaluatorId(
+                        "Received request for unknown evaluator id \(message.evaluatorId)")
                 }
-                self.handlerTasks.append(Task {
-                    do {
-                        try await evaluator.handleListResourcesRequest(request: message)
-                    } catch {
-                        await self.closeError(error: error)
-                    }
-                })
+                self.handlerTasks.append(
+                    Task {
+                        do {
+                            try await evaluator.handleListResourcesRequest(request: message)
+                        } catch {
+                            await self.closeError(error: error)
+                        }
+                    })
             default:
                 throw PklBugError.unknownMessage("Got request for unknown message: \(message)")
             }
@@ -246,7 +256,8 @@ public actor EvaluatorManager {
     }
 
     /// Convenience method for calling ``withEvaluator(_:)`` with preconfigured evaluator options.
-    public func withEvaluator<T: Sendable>(_ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withEvaluator<T: Sendable>(_ action: (Evaluator) async throws -> T) async throws
+        -> T {
         try await self.withEvaluator(options: .preconfigured, action)
     }
 
@@ -257,7 +268,9 @@ public actor EvaluatorManager {
     /// - Parameters:
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withEvaluator<T: Sendable>(options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
+    public func withEvaluator<T: Sendable>(
+        options: EvaluatorOptions, _ action: (Evaluator) async throws -> T
+    ) async throws -> T {
         let evaluator = try await newEvaluator(options: options)
         var closed = false
         do {
@@ -274,8 +287,12 @@ public actor EvaluatorManager {
     }
 
     /// Convenience method for constructing a project evaluator with preconfigured base options.
-    public func withProjectEvaluator<T: Sendable>(projectBaseURI: URL, _ action: (Evaluator) async throws -> T) async throws -> T {
-        try await self.withProjectEvaluator(projectBaseURI: projectBaseURI, options: .preconfigured, action)
+    public func withProjectEvaluator<T: Sendable>(
+        projectBaseURI: URL, _ action: (Evaluator) async throws -> T
+    ) async throws -> T {
+        try await self.withProjectEvaluator(
+            projectBaseURI: projectBaseURI, options: .preconfigured, action
+        )
     }
 
     /// Constructs an evaluator that is configured by the project within the project dir.
@@ -289,8 +306,12 @@ public actor EvaluatorManager {
     ///   - projectBaseURI: The project base path that contains the PklProject file.
     ///   - options: The options used to configure the evaluator.
     ///   - action: The action to run with the evaluator.
-    public func withProjectEvaluator<T: Sendable>(projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T) async throws -> T {
-        let evaluator = try await newProjectEvaluator(projectBaseURI: projectBaseURI, options: options)
+    public func withProjectEvaluator<T: Sendable>(
+        projectBaseURI: URL, options: EvaluatorOptions, _ action: (Evaluator) async throws -> T
+    ) async throws -> T {
+        let evaluator = try await newProjectEvaluator(
+            projectBaseURI: projectBaseURI, options: options
+        )
         var closed = false
         do {
             let result = try await action(evaluator)
@@ -319,8 +340,11 @@ public actor EvaluatorManager {
         guard options.http == nil || version >= pklVersion0_26 else {
             throw PklError("http options are not supported on Pkl versions lower than 0.26")
         }
-        guard (options.externalModuleReaders == nil && options.externalResourceReaders == nil) || version >= pklVersion0_27 else {
-            throw PklError("external reader options are not supported on Pkl versions lower than 0.27")
+        guard
+            (options.externalModuleReaders == nil && options.externalResourceReaders == nil)
+            || version >= pklVersion0_27 else {
+            throw PklError(
+                "external reader options are not supported on Pkl versions lower than 0.27")
         }
         let req = options.toMessage()
         guard let response = try await ask(req) as? CreateEvaluatorResponse else {
@@ -350,7 +374,8 @@ public actor EvaluatorManager {
     /// - Parameters:
     ///   - projectBaseURI: The project base path containing the `PklProject` file.
     ///   - options: The base options used to configure the evaluator.
-    public func newProjectEvaluator(projectBaseURI: URL, options: EvaluatorOptions) async throws -> Evaluator {
+    public func newProjectEvaluator(projectBaseURI: URL, options: EvaluatorOptions) async throws
+        -> Evaluator {
         if self.isClosed {
             throw PklError("The evaluator manager is closed")
         }
@@ -360,11 +385,12 @@ public actor EvaluatorManager {
                 asType: Project.self
             )
             let version = try await SemanticVersion(getVersion())
-            let resolvedOptions = if version! < pklVersion0_32 {
-                options.withProjectLegacy(project)
-            } else {
-                options.withProject(project)
-            }
+            let resolvedOptions =
+                if version! < pklVersion0_32 {
+                    options.withProjectLegacy(project)
+                } else {
+                    options.withProject(project)
+                }
             return try await self.newEvaluator(options: resolvedOptions)
         }
     }
@@ -380,7 +406,9 @@ public actor EvaluatorManager {
         guard !self.isClosed else { return }
         let inFlightCount = self.inFlightRequests.count
         let evaluatorCount = self.evaluators.count
-        debug("closeError triggered: \(error) (in-flight: \(inFlightCount), evaluators: \(evaluatorCount))")
+        debug(
+            "closeError triggered: \(error) (in-flight: \(inFlightCount), evaluators: \(evaluatorCount))"
+        )
         for (id, req) in self.inFlightRequests {
             self.inFlightRequests.removeValue(forKey: id)
             req.resume(throwing: error)
@@ -417,7 +445,8 @@ public actor EvaluatorManager {
     }
 
     private func doAsk(
-        _ message: ClientRequestMessage, _ onResponse: CheckedContinuation<ServerResponseMessage, Error>
+        _ message: ClientRequestMessage,
+        _ onResponse: CheckedContinuation<ServerResponseMessage, Error>
     ) throws {
         self.inFlightRequests[message.requestId] = onResponse
         try self.transport.send(message)
@@ -469,6 +498,7 @@ let pklVersion0_30 = SemanticVersion("0.30.0")!
 let pklVersion0_31 = SemanticVersion("0.31.0")!
 let pklVersion0_31_1 = SemanticVersion("0.31.1")!
 let pklVersion0_32 = SemanticVersion("0.32.0")!
+let pklVersion0_33 = SemanticVersion("0.33.0")!
 
 let supportedPklVersions = [
     pklVersion0_25,
@@ -479,4 +509,5 @@ let supportedPklVersions = [
     pklVersion0_30,
     pklVersion0_31,
     pklVersion0_32,
+    pklVersion0_33,
 ]
