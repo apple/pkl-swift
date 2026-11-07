@@ -25,7 +25,7 @@ import "@pkl.impl.ghactions/steps/SetupPkl.pkl"
 
 local swiftImage = "swift:6.2-rhel-ubi9"
 local xcodeVersion = "26.6"
-local pklCurrent: String(semver.isValid(this)) = "0.32.0"
+local pklCurrent: String(semver.isValid(this)) = "0.33.0"
 local pklDistributions: Listing<String(semver.isValid(this))> = new {
   "0.25.3"
   pklCurrent
@@ -316,14 +316,17 @@ codeql {
   }
 }
 
-workflows {
-  ["workflows/codeql.yml"] {
-    jobs {
-      ["analyze-swift"] {
-        `if` = "github.repository_owner == 'apple'"
-        `runs-on` {
-          "self-hosted"
-          "macos"
+output {
+  files {
+    ["workflows/codeql.yml"] {
+      value {
+        jobs {
+          ["analyze-swift"] {
+            `runs-on` {
+              // TODO remove me once codeql runs successfully on macOS 27
+              "tahoe"
+            }
+          }
         }
       }
     }

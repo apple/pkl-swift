@@ -2,7 +2,9 @@ module Ref
 
 import "pkl:ref"
 
-class D extends ref.Domain
+class D extends ref.AbstractDomain {
+  function renderReference(_) = TODO()
+}
 local d: D = new {}
 
 class A {
@@ -17,7 +19,7 @@ class MapKey {
 
 typealias MapKeyValue = String | Int
 
-res0: ref.Reference<D, A> = ref.Reference(d, A, "hi")
+res0: ref.Reference<D, A> = ref.Reference<D, A>(d, "hi")
 res1: ref.Reference<D, Int> = res0.foo
 res2: ref.Reference<D, Int> = res0.bar["hi"]
 res3: ref.Reference<D, Int> = res0.bar[null]
