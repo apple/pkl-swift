@@ -29,6 +29,7 @@ generate-fixtures: clean-fixtures
 .PHONY: test-snippets
 test-snippets:
 	./scripts/test-snippets.sh
+	./scripts/test-generator-settings.sh
 
 .PHONY: test-swift-lib
 test-swift-lib: generate-fixtures
