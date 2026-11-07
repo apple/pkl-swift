@@ -316,14 +316,17 @@ codeql {
   }
 }
 
-workflows {
-  ["workflows/codeql.yml"] {
-    jobs {
-      ["analyze-swift"] {
-        `if` = "github.repository_owner == 'apple'"
-        `runs-on` {
-          "self-hosted"
-          "macos"
+output {
+  files {
+    ["workflows/codeql.yml"] {
+      value {
+        jobs {
+          ["analyze-swift"] {
+            `runs-on` {
+              // TODO remove me once codeql runs successfully on macOS 27
+              "tahoe"
+            }
+          }
         }
       }
     }
