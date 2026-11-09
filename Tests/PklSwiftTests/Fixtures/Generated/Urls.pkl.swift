@@ -43,6 +43,8 @@ extension Urls {
 
         public var relative: URL
 
+        public var uri: URL
+
         public var ipv6: URL
 
         public var zoneId: URL
@@ -62,6 +64,7 @@ extension Urls {
         public init(
             absolute: URL,
             relative: URL,
+            uri: URL,
             ipv6: URL,
             zoneId: URL,
             nullable: URL?,
@@ -73,6 +76,7 @@ extension Urls {
         ) {
             self.absolute = absolute
             self.relative = relative
+            self.uri = uri
             self.ipv6 = ipv6
             self.zoneId = zoneId
             self.nullable = nullable
@@ -87,6 +91,7 @@ extension Urls {
             let dec = try decoder.container(keyedBy: PklCodingKey.self)
             let absolute = try dec.decode(URL.self, forKey: PklCodingKey(string: "absolute"))
             let relative = try dec.decode(URL.self, forKey: PklCodingKey(string: "relative"))
+            let uri = try dec.decode(URL.self, forKey: PklCodingKey(string: "uri"))
             let ipv6 = try dec.decode(URL.self, forKey: PklCodingKey(string: "ipv6"))
             let zoneId = try dec.decode(URL.self, forKey: PklCodingKey(string: "zoneId"))
             let nullable = try dec.decode(URL?.self, forKey: PklCodingKey(string: "nullable"))
@@ -96,7 +101,7 @@ extension Urls {
             let union = try dec.decode(UrlOrInt.self, forKey: PklCodingKey(string: "union"))
             let any = try dec.decode(PklSwift.PklAny.self, forKey: PklCodingKey(string: "any"))
                 .value
-            self = Module(absolute: absolute, relative: relative, ipv6: ipv6, zoneId: zoneId, nullable: nullable, aliased: aliased, list: list, mapping: mapping, union: union, any: any)
+            self = Module(absolute: absolute, relative: relative, uri: uri, ipv6: ipv6, zoneId: zoneId, nullable: nullable, aliased: aliased, list: list, mapping: mapping, union: union, any: any)
         }
     }
 

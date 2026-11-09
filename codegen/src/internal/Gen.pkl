@@ -33,7 +33,7 @@ contents: String
 topLevelContents: String?
 
 /// The Swift modules that the generated code needs to import
-imports: List<String> = List()
+imports: List<String>
 
 /// The name of the namespace
 namespaceName: String

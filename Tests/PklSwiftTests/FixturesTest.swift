@@ -311,6 +311,7 @@ class FixturesTest: XCTestCase {
         XCTAssertEqual(result, .init(
             absolute: URL(string: "https://user@example.com:8080/a%20b?q=1#frag")!,
             relative: URL(string: "../foo/bar")!,
+            uri: URL(string: "https://example.com/uri?a=1")!,
             ipv6: URL(string: "http://[::1]:8080/")!,
             zoneId: URL(string: "http://[fe80::1%25eth0]/")!,
             nullable: nil,

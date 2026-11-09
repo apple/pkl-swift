@@ -8,6 +8,8 @@ mirrors: Listing<net.Url>
 
 byName: Mapping<String, net.Url>
 
+uri: Uri
+
 aliased: UrlAlias
 
 either: UrlOrInt

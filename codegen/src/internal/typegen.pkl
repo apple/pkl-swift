@@ -111,6 +111,7 @@ mappedTypes: Mapping<Class | TypeAlias, Type> = new {
   [Null] = new Type.Declared { typeName = "Optional"; typeArguments = List(neverType) }
   [Any] = anyType
   [Char] = new Type.Declared { typeName = "Character" }
+  [Uri] = urlType
   [Duration] = new Type.Declared {
     swiftModuleName = "PklSwift"
     typeName = "Duration"

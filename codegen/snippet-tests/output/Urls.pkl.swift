@@ -47,6 +47,8 @@ extension Urls {
 
         public var byName: [String: URL]
 
+        public var uri: URL
+
         public var aliased: UrlAlias
 
         public var either: UrlOrInt
@@ -56,6 +58,7 @@ extension Urls {
             backup: URL?,
             mirrors: [URL],
             byName: [String: URL],
+            uri: URL,
             aliased: UrlAlias,
             either: UrlOrInt
         ) {
@@ -63,6 +66,7 @@ extension Urls {
             self.backup = backup
             self.mirrors = mirrors
             self.byName = byName
+            self.uri = uri
             self.aliased = aliased
             self.either = either
         }

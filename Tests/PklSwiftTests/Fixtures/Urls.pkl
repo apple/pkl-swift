@@ -10,6 +10,8 @@ absolute: net.Url = net.Url("https://user@example.com:8080/a b?q=1#frag")
 
 relative: net.Url = net.Url("../foo/bar")
 
+uri: Uri = "https://example.com/uri?a=1"
+
 ipv6: net.Url = net.Url("http://[::1]:8080/")
 
 zoneId: net.Url = net.Url("http://[fe80::1%25eth0]/")
