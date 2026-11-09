@@ -1,0 +1,17 @@
+import "pkl:net"
+
+homepage: net.Url
+
+backup: net.Url?
+
+mirrors: Listing<net.Url>
+
+byName: Mapping<String, net.Url>
+
+aliased: UrlAlias
+
+either: UrlOrInt
+
+typealias UrlAlias = net.Url
+
+typealias UrlOrInt = net.Url | Int
