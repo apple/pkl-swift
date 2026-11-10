@@ -92,12 +92,7 @@ extension _PklDecoder {
 
             let value = self.members![self.currentIndex]
 
-            // special case for polymorphic types
-            if type == PklAny.self,
-               let value = try _PklDecoder.decodePolymorphic(value, codingPath: codingPath) {
-                return value as! T
-            }
-            return try _PklDecoder.decode(T.self, from: value)
+            return try _PklDecoder.decode(T.self, from: value, codingPath: codingPath)
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<

@@ -190,6 +190,16 @@ final class _PklDecoder: Decoder {
 
 extension _PklDecoder {
     static func decode<T: Decodable>(_ type: T.Type, from value: MessagePackValue, codingPath: [CodingKey] = []) throws -> T {
+        // special case for polymorphic types
+        if type == PklAny.self {
+            guard let result = try self.decodePolymorphic(value, codingPath: codingPath) else {
+                throw DecodingError.typeMismatch(
+                    T.self,
+                    .init(codingPath: codingPath, debugDescription: "Tried to decode but got nil")
+                )
+            }
+            return result as! T
+        }
         if type == URL.self {
             return try self.decodeURL(value, codingPath: codingPath) as! T
         }

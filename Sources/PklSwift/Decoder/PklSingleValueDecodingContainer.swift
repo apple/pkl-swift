@@ -132,13 +132,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
     }
 
     func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
-        if type == PklAny.self {
-            guard let result = try _PklDecoder.decodePolymorphic(value, codingPath: codingPath) else {
-                throw DecodingError.typeMismatch(T.self, .init(codingPath: self.codingPath, debugDescription: "Tried to decode but got nil"))
-            }
-            return result as! T
-        }
-        return try _PklDecoder.decode(T.self, from: self.value, codingPath: self.codingPath)
+        try _PklDecoder.decode(T.self, from: self.value, codingPath: self.codingPath)
     }
 
     private func decodeBinaryInteger<T>() throws -> T where T: BinaryInteger {
