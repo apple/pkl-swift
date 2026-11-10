@@ -91,13 +91,7 @@ extension _PklDecoder {
         func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
             for entry in self.allEntries {
                 if entry.key.stringValue == key.stringValue { // TODO: not great, compare underlying value?
-                    // special case for polymorphic types
-                    if type == PklAny.self,
-                       let value = try _PklDecoder.decodePolymorphic(entry.value, codingPath: codingPath) {
-                        return value as! T
-                    }
-                    let decoder = try _PklDecoder(value: entry.value)
-                    return try T(from: decoder)
+                    return try _PklDecoder.decode(T.self, from: entry.value, codingPath: self.codingPath)
                 }
             }
             throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))

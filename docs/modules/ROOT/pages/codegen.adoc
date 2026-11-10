@@ -86,6 +86,12 @@ The below table describes how Pkl types are mapped into Swift types.
 |`Duration`
 |`PklSwift.Duration`
 
+|`net.Url` footnote:[Introduced in Pkl 0.33.]
+|`Foundation.URL`
+
+|`Uri` footnote:[Before Pkl 0.33, `Uri` is an unvalidated `String`. Decoding fails if the value is not accepted by `URL(string:)`.]
+|`Foundation.URL`
+
 |`IntSeq`
 |Not supported
 
