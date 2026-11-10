@@ -119,7 +119,7 @@ extension _PklDecoder {
                 throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
             }
 
-            return try _PklDecoder.decode(T.self, from: propertyValue, codingPath: codingPath)
+            return try _PklDecoder.decode(T.self, from: propertyValue, codingPath: self.codingPath)
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws

@@ -92,7 +92,7 @@ extension _PklDecoder {
 
             let value = self.members![self.currentIndex]
 
-            return try _PklDecoder.decode(T.self, from: value, codingPath: codingPath)
+            return try _PklDecoder.decode(T.self, from: value, codingPath: self.codingPath)
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<

@@ -131,7 +131,7 @@ class PklSingleValueDecodingContainer: SingleValueDecodingContainer {
         try self.decodeBinaryInteger()
     }
 
-    func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
+    func decode<T>(_: T.Type) throws -> T where T: Decodable {
         try _PklDecoder.decode(T.self, from: self.value, codingPath: self.codingPath)
     }
 

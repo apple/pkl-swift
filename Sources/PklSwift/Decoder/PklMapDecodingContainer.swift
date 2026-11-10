@@ -91,7 +91,7 @@ extension _PklDecoder {
         func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
             for entry in self.allEntries {
                 if entry.key.stringValue == key.stringValue { // TODO: not great, compare underlying value?
-                    return try _PklDecoder.decode(T.self, from: entry.value, codingPath: codingPath)
+                    return try _PklDecoder.decode(T.self, from: entry.value, codingPath: self.codingPath)
                 }
             }
             throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
