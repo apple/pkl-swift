@@ -315,20 +315,3 @@ codeql {
     }
   }
 }
-
-output {
-  files {
-    ["workflows/codeql.yml"] {
-      value {
-        jobs {
-          ["analyze-swift"] {
-            `runs-on` {
-              // TODO remove me once codeql runs successfully on macOS 27
-              "tahoe"
-            }
-          }
-        }
-      }
-    }
-  }
-}
