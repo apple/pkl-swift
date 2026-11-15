@@ -80,6 +80,12 @@ final class PklDecoderTests: XCTestCase {
         XCTAssertEqual(value, [1, 2, 3, 4])
     }
 
+    func testDecodeListingWithNegativeInts() throws {
+        let bytes: [UInt8] = [0x92, 0x04, 0x94, 0xFF, 0x02, 0xE0, 0x03]
+        let value = try PklDecoder.decode([Int].self, from: bytes)
+        XCTAssertEqual(value, [-1, 2, -32, 3])
+    }
+
     func testDecodeDataSize() throws {
         let bytes: [UInt8] = [
             0x93, 0x08, 0xCB, 0x40, 0x09, 0x21, 0xF9, 0xF0, 0x1B, 0x86, 0x6E, 0xA2, 0x6B, 0x62,
