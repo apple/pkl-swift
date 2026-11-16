@@ -311,7 +311,25 @@ codeql {
   scans {
     new {
       language = "swift"
-      buildMode = "autobuild"
+      buildMode = "manual"
+      // The CodeQL tracer runs under Rosetta, where `sandbox-exec` has no x86_64 slice.
+      buildScript = "swift build --disable-sandbox"
+    }
+  }
+}
+
+output {
+  files {
+    ["workflows/codeql.yml"] {
+      value {
+        jobs {
+          ["analyze-swift"] {
+            `runs-on` {
+              "goldengate"
+            }
+          }
+        }
+      }
     }
   }
 }
