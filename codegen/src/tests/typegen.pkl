@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ amends "pkl:test"
 
 import "pkl:reflect"
 
+import "../internal/Type.pkl"
 import "../internal/typegen.pkl"
 
 local class Maps {
@@ -64,7 +65,41 @@ local mod = reflect.Module(module).moduleClass
 
 local function generateType(typ: reflect.Type) = typegen.generateType(typ, mod, List()).render("")
 
+local importedType = new Type.Declared {
+  swiftModuleName = "PklSwift"
+  typeName = "TypeAlias"
+}
+
 facts {
+  ["imported types cannot be shadowed"] {
+    importedType.render("TypeAlias") == "PklSwift.TypeAlias"
+    importedType.renderGeneric("TypeAlias") == "PklSwift.TypeAlias"
+    importedType.renderEnumCaseName("TypeAlias").first == "TypeAlias"
+    new Type.Declared { typeName = "Set"; typeArguments = List(importedType) }
+      .renderEnumCaseName("Config")
+      .first == "SetTypeAlias"
+    ((importedType) { namespaceName = "Config"; swiftModuleName = "Custom" }).render("Config")
+      == "TypeAlias"
+    ((importedType) { namespaceName = "Config"; swiftModuleName = "Custom" }).renderGeneric("Other")
+      == "Config.TypeAlias"
+    ((importedType) { isPolymorphic = true }).render("TypeAlias") == "any PklSwift.TypeAlias"
+    ((importedType) { isPolymorphic = true }).renderGeneric("TypeAlias") == "PklSwift.PklAny"
+  }
+
+  ["generic enum case names preserve qualified dictionary keys"] {
+    new Type.Declared {
+      typeName = "Set"
+      typeArguments =
+        List(new Type.Dictionary {
+          key = new Type.Optional { elem = new Type.Declared { typeName = "String" } }
+          elem = new Type.Declared { typeName = "Bool" }
+          pklTypeName = "Map"
+        })
+    }
+      .renderEnumCaseName("Config")
+      .first == "SetPklSwiftOptionalDictionaryKeyStringBool"
+  }
+
   ["basic types"] {
     generateType(reflect.stringType) == "String"
     generateType(reflect.booleanType) == "Bool"
@@ -80,9 +115,9 @@ facts {
     generateType(reflect.anyType) == "AnyHashable?"
     generateType(reflect.DeclaredType(reflect.Class(Null))) == "Optional<Never>"
     generateType(reflect.DeclaredType(reflect.TypeAlias(Char))) == "Character"
-    generateType(reflect.dynamicType) == "Object"
-    generateType(reflect.durationType) == "Duration"
-    generateType(reflect.dataSizeType) == "DataSize"
+    generateType(reflect.dynamicType) == "PklSwift.Object"
+    generateType(reflect.durationType) == "PklSwift.Duration"
+    generateType(reflect.dataSizeType) == "PklSwift.DataSize"
     generateType(nothingType) == "Never"
   }
   ["dictionaries"] {
