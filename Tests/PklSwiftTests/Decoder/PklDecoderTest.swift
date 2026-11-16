@@ -1,5 +1,5 @@
 //===----------------------------------------------------------------------===//
-// Copyright © 2024-2025 Apple Inc. and the Pkl project authors. All rights reserved.
+// Copyright © 2024-2026 Apple Inc. and the Pkl project authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,6 +78,12 @@ final class PklDecoderTests: XCTestCase {
         let bytes: [UInt8] = [0x92, 0x04, 0x94, 0x01, 0x02, 0x03, 0x04]
         let value = try PklDecoder.decode([Int].self, from: bytes)
         XCTAssertEqual(value, [1, 2, 3, 4])
+    }
+
+    func testDecodeListingWithNegativeInts() throws {
+        let bytes: [UInt8] = [0x92, 0x04, 0x94, 0xFF, 0x02, 0xE0, 0x03]
+        let value = try PklDecoder.decode([Int].self, from: bytes)
+        XCTAssertEqual(value, [-1, 2, -32, 3])
     }
 
     func testDecodeDataSize() throws {

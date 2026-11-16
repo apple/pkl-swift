@@ -60,6 +60,12 @@ class MessagePackDecodingTests: XCTestCase {
         XCTAssertEqual(value, -1)
     }
 
+    func testDecodeArrayWithNegativeFixInt() throws {
+        let bytes: [UInt8] = [0x94, 0xFF, 0x02, 0xE0, 0x03]
+        let value = try decode([Int].self, from: bytes)
+        XCTAssertEqual(value, [-1, 2, -32, 3])
+    }
+
     func testDecodeUInt8() throws {
         let bytes: [UInt8] = [0xCC, 0xFF]
         let value = try decode(UInt8.self, from: bytes)

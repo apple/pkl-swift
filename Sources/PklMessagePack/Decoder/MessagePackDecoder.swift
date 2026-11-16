@@ -44,7 +44,7 @@ public final class MessagePackDecoder {
         case let c where c.isFixedMap(): fallthrough
         case .map16, .map32: return try MessagePackValue.map(self.decodeMapGeneric())
         case let c where c.isNegativeFixint():
-            return MessagePackValue.int(Int(exactly: Int8(bitPattern: code))!)
+            return try MessagePackValue.int(Int(Int8(bitPattern: self.readByte())))
         case .uint8: return try MessagePackValue.int(self.decodeUInt8())
         case .uint16: return try MessagePackValue.int(self.decodeUInt16())
         case .uint32: return try MessagePackValue.int(self.decodeUInt32())
