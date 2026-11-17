@@ -47,6 +47,9 @@ extension _PklDecoder {
             }
 
             if pklType == .bytes {
+                guard value.count > 1 else {
+                    throw error("Expected binary, but got only Bytes type marker")
+                }
                 guard case .bin(let bytes) = value[1] else {
                     throw error("Expected binary but got \(value[1].debugDataTypeDescription)")
                 }
@@ -56,7 +59,8 @@ extension _PklDecoder {
                     throw error("Expected either list, listing, or set, but got \(pklType)")
                 }
                 guard case .array(let members) = value[1] else {
-                    throw error("Expected an array at slot 2, but got \(value[1].debugDataTypeDescription)")
+                    throw error(
+                        "Expected an array at slot 2, but got \(value[1].debugDataTypeDescription)")
                 }
                 self.members = members
             } else {
@@ -100,11 +104,13 @@ extension _PklDecoder {
             return try T(from: _PklDecoder(value: value))
         }
 
-        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<
-            NestedKey
-        > where NestedKey: CodingKey {
+        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws
+            -> KeyedDecodingContainer<
+                NestedKey
+            > where NestedKey: CodingKey {
             if self.bytes != nil {
-                throw self.error("Cannot decode byte into \(type) because the decoded value is a byte array.")
+                throw self.error(
+                    "Cannot decode byte into \(type) because the decoded value is a byte array.")
             }
             defer { currentIndex += 1 }
             let value = self.members![self.currentIndex]
@@ -119,7 +125,9 @@ extension _PklDecoder {
 
         func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
             if self.bytes != nil {
-                throw self.error("Cannot create nested UnkeyedDecodingContainer; the decoded value is a byte array.")
+                throw self.error(
+                    "Cannot create nested UnkeyedDecodingContainer; the decoded value is a byte array."
+                )
             }
             defer { currentIndex += 1 }
             let value = self.members![self.currentIndex]
@@ -130,7 +138,8 @@ extension _PklDecoder {
             if case .array(let value) = value {
                 return try PklUnkeyedDecodingContainer(value: value, codingPath: nestedCodingPath)
             } else {
-                throw DecodingError.dataCorrupted(.init(codingPath: nestedCodingPath, debugDescription: ""))
+                throw DecodingError.dataCorrupted(
+                    .init(codingPath: nestedCodingPath, debugDescription: ""))
             }
         }
 
