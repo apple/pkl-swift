@@ -93,6 +93,42 @@ final class PklSwiftTests: XCTestCase {
         try await evaluator.close()
     }
 
+    func testEvaluateStringAsUrl() async throws {
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let output = try await evaluator.evaluateExpression(
+            source: .text(#"homepage = "https://example.com/a%20b""#),
+            expression: "homepage",
+            as: URL.self
+        )
+        XCTAssertEqual(output, URL(string: "https://example.com/a%20b")!)
+        try await evaluator.close()
+    }
+
+    func testEvaluateUrl() async throws {
+        let version = try await SemanticVersion(EvaluatorManager().getVersion())!
+        if version < pklVersion0_33 {
+            throw XCTSkip("net.Url is not available")
+        }
+        let evaluator = try await manager.newEvaluator(options: EvaluatorOptions.preconfigured)
+        let source = ModuleSource.text(
+            """
+            import "pkl:net"
+
+            homepage = net.Url("https://example.com/a b")
+            empty = net.Url("")
+            """
+        )
+        let output = try await evaluator.evaluateExpression(source: source, expression: "homepage", as: URL.self)
+        XCTAssertEqual(output, URL(string: "https://example.com/a%20b")!)
+        do {
+            _ = try await evaluator.evaluateExpression(source: source, expression: "empty", as: URL.self)
+            XCTFail("Expected an empty URL to fail decoding")
+        } catch DecodingError.dataCorrupted {
+            // expected
+        }
+        try await evaluator.close()
+    }
+
     func testEvaluateOutputBytes() async throws {
         let version = try await SemanticVersion(EvaluatorManager().getVersion())!
         if version < pklVersion0_29 {

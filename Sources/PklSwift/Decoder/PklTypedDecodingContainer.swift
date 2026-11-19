@@ -119,13 +119,7 @@ extension _PklDecoder {
                 throw DecodingError.keyNotFound(key, .init(codingPath: self.codingPath, debugDescription: "Missing key \(key)"))
             }
 
-            // special case for polymorphic types
-            if type == PklAny.self,
-               let value = try _PklDecoder.decodePolymorphic(propertyValue, codingPath: codingPath) {
-                return value as! T
-            }
-            let decoder = try _PklDecoder(value: propertyValue)
-            return try T(from: decoder)
+            return try _PklDecoder.decode(T.self, from: propertyValue, codingPath: self.codingPath)
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws
